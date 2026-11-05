@@ -37,6 +37,7 @@ import {
   Attachment,
   AutoTitle,
   BodyEditor,
+  revealAnchor,
 } from "./ui.jsx";
 function FormShell({ title, children, onSubmit, submit = t("儲存") }) {
   const [error, setError] = useState(""),
@@ -1013,7 +1014,10 @@ export function Dialog() {
       if (modal.draft) {
         el.querySelectorAll("details").forEach((detail, i) => { detail.open = Boolean(modal.draft.expanded[i]); });
         el.scrollTop = modal.draft.scroll;
+        const body = el.querySelector('[name="body"]');
+        if (body) body.scrollTop = modal.draft.bodyScroll || 0;
       } else el.scrollTop = 0;
+      if (modal.fragment && !revealAnchor(el, modal.fragment)) notify(t("找不到此文件段落。"), true);
     } else if (el.open) el.close();
   }, [modal?.key]);
   let content = null;

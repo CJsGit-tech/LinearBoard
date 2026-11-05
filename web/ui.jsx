@@ -373,4 +373,4 @@ export function AutoTitle({ value, label, ...props }) {
     />
   );
 }
-export { BodyEditor } from "./editor.jsx";
+export { BodyEditor, revealAnchor } from "./editor.jsx";

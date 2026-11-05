@@ -36,6 +36,7 @@ function captureObject() {
       preview: Boolean(form.querySelector('[name="body"]')?.hidden),
       comment: document.querySelector('#comment-form textarea, #doc-comment-form textarea')?.value || "",
       scroll: document.getElementById("dialog")?.scrollTop || 0,
+      bodyScroll: form.querySelector('[name="body"]')?.scrollTop || 0,
       expanded: Array.from(document.querySelectorAll('#dialog details'), (el) => el.open),
     },
   };
@@ -61,7 +62,8 @@ function restoreObject(modal) {
   S.project = modal.record.project_id || S.project;
   S.selected = modal.type === "issue" ? modal.record.id : null;
   if (modal.record.id) writeRoute(objectRoute(modal));
-  S.modal = { ...modal, key: ++modalSerial };
+  // A restored object returns to its captured scroll, not to the link that first opened it.
+  S.modal = { ...modal, fragment: "", key: ++modalSerial };
   render();
 }
 export function backObject() {
@@ -103,8 +105,13 @@ let workspaceContext = null;
 let detailRequest = 0;
 let retryNavigation = null;
 let requestedProject = null;
-const isRecordRoute = () =>
-  Boolean(location.hash.replace(/^#\//, "").split("/")[1]);
+// A record route may carry its own in-document fragment: #/documents/<id>#us-04
+function parseRoute(hash = location.hash) {
+  const [path, ...fragment] = hash.replace(/^#\//, "").split("#");
+  const [type, id] = path.split("/");
+  return { type, id, fragment: fragment.join("#") };
+}
+const isRecordRoute = () => Boolean(parseRoute().id);
 function workspaceRoute(context) {
   return context.page === "issues" && context.view !== "all"
     ? `#/views/${context.view}`
@@ -183,11 +190,11 @@ function closeDialog() {
     render();
   }
 }
-function enterDetail(type, id, projectId) {
+function enterDetail(type, id, projectId, fragment = "") {
   if (!isRecordRoute()) rememberWorkspace();
   workspaceContext ||=
     history.state?.linearboardWorkspace || fallbackWorkspace(type, projectId);
-  const hash = `#/${type}/${id}`;
+  const hash = `#/${type}/${id}` + (fragment ? `#${fragment}` : "");
   writeRoute(hash);
   return { request: ++detailRequest, hash };
 }
@@ -373,10 +380,10 @@ export async function openIssue(id, { fresh = true } = {}) {
       navigationFailure(error, () => openIssue(id));
   }
 }
-export async function openDocument(id, { fresh = true } = {}) {
+export async function openDocument(id, { fresh = true, fragment = "" } = {}) {
   if (isObject(S.modal)) S.modal = captureObject();
   const pending = id
-    ? enterDetail("documents", id, get("documents", id)?.project_id)
+    ? enterDetail("documents", id, get("documents", id)?.project_id, fragment)
     : navigationIntent();
   try {
     if (fresh && !(await refreshNavigation(pending))) return;
@@ -389,11 +396,13 @@ export async function openDocument(id, { fresh = true } = {}) {
     const history = id ? await api("history/" + id) : [];
     if (!isCurrentNavigation(pending)) return;
     S.selected = null;
-    const draft = returnedDrafts.get(`document:${id || `new:${S.project}`}`);
-    show(draft ? { ...draft, history } : { type: "document", record, history });
+    // Following a story link within the open document must not discard its unsaved edits.
+    const draft = returnedDrafts.get(`document:${id || `new:${S.project}`}`) ||
+      (fragment && S.modal?.type === "document" && S.modal.record.id === id ? S.modal : null);
+    show(draft ? { ...draft, history, fragment } : { type: "document", record, history, fragment });
   } catch (error) {
     if (isCurrentNavigation(pending))
-      navigationFailure(error, () => openDocument(id));
+      navigationFailure(error, () => openDocument(id, { fragment }));
   }
 }
 export async function persist(kind, record, data) {
@@ -618,7 +627,7 @@ async function routeHash({ fresh = true } = {}) {
   try {
     if (fresh && !(await refreshNavigation(pending))) return;
     applyProjectSelection();
-    const [type, id] = location.hash.replace(/^#\//, "").split("/");
+    const { type, id, fragment } = parseRoute();
     const saved = history.state?.linearboardWorkspace;
     if (type === "views" && id) {
       dismissDialog();
@@ -664,7 +673,7 @@ async function routeHash({ fresh = true } = {}) {
         S.page = type;
         render();
         if (type === "issues") await openIssue(id, { fresh: false });
-        else await openDocument(id, { fresh: false });
+        else await openDocument(id, { fresh: false, fragment });
         return;
       }
       dismissDialog();

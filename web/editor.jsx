@@ -68,6 +68,26 @@ function RichText({ value, onChange, label }) {
   </div>;
 }
 
+// Documents with explicit anchors open in the Markdown source editor, so an anchor is text, not an element.
+export function revealAnchor(dialog, anchor) {
+  const field = dialog.querySelector('textarea[name="body"]:not([hidden])');
+  const pattern = new RegExp(`<a\\s+id=["']${anchor.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["']\\s*>`);
+  const index = field ? field.value.search(pattern) : -1;
+  if (index < 0) return false;
+  const style = getComputedStyle(field), mirror = document.createElement("div"), marker = document.createElement("span");
+  for (const property of ["font", "letterSpacing", "wordSpacing", "tabSize", "padding"]) mirror.style[property] = style[property];
+  Object.assign(mirror.style, { position: "absolute", visibility: "hidden", top: "0", left: "0", boxSizing: "border-box",
+    width: field.clientWidth + "px", whiteSpace: "pre-wrap", overflowWrap: "break-word" });
+  mirror.textContent = field.value.slice(0, index);
+  mirror.append(marker);
+  dialog.append(mirror);
+  field.scrollTop = marker.offsetTop - parseFloat(style.paddingTop);
+  mirror.remove();
+  const head = dialog.querySelector(".dialog-head");
+  dialog.scrollTop += field.getBoundingClientRect().top - (head?.getBoundingClientRect().bottom ?? dialog.getBoundingClientRect().top);
+  return true;
+}
+
 export function BodyEditor({ value = "", document = false, initialPreview = true }) {
   const [body, setBody] = useState(value);
   const hasHtml = useMemo(() => {
