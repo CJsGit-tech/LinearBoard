@@ -2,6 +2,8 @@
 
 [English](README.md) · [繁體中文](README.zh-TW.md)
 
+**Hands-on 操作指南:** [English](docs/linearboard-guides/hands-on.en.html) · [繁體中文](docs/linearboard-guides/hands-on.zh-Hant.html)
+
 ## 靈感來自 Linear
 
 本應用程式與隨附的管理 skill，靈感來自 [Linear](https://linear.app) 組織產品工作的方式。LinearBoard 是獨立開發的本機工作區。

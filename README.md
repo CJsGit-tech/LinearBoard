@@ -2,6 +2,8 @@
 
 [English](README.md) · [繁體中文](README.zh-TW.md)
 
+**Hands-on guides:** [English](docs/linearboard-guides/hands-on.en.html) · [繁體中文](docs/linearboard-guides/hands-on.zh-Hant.html)
+
 ## Inspired by Linear
 
 This application and its companion management skill are inspired by [Linear](https://linear.app) and its approach to organizing product work. LinearBoard is developed independently as a standalone local workspace.
