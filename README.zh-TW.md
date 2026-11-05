@@ -112,6 +112,7 @@ Automation 可建立 draft／evidence 附件，不能核准視覺或把 issue �
 ```sh
 npm run build
 npm test
+npm run test:guide
 npm run test:ui
 npm run test:selects
 ```

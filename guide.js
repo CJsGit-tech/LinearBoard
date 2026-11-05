@@ -1,8 +1,174 @@
-function initializeLinearBoardGuide(){'use strict';const $=id=>document.getElementById(id),data=JSON.parse($('command-data').textContent);let toastTimer;function toast(s){$('toast').textContent=s;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').textContent='',3000)}
-document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',async()=>{const el=b.closest('.codebox').querySelector('code');try{if(!navigator.clipboard)throw new Error('clipboard unavailable');await navigator.clipboard.writeText(el.textContent);const prev=b.textContent;b.textContent='已複製';toast('已複製文字。貼到 Codex 並送出才會執行。');setTimeout(()=>b.textContent=prev,1800)}catch(e){const range=document.createRange();range.selectNodeContents(el);const s=window.getSelection();s.removeAllRanges();s.addRange(range);toast('指令已選取，請按 ⌘C／Ctrl+C 複製。')}}));
+function initializeLinearBoardGuide() {
+  'use strict';
+
+  const commands = JSON.parse(document.getElementById('command-data').textContent);
+  const $ = id => document.getElementById(id);
+  const escapeHTML = value => String(value).replace(/[&<>"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[char]));
+  const toast = message => {
+    $('toast').textContent = message;
+    clearTimeout(window.linearboardToast);
+    window.linearboardToast = setTimeout(() => $('toast').textContent = '', 1800);
+  };
+
+  const phaseSection = phase => {
+    if (phase === '起步') return 'start';
+    if (phase === '規劃') return 'planning';
+    if (phase === '需求') return 'requirements';
+    if (phase === '設計') return 'design';
+    if (phase === '維護') return 'maintenance';
+    return 'delivery';
+  };
+
+  const action = $('action');
+  const selectedAction = action.value || 'create-issues-FE';
+  action.replaceChildren();
+  $('catalog').replaceChildren();
+  document.querySelectorAll('[id^="commands-"]').forEach(container => container.replaceChildren());
+  commands.forEach(command => {
+    const option = document.createElement('option');
+    option.value = command.name;
+    option.textContent = `${command.name} · ${command.title}`;
+    if (command.name === selectedAction) option.selected = true;
+    action.append(option);
+
+    const row = document.createElement('tr');
+    row.dataset.phase = command.phase;
+    row.dataset.search = Object.values(command).join(' ').toLowerCase();
+    row.innerHTML = `<td><a href="#cmd-${escapeHTML(command.name)}"><code>${escapeHTML(command.name)}</code></a></td><td>${escapeHTML(command.title)}</td><td>${escapeHTML(command.effect)}</td><td>${escapeHTML(command.view)}</td><td><button type="button" class="use-command" data-command="${escapeHTML(command.name)}">組合 ↗</button></td>`;
+    $('catalog').append(row);
+
+    const card = document.createElement('article');
+    card.className = 'command';
+    card.id = `cmd-${command.name}`;
+    card.innerHTML = `
+      <div class="command-top"><div><span class="eyebrow">${escapeHTML(command.phase)}</span><h3>${escapeHTML(command.name)}</h3><p class="subtitle">${escapeHTML(command.title)}</p></div><span class="badge">${escapeHTML(command.effect)}</span></div>
+      <p>${escapeHTML(command.when)}</p>
+      <div class="codebox"><div class="code-toolbar"><span>CODEX PROMPT</span><button class="copy" type="button" data-copy="#example-${escapeHTML(command.name)}">複製</button></div><pre><code id="example-${escapeHTML(command.name)}">${escapeHTML(command.example)}</code></pre></div>
+      <dl><div><dt>先準備</dt><dd>${escapeHTML(command.input)}</dd></div><div><dt>會得到</dt><dd>${escapeHTML(command.output)}</dd></div><div><dt>怎麼確認</dt><dd>${escapeHTML(command.check)}</dd></div></dl>
+      <p class="boundary"><strong>邊界：</strong>${escapeHTML(command.limit)}</p>
+      <button type="button" class="compose-command" data-command="${escapeHTML(command.name)}">用這個指令組合範圍 ↗</button>`;
+    const target = command.name === 'organize-task-batch' ? $('commands-delivery') : command.name === 'dispatch' ? $('commands-execution') : $(`commands-${phaseSection(command.phase)}`);
+    target.append(card);
+  });
+
+  function build() {
+    const command = commands.find(item => item.name === action.value);
+    const project = $('project').value.trim() || '〈Project〉';
+    const milestone = $('milestone').value.trim() || '〈Milestone〉';
+    const scope = $('dispatchscope').value;
+    const ids = $('issueids').value.trim();
+    const batch = $('batch').value.trim();
+    const validBatch = /^[1-9]\d*$/.test(batch);
+    $('dispatch-scope-field').hidden = command.name !== 'dispatch';
+    $('batch-field').hidden = command.name !== 'dispatch' || scope !== 'batch';
+    $('issue-field').hidden = !(command.name === 'organize-task-batch' || (command.name === 'dispatch' && scope === 'issues'));
+    $('issue-label').textContent = command.name === 'organize-task-batch' ? 'Issue IDs（選填）' : 'Issue IDs（必填）';
+    $('debug-field').hidden = command.name !== 'debug';
+
+    let args = command.name === 'help' ? '' : ` ${project}`;
+    if (!['help', 'planning', 'create-vision-document', 'create-milestones'].includes(command.name)) args += ` ${milestone}`;
+    if (command.name === 'organize-task-batch' && ids) args += ` ${ids}`;
+    if (command.name === 'dispatch' && scope === 'batch') args += ` Batch ${validBatch ? batch : '〈批次編號〉'}`;
+    if (command.name === 'dispatch' && scope === 'issues') args += ` ${ids || '〈issue IDs〉'}`;
+    if (command.name === 'debug') args += ` ${$('debugsource').value.trim() || '〈Bugs 文件或 issue IDs〉'}`;
+    let prompt = `$linearboard ${command.name}${args}`;
+    const extra = $('additional').value.trim();
+    if (extra) prompt += `\n${extra}`;
+    $('built').textContent = prompt;
+    $('builder-help').textContent = `${command.effect} · ${command.when} ${command.limit}`;
+  }
+
+  ['action','project','milestone','dispatchscope','batch','issueids','debugsource','additional'].forEach(id => $(id).addEventListener('input', build));
+  build();
+
+  document.addEventListener('click', async event => {
+    const copy = event.target.closest('[data-copy]');
+    if (copy) {
+      const text = document.querySelector(copy.dataset.copy)?.textContent || '';
+      try { await navigator.clipboard.writeText(text); toast('已複製指令。'); }
+      catch { toast('瀏覽器未允許剪貼簿，請手動選取。'); }
+    }
+    const commandButton = event.target.closest('[data-command]');
+    if (commandButton) {
+      action.value = commandButton.dataset.command;
+      build();
+      location.hash = 'builder';
+      action.focus({preventScroll: true});
+    }
+  });
+
+  let activeStage = document.querySelector('[data-stage][aria-pressed="true"]')?.dataset.stage || '';
+  function filterCommands() {
+    const query = $('search').value.trim().toLowerCase();
+    let count = 0;
+    [...$('catalog').rows].forEach(row => {
+      const phase = row.dataset.phase;
+      const stageMatch = !activeStage || (activeStage === '交付' ? ['交付'].includes(phase) : phase === activeStage);
+      const visible = stageMatch && row.dataset.search.includes(query);
+      row.hidden = !visible;
+      if (visible) count += 1;
+    });
+    $('result-count').textContent = `${count} / ${commands.length} 個指令`;
+    $('search-empty').hidden = count !== 0;
+  }
+  $('search').addEventListener('input', filterCommands);
+  $('clear-search').addEventListener('click', () => {
+    $('search').value = '';
+    activeStage = '';
+    document.querySelectorAll('[data-stage]').forEach(item => item.setAttribute('aria-pressed', String(item.dataset.stage === '')));
+    filterCommands();
+    $('search').focus();
+  });
+  filterCommands();
+  document.querySelectorAll('[data-stage]').forEach(button => button.addEventListener('click', () => {
+    activeStage = button.dataset.stage;
+    document.querySelectorAll('[data-stage]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+    filterCommands();
+  }));
+
+  const menu = $('menu-toggle');
+  menu.addEventListener('click', () => {
+    const open = menu.getAttribute('aria-expanded') !== 'true';
+    menu.setAttribute('aria-expanded', String(open));
+    $('guide-nav').classList.toggle('is-open', open);
+  });
+  document.querySelectorAll('#guide-nav a').forEach(link => link.addEventListener('click', () => {
+    $('guide-nav').classList.remove('is-open');
+    menu.setAttribute('aria-expanded', 'false');
+  }));
+
+  const marks = [...document.querySelectorAll('[data-progress]')];
+  const savedControl = document.querySelector('[data-guide-offline]');
+  const progressKey = 'linearboard-guide-reading-v1';
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(progressKey) || '{}'); } catch {}
+  function updateProgress() {
+    const completed = marks.filter(mark => mark.checked).length;
+    $('progress').value = completed;
+    $('progress-label').textContent = `閱讀進度 ${completed} / ${marks.length}`;
+    const state = {};
+    marks.forEach(mark => state[mark.dataset.progress] = mark.checked);
+    try { localStorage.setItem(progressKey, JSON.stringify(state)); } catch {}
+  }
+  marks.forEach(mark => {
+    if (!savedControl) mark.checked = Boolean(saved[mark.dataset.progress]);
+    mark.addEventListener('change', updateProgress);
+  });
+  $('reset').addEventListener('click', () => { marks.forEach(mark => mark.checked = false); updateProgress(); toast('已重設閱讀進度；未修改 LinearBoard。'); });
+  updateProgress();
+
+  const navLinks = [...document.querySelectorAll('#guide-nav a')];
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      navLinks.forEach(link => link.classList.toggle('active', link.hash === `#${entry.target.id}`));
+    }), {rootMargin: '-8% 0px -70% 0px'});
+    document.querySelectorAll('main > section').forEach(section => observer.observe(section));
+  }
+
 // Export only this trusted runtime and the inert command data. The online page
 // keeps script-src self; each standalone download authorizes its exact script hash.
-const download=document.querySelector('a.download');
+const download=document.querySelector('a[download]');
 download.addEventListener('click',async event=>{
  event.preventDefault();
  try{
@@ -10,6 +176,7 @@ download.addEventListener('click',async event=>{
   const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(runtime));
   const hash=btoa(String.fromCharCode(...new Uint8Array(digest)));
   const copy=document.documentElement.cloneNode(true);
+  copy.setAttribute('data-guide-offline', 'true');
   const originals=[...document.querySelectorAll('input,select,textarea')];
   copy.querySelectorAll('input,select,textarea').forEach((control,index)=>{
    const original=originals[index];
@@ -24,7 +191,7 @@ download.addEventListener('click',async event=>{
   copy.querySelector('head').prepend(policy);
   copy.querySelectorAll('script').forEach(script=>{
    if(script.hasAttribute('data-guide-runtime')){script.removeAttribute('src');script.removeAttribute('defer');script.textContent=runtime;}
-   else if(script.id==='command-data')script.textContent=JSON.stringify(data).replaceAll('<','\\u003c').replaceAll('>','\\u003e').replaceAll('&','\\u0026');
+   else if(script.id==='command-data')script.textContent=JSON.stringify(commands).replaceAll('<','\\u003c').replaceAll('>','\\u003e').replaceAll('&','\\u0026');
    else script.remove();
   });
   copy.querySelector('a.download').setAttribute('href','#download');
@@ -37,43 +204,6 @@ download.addEventListener('click',async event=>{
   else toast('此瀏覽器無法匯出離線 HTML，請使用支援 Web Crypto 的瀏覽器。');
  }
 });
-const inputs=['action','project','milestone','dispatchscope','batch','issueids','debugsource','additional'];
-function build(){
- const name=$('action').value,p=$('project').value.trim()||'〈Project〉',m=$('milestone').value.trim()||'〈Milestone〉',c=data.find(x=>x.name===name);
- const mode=$('dispatchscope').value,ids=$('issueids').value.trim(),batch=$('batch').value.trim();
- const validBatch=/^[1-9]\d*$/.test(batch);
- $('dispatch-scope-field').hidden=name!=='dispatch';
- $('batch-field').hidden=name!=='dispatch'||mode!=='batch';
- $('issue-field').hidden=!(name==='organize-task-batch'||name==='dispatch'&&mode==='issues');
- $('issue-label').textContent=name==='dispatch'?'Issue IDs（必填；不會自動擴成里程碑）':'Issue IDs（分批選填；留空＝里程碑 FE／BE）';
- $('debug-field').hidden=name!=='debug';
- let arg=name==='help'?'':p+' '+m;
- if(name==='organize-task-batch'&&ids)arg+=' '+ids;
- if(name==='dispatch'&&mode==='batch')arg+=' Batch '+(validBatch?batch:'〈批次編號〉');
- if(name==='dispatch'&&mode==='issues')arg+=' '+(ids||'〈issue IDs〉');
- if(name==='debug')arg+=' '+($('debugsource').value.trim()||'〈LinearBoard 回報文件 URL 或來源 issue IDs〉');
- let text='$linearboard '+name+(arg?' '+arg:'');
- if(name==='create-issues-FE')text+='\n'+c.extended.replaceAll('PocketMap',p).replaceAll('M1',m);
- else if(name==='create-issues-BE'){
-  text+='\n根據既有 US、PRDs 與已確認的資料／服務範圍建立或重用 BE issues。由 agent 先查核現有服務、相依套件與官方 SDK／API 文件，選用符合平台與資料邊界的技術。保留原生 '+m+'、'+m+'＋所有來源 US labels、Category BackEnd 及 Coder；共用契約指定負責票，選型依據、限制、待驗證項目與相依寫入 tickets，建立或重用團隊 Issues 上方的 '+p+'-BE View，不 dispatch。';
-  if(p==='PocketMap'&&m==='M1')text+='\nPocketMap M1 的 BE 為 App 內資料／服務，不新增伺服器或帳號。';
- }else if(name==='frd')text+='\n'+c.extended;
- else if(name==='create-visuals')text+='\n先確認視覺方向，再使用 imagegen 產生指定畫面與狀態供我審閱。';
- else if(name==='dispatch'){
-  text+='\n'+(mode==='batch'?'只執行既有分批提案中指定 Batch 的確切 IDs；定義缺失或衝突先釐清，不重新分組或擴成整個里程碑。':mode==='issues'?'只執行以上指定 IDs；空白時先補齊，不自動改派整個里程碑。':c.extended.replaceAll('M1',m));
-  if(mode!=='milestone')text+='\n先核對原生 milestone、相依與現有派工，列出本次 IDs、排除原因及主 App 執行目標。最多三位 active worker，責任不重疊；計畫、技術決策與獨立驗證由 TPM 寫回各票。';
-  text+='\n從主 App 正常入口驗證整合與資料結果，說明應 Build／Run 的主 scheme 或服務目標。診斷畫面不代替整合驗證；可交審工作 In Review，Done 留給使用者。';
- }else if(name==='organize-task-batch'||name==='sync'||name==='debug')text+='\n'+c.extended;
- const extra=$('additional').value.trim();if(extra)text+='\n'+extra;
- $('built').textContent=text;
- const dispatchHelp=mode==='batch'?(validBatch?'需有既有 Batch 定義；不會自行選取整個里程碑。':'請填正整數 Batch 編號並確認既有定義。'):mode==='issues'?(ids?'只處理指定 IDs。':'請填實際 issue IDs，不會自動擴張範圍。'):'會完整盤點里程碑 FE／BE，先列出可派工、排除與未就緒項目。';
- $('builder-help').textContent=c.effect+' · '+c.when+' '+(name==='help'?'':name==='organize-task-batch'?'只提供分批建議，不修改 Linear 或派工。':name==='dispatch'?dispatchHelp:name==='debug'?($('debugsource').value.trim()?'預設包含指定回報的建票、修復、獨立驗證與來源回覆；只建票請明確註明。':'先填入實際問題來源再送出；不會自動把整個里程碑當成修復範圍。'):name==='planning'?'規劃預設只討論，保存需明確要求。':'送出後會依指令範圍建立或更新產出。');
-}
-inputs.forEach(id=>$(id).addEventListener('input',build));build();
-let activeStage=document.querySelector('[data-stage][aria-pressed="true"]')?.dataset.stage||'';function filterCommands(){const q=$('search').value.trim().toLowerCase();let n=0;document.querySelectorAll('#catalog tbody tr').forEach(r=>{const hay=r.dataset.search.toLowerCase(),name=r.querySelector('code').textContent,cmd=data.find(c=>c.name===name);const stageOK=!activeStage||(activeStage==='交付'?['開發拆票','交付規劃','交付'].includes(cmd.phase):cmd.phase===activeStage);const ok=hay.includes(q)&&stageOK;r.hidden=!ok;if(ok)n++});$('result-count').textContent=n+' / '+data.length+' 個指令';$('search-empty').hidden=n!==0} filterCommands(); $('search').addEventListener('input',filterCommands);document.querySelectorAll('[data-stage]').forEach(b=>b.addEventListener('click',()=>{activeStage=b.dataset.stage;document.querySelectorAll('[data-stage]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));filterCommands()}));$('clear-search').addEventListener('click',()=>{$('search').value='';activeStage='';document.querySelectorAll('[data-stage]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.stage==='')));filterCommands();$('search').focus()});
-function composeCommand(name){$('action').value=name;build();location.hash='builder';$('action').focus({preventScroll:true})}document.querySelectorAll('[data-command]').forEach(b=>b.addEventListener('click',()=>composeCommand(b.dataset.command)));
-$('menu-toggle').addEventListener('click',()=>{const open=$('menu-toggle').getAttribute('aria-expanded')!=='true';$('menu-toggle').setAttribute('aria-expanded',String(open));$('guide-nav').classList.toggle('is-open',open)});document.querySelectorAll('#guide-nav a').forEach(a=>a.addEventListener('click',()=>{$('guide-nav').classList.remove('is-open');$('menu-toggle').setAttribute('aria-expanded','false')}));
-const marks=[...document.querySelectorAll('[data-progress]')],key='linearboard-guide-reading-v1';let stored={};try{stored=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}function progress(){const n=marks.filter(c=>c.checked).length;$('progress').value=n;$('progress-label').textContent='閱讀進度 '+n+' / '+marks.length;const saved={};marks.forEach(c=>saved[c.dataset.progress]=c.checked);try{localStorage.setItem(key,JSON.stringify(saved))}catch(e){}}marks.forEach(c=>{c.checked=!!stored[c.dataset.progress];c.addEventListener('change',progress)});$('reset').addEventListener('click',()=>{marks.forEach(c=>c.checked=false);progress();toast('已重設閱讀進度；未修改 LinearBoard。')});progress();
-const links=[...document.querySelectorAll('nav a')];if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{for(const e of entries)if(e.isIntersecting)links.forEach(a=>(a.classList.toggle('active',a.hash==='#'+e.target.id),a.hash==='#'+e.target.id?a.setAttribute('aria-current','location'):a.removeAttribute('aria-current')))},{rootMargin:'-5% 0px -65% 0px',threshold:0});document.querySelectorAll('main>section').forEach(s=>observer.observe(s))}
+
 }
 initializeLinearBoardGuide();

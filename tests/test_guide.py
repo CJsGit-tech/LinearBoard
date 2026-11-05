@@ -14,7 +14,6 @@ import unittest
 from unittest.mock import patch
 
 import server
-from linearboard.contracts import capabilities
 
 
 class GuideHTML(HTMLParser):
@@ -120,7 +119,7 @@ class GuideRouteTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertIn('javascript', headers['Content-Type'])
         self.assertEqual(raw, (server.ROOT / 'guide.js').read_bytes())
-        for behavior in ['function build()', 'function filterCommands()', 'navigator.clipboard.writeText', "$('menu-toggle')", "$('reset')", "localStorage.setItem", "composeCommand", 'URL.createObjectURL']:
+        for behavior in ['function build()', 'function filterCommands()', 'navigator.clipboard.writeText', "$('menu-toggle')", "$('reset')", "localStorage.setItem", 'URL.createObjectURL']:
             with self.subTest(behavior=behavior):
                 self.assertIn(behavior, raw.decode())
 
@@ -130,30 +129,32 @@ class GuideRouteTests(unittest.TestCase):
         self.assertNotIn('window.print', (server.ROOT / 'guide.js').read_text())
         self.assertNotIn('print', GuideHTML(server.offline_guide()).ids)
 
-    def test_all_sixteen_commands_have_catalog_composer_and_teaching_content(self):
+    def test_current_skill_commands_have_complete_teaching_data(self):
         html = (server.ROOT / 'linearboard-guide.html').read_text()
         page = GuideHTML(html)
-        expected = {command['command'] for command in capabilities()['commands']}
-        names = [command['name'] for command in page.command_data()]
-        self.assertEqual(len(expected), 16)
-        self.assertEqual(len(names), 16)
+        skill = (server.ROOT / 'skills/linearboard/SKILL.md').read_text()
+        router = skill.split('## Commands\n')[1].split('Technology lookup')[0]
+        expected = {match.split()[0] for match in re.findall(r'^- `([^`]+)`', router, re.M)}
+        # FE and BE share a router bullet but remain separate commands.
+        self.assertIn('`create-issues-BE`', router)
+        expected.add('create-issues-BE')
+        data = page.command_data()
+        names = [command['name'] for command in data]
+        self.assertEqual(len(names), len(set(names)))
         self.assertEqual(set(names), expected)
-        self.assertEqual(set(page.action_values), expected)
-        self.assertEqual(set(page.catalog_links), {'#cmd-' + name for name in expected})
-        self.assertTrue({'cmd-' + name for name in expected}.issubset(page.ids))
-        self.assertEqual(set(page.command_buttons), expected)
-        self.assertIn('#cmd-frd', page.nav_links)
-        self.assertIn('16 個教學指令', html)
-        self.assertIn('16 / 16 個指令', html)
-        self.assertNotIn('15 個教學指令', html)
-        frd = next(command for command in page.command_data() if command['name'] == 'frd')
-        self.assertIn('Project Document', frd['output'])
-        self.assertIn('FR-*', frd['output'])
-        self.assertIn('US', frd['output'])
-        self.assertIn('PRD', frd['output'])
-        self.assertIn('驗證方法', frd['check'])
-        self.assertIn('不 dispatch', frd['extended'])
-        self.assertIn("name==='frd'", (server.ROOT / 'guide.js').read_text())
+        for command in data:
+            with self.subTest(command=command['name']):
+                for field in ['title', 'phase', 'effect', 'view', 'when', 'input', 'output', 'check', 'example', 'limit']:
+                    self.assertTrue(command[field].strip(), field)
+                self.assertTrue(command['example'].startswith('$linearboard ' + command['name']))
+        self.assertIn(f'{len(expected)} 個主要指令', html)
+        self.assertIn(f'{len(expected)} / {len(expected)} 個指令', html)
+        # Story creation is now part of the milestone document, not a new issue stage.
+        milestones = next(command for command in data if command['name'] == 'create-milestones')
+        self.assertIn('User Stories', milestones['output'])
+        self.assertIn('不建立 UserStory issues 或 View', milestones['limit'])
+        self.assertNotIn('create-userstories', names)
+        self.assertNotIn('frd', names)
 
     def test_debug_contract_requires_bugs_document_before_fix_and_document_results(self):
         html = (server.ROOT / 'linearboard-guide.html').read_text()
@@ -161,9 +162,9 @@ class GuideRouteTests(unittest.TestCase):
         self.assertLess(debug['output'].index('Bugs Project Document'), debug['output'].index('FIX'))
         for requirement in ['Datetime', 'User Report', 'bullet', '原生結果留言', 'issue-only']:
             self.assertIn(requirement, ' '.join(debug.values()))
-        self.assertIn('不以 issue 留言替代文件結果', debug['extended'])
+        self.assertIn('不以 issue 留言替代文件結果', debug['check'])
         self.assertIn('先保存原始回報', html)
-        self.assertIn('每張 FIX 指明 Bugs 文件、Datetime 批次與 bullet', html)
+        self.assertIn('每張 FIX 指回正確 report batch／bullet', debug['check'])
         self.assertIn('在 Bugs 文件回寫結果', html)
         self.assertNotIn('若來源只有 issue，則回覆來源 issue', html)
 

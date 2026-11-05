@@ -308,7 +308,7 @@
     <div class="topline">
       <span>Standalone local app / 以 PocketScheduler M1 示範</span>
       <div class="page-tools">
-        <a href="linearboard-guide.html" download>下載 HTML</a>
+        <a class="download" href="guide/download" download>下載 HTML</a>
         <a class="app-link" href="http://127.0.0.1:8765" target="_blank" rel="noopener">開啟 LinearBoard ↗</a>
       </div>
     </div>
@@ -332,9 +332,9 @@
     </header>
 
     <div class="meta">
-      <span><i class="status-dot"></i>15 個主要指令</span>
+      <span><i class="status-dot"></i>14 個主要指令</span>
       <span>預設服務：http://127.0.0.1:8765</span>
-      <span>更新：2026-11-03</span>
+      <span>更新：2026-11-05</span>
       <span>可離線閱讀</span>
     </div>
 
@@ -350,9 +350,8 @@
             <label>Milestone<input id="milestone" value="M1" maxlength="40" autocomplete="off"></label>
             <label id="dispatch-scope-field" hidden>派工範圍
               <select id="dispatchscope">
-                <option value="milestone">里程碑內所有就緒 FE／BE</option>
-                <option value="batch">既有 Batch</option>
                 <option value="issues">指定 issue IDs</option>
+                <option value="batch">既有 Batch</option>
               </select>
             </label>
             <label id="batch-field" hidden>Batch 編號<input id="batch" type="number" min="1" step="1" value="1"></label>
@@ -386,7 +385,8 @@
       </div>
       <label class="sr-only" for="search">搜尋指令</label>
       <input id="search" type="search" placeholder="搜尋 FE、PRD、設計、派工、debug…" autocomplete="off">
-      <p class="table-count" id="result-count">15 / 15 個指令</p>
+      <button type="button" id="clear-search">清除搜尋與階段篩選</button>
+      <p class="table-count" id="result-count">14 / 14 個指令</p>
       <div class="table-scroll">
         <table>
           <thead><tr><th>指令</th><th>用途</th><th>效果</th><th>Saved View</th><th><span class="sr-only">組合</span></th></tr></thead>
@@ -396,7 +396,7 @@
       <p id="search-empty" hidden>沒有符合的指令。</p>
       <details>
         <summary>既有別名</summary>
-        <p><code>user-stories</code>／<code>stories</code> → <code>create-userstories</code>；<code>create-prds</code>／<code>prd</code> → <code>create-PRDs</code>；<code>prototype-ui*</code> → <code>create-designs</code>；<code>build-ui*</code> → <code>create-issues-FE</code>；<code>create-issues-be</code> → <code>create-issues-BE</code>。</p>
+        <p><code>create-userstories</code>／<code>user-stories</code>／<code>stories</code> → <code>create-milestones</code>；<code>create-prds</code>／<code>prd</code> → <code>create-PRDs</code>；<code>prototype-ui*</code> → <code>create-designs</code>；<code>build-ui*</code> → <code>create-issues-FE</code>；<code>create-issues-be</code> → <code>create-issues-BE</code>。</p>
       </details>
     </section>
 
@@ -433,7 +433,7 @@
         <a href="#planning">願景／Milestones</a><b>→</b>
         <a href="#requirements">Stories／PRDs</a><b>→</b>
         <a href="#design">Design documents</a><b>→</b>
-        <a href="#cmd-create-visuals">三版面／全套視覺／核准</a><b>→</b>
+        <a href="#cmd-create-visuals">版型研究／全套視覺／核准</a><b>→</b>
         <a href="#delivery">Design／FE／BE issues</a><b>→</b>
         <a href="#cmd-organize-task-batch">Checkpoints</a><b>→</b>
         <a href="#execution">Dispatch／Review</a>
@@ -442,7 +442,7 @@
         <article class="route">
           <span class="eyebrow">從零開始</span>
           <h3>只有產品構想</h3>
-          <p class="path">planning → create-vision-document → create-milestones → create-userstories → create-PRDs</p>
+          <p class="path">planning → create-vision-document → create-milestones → create-PRDs</p>
           <p>先建立可追溯需求，再進入設計。產品決策仍未確定時，用 <code>prd-demystify</code> 一次處理一題。</p>
         </article>
         <article class="route">
@@ -483,7 +483,7 @@
     <section id="planning">
       <span class="eyebrow">04 / Intent → Stories</span>
       <h2>願景、里程碑與 User Stories</h2>
-      <p>願景說明為誰解決什麼問題；Milestone 定義一階段的可觀察成果；User Story 保持在使用者結果與 acceptance criteria。</p>
+      <p>願景說明為誰解決什麼問題；Milestone 定義一階段的可觀察成果；User Stories 保存在按 milestone 分組的 Project Document，包含穩定 ID 與核心 acceptance criteria。</p>
       <div id="commands-planning"></div>
       <label class="done-row"><input type="checkbox" data-progress="planning">我能分辨 vision、milestone 與 User Story 的責任。</label>
     </section>
@@ -493,15 +493,15 @@
       <h2>PRDs 與逐題釐清</h2>
       <p>PRD 可以涵蓋多個 User Stories，但每條規則要有唯一主要負責位置。未回答的選項是 unresolved，不是默認同意。</p>
       <div id="commands-requirements"></div>
-      <label class="done-row"><input type="checkbox" data-progress="requirements">我能維持 US、PRD、labels、relations 與 QA 決策的追溯鏈。</label>
+      <label class="done-row"><input type="checkbox" data-progress="requirements">我能維持故事文件、US ID、PRD、原生關聯與確認決策的追溯鏈。</label>
     </section>
 
     <section id="design">
       <span class="eyebrow">06 / Design → Approval</span>
-      <h2>設計文件、三版面與完整視覺審閱</h2>
+      <h2>設計文件、版型研究與完整視覺審閱</h2>
       <p><code>create-designs</code> 與 <code>create-visuals</code> 是兩個不同階段。前者只建立設計文件；後者先選本次 layout，再完成全套 screens／components 與 key states。</p>
       <div id="commands-design"></div>
-      <div class="note warm"><strong>核准順序：</strong>三個代表性 layout → 使用者選擇本次 layout → 產生完整範圍與關鍵狀態 → 選定 final images 並授權 upload → 使用者核准完整設計範圍 → 建立或重用 Design tickets 與 Design View。</div>
+      <div class="note warm"><strong>核准順序：</strong>適量版型研究或 bounded edit → 確認本次 layout → 產生完整範圍與關鍵狀態 → 選定 final images 並授權 upload → 使用者核准完整設計範圍 → 建立或重用 Design tickets 與 Design View。</div>
       <label class="done-row"><input type="checkbox" data-progress="design">我不會把 theme、layout、final image upload 與完整設計 approval 混成同一個 gate。</label>
     </section>
 
@@ -544,7 +544,7 @@
       <h2>常見問題</h2>
       <details><summary>本機服務沒啟動，可以直接改資料庫嗎？</summary><p>不可以。使用 connected tools 或 <code>scripts/operate.py</code> 的 preflight；不可直接修改 PostgreSQL、legacy SQLite 或另建 PM database。</p></details>
       <details><summary>create-designs 為什麼沒有 Design issues？</summary><p>目前規則是 document-only：只建立 design overview 與 screen／interaction specification。Design tickets 要等 <code>create-visuals</code> 的完整設計範圍明確核准後才建立。</p></details>
-      <details><summary>已經選過 theme，為什麼還要三個 layouts？</summary><p>Theme 決定 colors、typography 與 component language；不等於這次 surface 的 layout。每個新 layout scope 仍要先產生 exactly three representative layouts。</p></details>
+      <details><summary>每次都需要比較三個 layouts 嗎？</summary><p>新構圖依範圍比較適量版型（通常 2–3 版）；已選版型的小修直接編輯。選定或委託選擇後，仍須完成原定畫面、元件與關鍵狀態。</p></details>
       <details><summary>View 看不到正確 issues，應該改 issue 狀態嗎？</summary><p>先修 View filters 與 membership。Saved View 應依 project 與精確 Category 組合；不要為了配合錯誤 View 改 issue 狀態或 labels。</p></details>
       <details><summary>Worker 說 completed，可以直接移到 Done 嗎？</summary><p>不行。TPM 必須獨立驗證後才能交到 In Review；Done 永遠由 final user 決定。</p></details>
       <details><summary>測試環境限制是否一定卡在 In Progress？</summary><p>只有狹窄、已明確 attribution 的 environment-only limitation，可以在主要 target 與流程已檢查、其他證據支持 review readiness 時保留於 In Review；該檢查必須標示 Not tested 或 Environment-blocked，不能寫 Pass。</p></details>
@@ -573,177 +573,191 @@
 
   <script id="command-data" type="application/json">
   [
-    {"name":"help","title":"查看指令與邊界","phase":"起步","effect":"唯讀","view":"無","when":"先理解目前 skill 支援的 commands、gates 與 authorization。","input":"目前安裝的 linearboard skill。","output":"指令、必要來源、輸出與限制；不寫入 LinearBoard。","check":"確認目的地是 standalone LinearBoard，不是 Linear SaaS。","example":"$linearboard help","limit":"不建立任何 record、View 或 agent dispatch。"},
-    {"name":"planning","title":"整理產品構想","phase":"規劃","effect":"討論","view":"無","when":"把模糊想法整理成使用者問題、價值與範圍。","input":"想法、既有對話、限制與研究問題。","output":"聊天中的規劃；只有明確要求保存才寫入 canonical record。","check":"目標使用者、問題、價值與不做事項清楚。","example":"$linearboard planning PocketScheduler：先整理產品範圍，不保存紀錄。","limit":"不把討論自動轉成文件、issues 或 implementation。"},
-    {"name":"create-vision-document","title":"建立產品願景","phase":"規劃","effect":"寫入 Project Document","view":"無","when":"將已確認方向保存為產品定位與邊界。","input":"已整理構想、證據、假設與限制。","output":"LinearBoard native vision Project Document。","check":"文件屬於正確 project；事實、假設與 unknowns 分開。","example":"$linearboard create-vision-document PocketScheduler","limit":"不建立 milestones、issues、design 或 dispatch。"},
-    {"name":"create-milestones","title":"建立成果型里程碑","phase":"規劃","effect":"寫入 milestones／document","view":"無","when":"把願景拆成可觀察的交付階段。","input":"Vision、優先順序與已知 dependency。","output":"Native milestones 與 milestone overview Project Document。","check":"每個 milestone 有 outcome、scope、completion gate；未授權日期不補造。","example":"$linearboard create-milestones PocketScheduler","limit":"不建立 issues；M label 也不等於 native milestone。"},
-    {"name":"create-userstories","title":"建立 User Story issues","phase":"需求","effect":"寫入 issues","view":"{Project}-UserStories","when":"以使用者 outcome 建立可驗收 stories。","input":"Milestone scope、vision 與確認需求。","output":"Milestone-linked UserStory issues 與 saved View；新票 Backlog。","check":"每票只有 story 與 acceptance criteria；native milestone、Category、M label 與 View membership 正確。","example":"$linearboard create-userstories PocketScheduler M1","limit":"缺 milestone 時，只有 source plan 已明確授權該 scope 才可建立；否則先釐清。"},
-    {"name":"create-PRDs","title":"建立 PRD issues","phase":"需求","effect":"寫入 issues／relations","view":"{Project}-PRDs","when":"把 User Stories 轉成產品規則與行為。","input":"指定 milestone 的 Stories、vision 與 shared constraints。","output":"ProductRequirement issues、Related relations、M＋所有來源 US labels 與 saved View。","check":"每個 PRD 聚焦一致 task；source relations、labels、milestone 與 View membership 全部讀回。","example":"$linearboard create-PRDs PocketScheduler M1","limit":"新票 Backlog；不實作、不 dispatch，unresolved 不視為 approved。"},
-    {"name":"prd-demystify","title":"逐題釐清 PRD 決策","phase":"需求","effect":"更新 PRDs／QA document","view":"無","when":"存在會影響 product behavior、scope 或 data result 的 unresolved decisions。","input":"Milestone PRDs、既有回答與 QA history。","output":"逐題修訂 PRDs，維護 {Project} {Milestone}-工能釐清QA紀錄。","check":"每題有 example、options、behavior、pros／cons 與 recommendation；history 不補造。","example":"$linearboard prd-demystify PocketScheduler M1","limit":"一次一題；可 defer 或 pause；技術實作問題留在 engineering issue。"},
-    {"name":"create-designs","title":"建立設計文件","phase":"設計","effect":"寫入 2 份 documents","view":"無","when":"把需求轉成 screen、flow、interaction 與 state specification。","input":"Stories、PRDs、QA decisions 與可用技術背景。","output":"Design overview 與 screen／interaction specification Project Documents。","check":"入口、出口、actions、normal／loading／empty／error states 可追到來源規則。","example":"$linearboard create-designs PocketScheduler M1","limit":"Document-only；不建立 Design issues／View，也不執行 create-visuals。"},
-    {"name":"create-visuals","title":"產生與核准完整視覺","phase":"設計","effect":"生成 gallery／授權後 upload","view":"核准後 {Project}-Design","when":"先選擇本次 layout，再完成全部 screens／components 與 key states。","input":"Design documents、requirements、established theme 與 references。","output":"三個 representative layouts、selected-layout 後的完整 gallery；final selection／upload／full approval 後建立 Design tickets 與 View。","check":"Theme、layout、detail review、final upload 與 full design approval 是分開 gates；gallery links 與 images 全部驗證。","example":"$linearboard create-visuals PocketScheduler M1","limit":"探索與詳細生成期間不建 tickets、不改 statuses；upload 不等於 native attachment approval。"},
-    {"name":"create-issues-FE","title":"建立 FrontEnd delivery issues","phase":"交付","effect":"寫入 issues","view":"{Project}-FE","when":"把需求與 approved visuals 拆成 independently reviewable UI work。","input":"Stories、PRDs、design documents、exact approved visuals 與 repository context。","output":"FrontEnd issues、native milestone、M＋所有來源 US labels、Coder 與 saved FE View；新票 Backlog。","check":"Routes、states、data effects、errors、accessibility、responsive scope、evidence requirements 與 exact visual version 完整。","example":"$linearboard create-issues-FE PocketScheduler M1","limit":"只建 FE 不授權 BE 或 dispatch；technical lookup 是內部流程。"},
-    {"name":"create-issues-BE","title":"建立 BackEnd delivery issues","phase":"交付","effect":"寫入 issues","view":"{Project}-BE","when":"把 confirmed data／service scope 拆成明確 ownership。","input":"Stories、PRDs、data boundaries、existing services 與 repository context。","output":"BackEnd issues、native milestone、M＋所有來源 US labels、Coder 與 saved BE View；新票 Backlog。","check":"Shared contracts 有單一 owner；authorization、consistency、failure／retry／recovery 與 compatibility 有驗收。","example":"$linearboard create-issues-BE PocketScheduler M1","limit":"BackEnd 不自動代表 server／cloud；technical lookup 是內部流程。"},
-    {"name":"organize-task-batch","title":"整理 checkpoint batches","phase":"交付","effect":"唯讀","view":"無","when":"依 observable outcome 與 dependencies 組織既有 FE／BE issues。","input":"Project、milestone 或 issue IDs，以及完整 issue／dependency evidence。","output":"聊天中的 ordered batches：Batch Name、FE Issues、BE Issues、grouping reason、expected outcomes。","check":"每張 selected issue 恰好出現一次或有排除理由；links、prerequisites、blockers 與 verification scenario 清楚。","example":"$linearboard organize-task-batch PocketScheduler M1","limit":"不寫 LinearBoard、不排日期、不 dispatch；batch 不是 concurrent worker allocation。"},
-    {"name":"dispatch","title":"派工指定 delivery issues","phase":"交付","effect":"派工／實作／驗證","view":"無","when":"使用者已授權 exact issue IDs、既有 Batch 或 bounded milestone selection。","input":"Ready FE／BE issues、canonical requirements、approved design、repository、target app 與 checks。","output":"最多三個 concurrent workers；validated plans、implementation reports、TPM independent evidence 與 review-ready In Review handoff。","check":"Worker scope 不重疊；先 acknowledged 再 release；actual target UI／service 驗證；Done 留給 user。","example":"$linearboard dispatch PocketScheduler M1 Batch 1","limit":"不擴張 issue selection；workers 不寫 LinearBoard；worker report 不是 acceptance evidence。"},
-    {"name":"debug","title":"從回報到修復與驗證","phase":"維護","effect":"記錄／建票／實作／驗證","view":"{Project}-FE／BE","when":"處理使用者選定的 bug reports 或 FIX issues。","input":"Project／milestone、Bugs document 或 issue IDs、reproduction、expected behavior 與 target environment。","output":"Bugs Project Document 的 Datetime／User Report、bounded FIX issues、saved View、independent evidence 與文件原生結果留言。","check":"每張 FIX 指回正確 report batch／bullet；result comment 回連 FIX；readback 與 target verification 完成。","example":"$linearboard debug PocketScheduler M1 〈Bugs 文件或 issue IDs〉","limit":"Triage-only 要明說；Bugs document 不可用就停止，不另存本機或以 issue-only 取代。"},
-    {"name":"sync","title":"同步已確認 records","phase":"維護","effect":"更新授權範圍","view":"依範圍","when":"Canonical records 之間存在有證據的缺漏或 drift。","input":"Project、milestone、scope 與 confirmed owner records。","output":"差異報告與 verified updates，涵蓋 content、milestone、labels、relations、status 與 Views。","check":"Updated、already aligned、conflict、unverified 分開回報；每次 write 後 readback。","example":"$linearboard sync PocketScheduler M1","limit":"不靠較新 timestamp 自動勝出；不補造 history、不重設 progress、不實作。"}
-  ]
+  {
+    "name": "help",
+    "title": "查看指令與邊界",
+    "phase": "起步",
+    "effect": "唯讀",
+    "view": "無",
+    "when": "先理解目前 skill 支援的 commands、gates 與 authorization。",
+    "input": "目前安裝的 linearboard skill。",
+    "output": "指令、必要來源、輸出與限制；不寫入 LinearBoard。",
+    "check": "確認目的地是 standalone LinearBoard，不是 Linear SaaS。",
+    "example": "$linearboard help",
+    "limit": "不建立任何 record、View 或 agent dispatch。"
+  },
+  {
+    "name": "planning",
+    "title": "整理產品構想",
+    "phase": "規劃",
+    "effect": "討論",
+    "view": "無",
+    "when": "把模糊想法整理成使用者問題、價值與範圍。",
+    "input": "想法、既有對話、限制與研究問題。",
+    "output": "聊天中的規劃；只有明確要求保存才寫入 canonical record。",
+    "check": "目標使用者、問題、價值與不做事項清楚。",
+    "example": "$linearboard planning PocketScheduler：先整理產品範圍，不保存紀錄。",
+    "limit": "不把討論自動轉成文件、issues 或 implementation。"
+  },
+  {
+    "name": "create-vision-document",
+    "title": "建立產品願景",
+    "phase": "規劃",
+    "effect": "寫入 Project Document",
+    "view": "無",
+    "when": "將已確認方向保存為產品定位與邊界。",
+    "input": "已整理構想、證據、假設與限制。",
+    "output": "LinearBoard native vision Project Document。",
+    "check": "文件屬於正確 project；事實、假設與 unknowns 分開。",
+    "example": "$linearboard create-vision-document PocketScheduler",
+    "limit": "不建立 milestones、issues、design 或 dispatch。"
+  },
+  {
+    "name": "create-milestones",
+    "title": "建立成果型里程碑",
+    "phase": "規劃",
+    "effect": "寫入 milestones／document",
+    "view": "無",
+    "when": "把願景拆成可觀察的交付階段。",
+    "input": "Vision、優先順序與已知 dependency。",
+    "output": "Native milestones 與按里程碑分組的 User Stories overview Project Document；每則故事保留穩定 US ID、anchor 與核心驗收。",
+    "check": "原生 milestone、文件歸屬、故事 ID 與索引一致；既有故事票作歷史來源保留。",
+    "example": "$linearboard create-milestones PocketScheduler",
+    "limit": "不建立 UserStory issues 或 View；create-userstories／user-stories／stories 是本指令的相容別名。"
+  },
+  {
+    "name": "create-PRDs",
+    "title": "建立 PRD issues",
+    "phase": "需求",
+    "effect": "寫入 issues／relations",
+    "view": "{Project}-PRDs",
+    "when": "把 User Stories 轉成產品規則與行為。",
+    "input": "指定 milestone 的故事文件、穩定 US IDs、vision 與 shared constraints。",
+    "output": "ProductRequirement issues、來源文件與故事連結、原生 milestone 與 saved PRDs View；M／US labels 選用。",
+    "check": "每個 PRD 聚焦一致 task；讀回來源索引、故事連結、milestone、Category 與 View membership。",
+    "example": "$linearboard create-PRDs PocketScheduler M1",
+    "limit": "新票 Backlog；不實作、不 dispatch，unresolved 不視為 approved。"
+  },
+  {
+    "name": "prd-demystify",
+    "title": "逐題釐清 PRD 決策",
+    "phase": "需求",
+    "effect": "更新原 PRDs",
+    "view": "無",
+    "when": "存在會影響 product behavior、scope 或 data result 的 unresolved decisions。",
+    "input": "Milestone PRDs、來源故事、既有回答與未決範圍。",
+    "output": "確認後直接修訂擁有規則的 PRD，必要時保留原生留言；不新增 QA 文件。",
+    "check": "一次一題；已確認答案反映於規則與驗收，未回答仍標未決；保留既有 QA history。",
+    "example": "$linearboard prd-demystify PocketScheduler M1",
+    "limit": "一次一題；可 defer 或 pause；技術實作問題留在 engineering issue。"
+  },
+  {
+    "name": "create-designs",
+    "title": "建立設計文件",
+    "phase": "設計",
+    "effect": "寫入 2 份 documents",
+    "view": "無",
+    "when": "把需求轉成 screen、flow、interaction 與 state specification。",
+    "input": "故事文件、PRDs、已確認決策與可用技術背景。",
+    "output": "Design overview 與 screen／interaction specification Project Documents。",
+    "check": "入口、出口、actions、normal／loading／empty／error states 可追到來源規則。",
+    "example": "$linearboard create-designs PocketScheduler M1",
+    "limit": "Document-only；不建立 Design issues／View，也不執行 create-visuals。"
+  },
+  {
+    "name": "create-visuals",
+    "title": "產生與核准完整視覺",
+    "phase": "設計",
+    "effect": "生成 gallery／授權後 upload",
+    "view": "核准後 {Project}-Designs",
+    "when": "先選擇本次 layout，再完成全部 screens／components 與 key states。",
+    "input": "Design documents、requirements、established theme 與 references。",
+    "output": "適量 representative layouts 或選定版型的 bounded edit，接續完成原定 gallery；完整設計核准後建立 Design tickets 與 View。",
+    "check": "版型選擇、完整覆蓋、上傳與完整設計核准分開；確切版本、gallery、Design tickets 與 View 皆讀回。",
+    "example": "$linearboard create-visuals PocketScheduler M1",
+    "limit": "新構圖通常比較 2–3 版；小修直接編輯已選版型。只上傳明確授權版本；不改既有狀態，upload 不等於 native attachment approval。"
+  },
+  {
+    "name": "create-issues-FE",
+    "title": "建立 FrontEnd delivery issues",
+    "phase": "交付",
+    "effect": "寫入 issues",
+    "view": "{Project}-FE",
+    "when": "把需求與 approved visuals 拆成 independently reviewable UI work。",
+    "input": "Stories、PRDs、design documents、exact approved visuals 與 repository context。",
+    "output": "FrontEnd issues、native milestone、Category 與來源連結；保留既有 labels 與 saved FE View；新票 Backlog。",
+    "check": "Routes、states、data effects、errors、accessibility、responsive scope、evidence requirements 與 exact visual version 完整。",
+    "example": "$linearboard create-issues-FE PocketScheduler M1",
+    "limit": "只建 FE 不授權 BE 或 dispatch；technical lookup 是內部流程。"
+  },
+  {
+    "name": "create-issues-BE",
+    "title": "建立 BackEnd delivery issues",
+    "phase": "交付",
+    "effect": "寫入 issues",
+    "view": "{Project}-BE",
+    "when": "把 confirmed data／service scope 拆成明確 ownership。",
+    "input": "Stories、PRDs、data boundaries、existing services 與 repository context。",
+    "output": "BackEnd issues、native milestone、Category 與來源連結；保留既有 labels 與 saved BE View；新票 Backlog。",
+    "check": "Shared contracts 有單一 owner；authorization、consistency、failure／retry／recovery 與 compatibility 有驗收。",
+    "example": "$linearboard create-issues-BE PocketScheduler M1",
+    "limit": "BackEnd 不自動代表 server／cloud；technical lookup 是內部流程。"
+  },
+  {
+    "name": "organize-task-batch",
+    "title": "整理 checkpoint batches",
+    "phase": "交付",
+    "effect": "唯讀",
+    "view": "無",
+    "when": "依 observable outcome 與 dependencies 組織既有 FE／BE issues。",
+    "input": "Project、milestone 或 issue IDs，以及完整 issue／dependency evidence。",
+    "output": "聊天中的 ordered batches：Batch Name、FE Issues、BE Issues、grouping reason、expected outcomes。",
+    "check": "每張 selected issue 恰好出現一次或有排除理由；links、prerequisites、blockers 與 verification scenario 清楚。",
+    "example": "$linearboard organize-task-batch PocketScheduler M1",
+    "limit": "不寫 LinearBoard、不排日期、不 dispatch；batch 不是 concurrent worker allocation。"
+  },
+  {
+    "name": "dispatch",
+    "title": "派工指定 delivery issues",
+    "phase": "交付",
+    "effect": "派工／實作／驗證",
+    "view": "無",
+    "when": "使用者已授權 exact issue IDs 或既有 Batch，且 readiness preflight 通過。",
+    "input": "Ready FE／BE issues、canonical requirements、approved design、repository、target app 與 checks。",
+    "output": "最多三個 concurrent workers；validated plans、implementation reports、TPM independent evidence 與 review-ready In Review handoff。",
+    "check": "Worker scope 不重疊；先 acknowledged 再 release；actual target UI／service 驗證；Done 留給 user。",
+    "example": "$linearboard dispatch PocketScheduler M1 Batch 1",
+    "limit": "不擴張 issue selection；workers 不寫 LinearBoard；worker report 不是 acceptance evidence。"
+  },
+  {
+    "name": "debug",
+    "title": "從回報到修復與驗證",
+    "phase": "維護",
+    "effect": "記錄／建票／實作／驗證",
+    "view": "{Project}-FE／BE",
+    "when": "處理使用者選定的 bug reports 或 FIX issues。",
+    "input": "Project／milestone、Bugs document 或 issue IDs、reproduction、expected behavior 與 target environment。",
+    "output": "Bugs Project Document 的 Datetime／User Report、bounded FIX issues、saved View、independent evidence 與文件原生結果留言。",
+    "check": "每張 FIX 指回正確 report batch／bullet；result comment 回連 FIX；readback 與 target verification 完成。 Bugs 文件先保存原始回報；在 Bugs 文件回寫結果，不以 issue 留言替代文件結果。",
+    "example": "$linearboard debug PocketScheduler M1 〈Bugs 文件或 issue IDs〉",
+    "limit": "Triage-only 要明說；Bugs document 不可用就停止，不另存本機或以 issue-only 取代。"
+  },
+  {
+    "name": "sync",
+    "title": "同步已確認 records",
+    "phase": "維護",
+    "effect": "更新授權範圍",
+    "view": "依範圍",
+    "when": "Canonical records 之間存在有證據的缺漏或 drift。",
+    "input": "Project、milestone、scope 與 confirmed owner records。",
+    "output": "差異報告與 verified updates，涵蓋 content、milestone、labels、relations、status 與 Views。",
+    "check": "Updated、already aligned、conflict、unverified 分開回報；每次 write 後 readback。",
+    "example": "$linearboard sync PocketScheduler M1",
+    "limit": "不靠較新 timestamp 自動勝出；不補造 history、不重設 progress、不實作。"
+  }
+]
   </script>
 
-  <script>
-    (() => {
-      const commands = JSON.parse(document.getElementById('command-data').textContent);
-      const $ = id => document.getElementById(id);
-      const escapeHTML = value => String(value).replace(/[&<>"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[char]));
-      const toast = message => {
-        $('toast').textContent = message;
-        clearTimeout(window.linearboardToast);
-        window.linearboardToast = setTimeout(() => $('toast').textContent = '', 1800);
-      };
-
-      const phaseSection = phase => {
-        if (phase === '起步') return 'start';
-        if (phase === '規劃') return 'planning';
-        if (phase === '需求') return 'requirements';
-        if (phase === '設計') return 'design';
-        if (phase === '維護') return 'maintenance';
-        return 'delivery';
-      };
-
-      const action = $('action');
-      commands.forEach(command => {
-        const option = document.createElement('option');
-        option.value = command.name;
-        option.textContent = `${command.name} · ${command.title}`;
-        if (command.name === 'create-issues-FE') option.selected = true;
-        action.append(option);
-
-        const row = document.createElement('tr');
-        row.dataset.phase = command.phase;
-        row.dataset.search = Object.values(command).join(' ').toLowerCase();
-        row.innerHTML = `<td><a href="#cmd-${escapeHTML(command.name)}"><code>${escapeHTML(command.name)}</code></a></td><td>${escapeHTML(command.title)}</td><td>${escapeHTML(command.effect)}</td><td>${escapeHTML(command.view)}</td><td><button type="button" class="use-command" data-command="${escapeHTML(command.name)}">組合 ↗</button></td>`;
-        $('catalog').append(row);
-
-        const card = document.createElement('article');
-        card.className = 'command';
-        card.id = `cmd-${command.name}`;
-        card.innerHTML = `
-          <div class="command-top"><div><span class="eyebrow">${escapeHTML(command.phase)}</span><h3>${escapeHTML(command.name)}</h3><p class="subtitle">${escapeHTML(command.title)}</p></div><span class="badge">${escapeHTML(command.effect)}</span></div>
-          <p>${escapeHTML(command.when)}</p>
-          <div class="codebox"><div class="code-toolbar"><span>CODEX PROMPT</span><button class="copy" type="button" data-copy="#example-${escapeHTML(command.name)}">複製</button></div><pre><code id="example-${escapeHTML(command.name)}">${escapeHTML(command.example)}</code></pre></div>
-          <dl><div><dt>先準備</dt><dd>${escapeHTML(command.input)}</dd></div><div><dt>會得到</dt><dd>${escapeHTML(command.output)}</dd></div><div><dt>怎麼確認</dt><dd>${escapeHTML(command.check)}</dd></div></dl>
-          <p class="boundary"><strong>邊界：</strong>${escapeHTML(command.limit)}</p>
-          <button type="button" class="compose-command" data-command="${escapeHTML(command.name)}">用這個指令組合範圍 ↗</button>`;
-        const target = command.name === 'organize-task-batch' ? $('commands-delivery') : command.name === 'dispatch' ? $('commands-execution') : $(`commands-${phaseSection(command.phase)}`);
-        target.append(card);
-      });
-
-      function build() {
-        const command = commands.find(item => item.name === action.value);
-        const project = $('project').value.trim() || '〈Project〉';
-        const milestone = $('milestone').value.trim() || '〈Milestone〉';
-        const scope = $('dispatchscope').value;
-        const ids = $('issueids').value.trim();
-        const batch = $('batch').value.trim();
-        $('dispatch-scope-field').hidden = command.name !== 'dispatch';
-        $('batch-field').hidden = command.name !== 'dispatch' || scope !== 'batch';
-        $('issue-field').hidden = !(command.name === 'organize-task-batch' || (command.name === 'dispatch' && scope === 'issues'));
-        $('issue-label').textContent = command.name === 'organize-task-batch' ? 'Issue IDs（選填）' : 'Issue IDs（必填）';
-        $('debug-field').hidden = command.name !== 'debug';
-
-        let args = command.name === 'help' ? '' : ` ${project}`;
-        if (!['help', 'planning', 'create-vision-document', 'create-milestones'].includes(command.name)) args += ` ${milestone}`;
-        if (command.name === 'organize-task-batch' && ids) args += ` ${ids}`;
-        if (command.name === 'dispatch' && scope === 'batch') args += ` Batch ${batch || '〈n〉'}`;
-        if (command.name === 'dispatch' && scope === 'issues') args += ` ${ids || '〈issue IDs〉'}`;
-        if (command.name === 'debug') args += ` ${$('debugsource').value.trim() || '〈Bugs 文件或 issue IDs〉'}`;
-        let prompt = `$linearboard ${command.name}${args}`;
-        const extra = $('additional').value.trim();
-        if (extra) prompt += `\n${extra}`;
-        $('built').textContent = prompt;
-        $('builder-help').textContent = `${command.effect} · ${command.when} ${command.limit}`;
-      }
-
-      ['action','project','milestone','dispatchscope','batch','issueids','debugsource','additional'].forEach(id => $(id).addEventListener('input', build));
-      build();
-
-      document.addEventListener('click', async event => {
-        const copy = event.target.closest('[data-copy]');
-        if (copy) {
-          const text = document.querySelector(copy.dataset.copy)?.textContent || '';
-          try { await navigator.clipboard.writeText(text); toast('已複製指令。'); }
-          catch { toast('瀏覽器未允許剪貼簿，請手動選取。'); }
-        }
-        const commandButton = event.target.closest('[data-command]');
-        if (commandButton) {
-          action.value = commandButton.dataset.command;
-          build();
-          location.hash = 'builder';
-          action.focus({preventScroll: true});
-        }
-      });
-
-      let activeStage = '';
-      function filterCommands() {
-        const query = $('search').value.trim().toLowerCase();
-        let count = 0;
-        [...$('catalog').rows].forEach(row => {
-          const phase = row.dataset.phase;
-          const stageMatch = !activeStage || (activeStage === '交付' ? ['交付'].includes(phase) : phase === activeStage);
-          const visible = stageMatch && row.dataset.search.includes(query);
-          row.hidden = !visible;
-          if (visible) count += 1;
-        });
-        $('result-count').textContent = `${count} / ${commands.length} 個指令`;
-        $('search-empty').hidden = count !== 0;
-      }
-      $('search').addEventListener('input', filterCommands);
-      document.querySelectorAll('[data-stage]').forEach(button => button.addEventListener('click', () => {
-        activeStage = button.dataset.stage;
-        document.querySelectorAll('[data-stage]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
-        filterCommands();
-      }));
-
-      const menu = $('menu-toggle');
-      menu.addEventListener('click', () => {
-        const open = menu.getAttribute('aria-expanded') !== 'true';
-        menu.setAttribute('aria-expanded', String(open));
-        $('guide-nav').classList.toggle('is-open', open);
-      });
-      document.querySelectorAll('#guide-nav a').forEach(link => link.addEventListener('click', () => {
-        $('guide-nav').classList.remove('is-open');
-        menu.setAttribute('aria-expanded', 'false');
-      }));
-
-      const marks = [...document.querySelectorAll('[data-progress]')];
-      const progressKey = 'linearboard-guide-reading-v1';
-      let saved = {};
-      try { saved = JSON.parse(localStorage.getItem(progressKey) || '{}'); } catch {}
-      function updateProgress() {
-        const completed = marks.filter(mark => mark.checked).length;
-        $('progress').value = completed;
-        $('progress-label').textContent = `閱讀進度 ${completed} / ${marks.length}`;
-        const state = {};
-        marks.forEach(mark => state[mark.dataset.progress] = mark.checked);
-        try { localStorage.setItem(progressKey, JSON.stringify(state)); } catch {}
-      }
-      marks.forEach(mark => {
-        mark.checked = Boolean(saved[mark.dataset.progress]);
-        mark.addEventListener('change', updateProgress);
-      });
-      $('reset').addEventListener('click', () => { marks.forEach(mark => mark.checked = false); updateProgress(); toast('已重設閱讀進度；未修改 LinearBoard。'); });
-      updateProgress();
-
-      const navLinks = [...document.querySelectorAll('#guide-nav a')];
-      if ('IntersectionObserver' in window) {
-        const observer = new IntersectionObserver(entries => entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-          navLinks.forEach(link => link.classList.toggle('active', link.hash === `#${entry.target.id}`));
-        }), {rootMargin: '-8% 0px -70% 0px'});
-        document.querySelectorAll('main > section').forEach(section => observer.observe(section));
-      }
-    })();
-  </script>
+  <script src="guide.js" data-guide-runtime defer></script>
 </body>
 </html>

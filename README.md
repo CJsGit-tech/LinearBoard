@@ -157,11 +157,12 @@ Send `Accept-Language: en` for English API errors or `zh-TW` for Traditional Chi
 npm run build
 npm test
 npm run test:i18n
+npm run test:guide
 npm run test:ui
 npm run test:selects
 ```
 
-Browser tests use installed Google Chrome and disposable SQLite databases, not the canonical workspace. The localization suite checks English and Chinese navigation, editing, persistence, language switching, errors, and content preservation. The older guide tests currently have known drift from the newer Chinese guide; a failing guide suite is not a passing verification result.
+Browser tests use installed Google Chrome and disposable SQLite databases, not the canonical workspace. The localization suite checks English and Chinese navigation, editing, persistence, language switching, errors, and content preservation. The guide suite checks the current skill command directory, prompt composer, search, reading progress, mobile navigation, strict Content Security Policy, and working browser/server offline exports.
 
 Main source areas: `web/` (React UI and message catalog), `linearboard/store.py` (validation and persistence), `linearboard/postgres.py` (PostgreSQL backend), `server.py` (HTTP routes), `mcp_server.py` (MCP bridge), and `tests/`. English API errors are in `linearboard/locales/en.json`.
 
