@@ -303,6 +303,6 @@ const {selectTrigger,selectValue,optionValues,selectProject}=require('./controls
  assert.equal(mcpCall('linearboard_update',{kind:'issues',id:story.id,data:{expected_version:after.issues.find(i=>i.id===story.id).version,status:'Done'},idempotency_key:'mcp-denied-done'}).isError,true);
  passed.push('MCP: create/update, replay deduplication, stale version and user-only Done');passed.push('MCP: initialize, tools/list and real application read');
  const snapshot=JSON.stringify(await http('state'));const capabilities=await http('capabilities');assert.equal(capabilities.commands.length,16);assert.equal(JSON.stringify(await http('state')),snapshot);passed.push('help/planning/organize-task-batch contracts are read-only; 16 command mappings discoverable');
- assert.deepEqual(errors,[]);console.log(JSON.stringify({passed,consoleErrors:errors,externalSkillOrchestration:'Not tested; installed linear-tpm unchanged',screenshots:'/tmp/linearboard-*.png'},null,2));
+ assert.deepEqual(errors,[]);console.log(JSON.stringify({passed,consoleErrors:errors,externalSkillOrchestration:'Not tested; external skill orchestration is separate from application UI verification',screenshots:'/tmp/linearboard-*.png'},null,2));
  }catch(e){console.error('QA FAILED',e);console.error('Completed checkpoints',passed);process.exitCode=1;}finally{await browser?.close();await stop();await fs.rm(temp,{recursive:true,force:true});}
 })();

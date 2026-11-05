@@ -364,7 +364,7 @@ function Integration() {
     <section className="page integration">
       <Heading title={t("整合與指令")}>
       </Heading>
-      <p>{t("使用 linear-tpm 時，需明確指定 LinearBoard 為紀錄目的地。")}</p>
+      <p>{t("LinearBoard skill 透過 REST API 與 MCP 工具管理本機工作區。")}</p>
       <div className="integration-grid">
         <div>
           <h2>{t("啟動 MCP adapter")}</h2>

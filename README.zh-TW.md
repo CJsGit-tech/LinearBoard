@@ -2,6 +2,10 @@
 
 [English](README.md) · [繁體中文](README.zh-TW.md)
 
+## 靈感來自 Linear
+
+本應用程式與隨附的管理 skill，靈感來自 [Linear](https://linear.app) 組織產品工作的方式。LinearBoard 是獨立開發的本機工作區。
+
 獨立的個人產品交付工作區。React UI、Compose 管理的 PostgreSQL 資料庫、REST API 和 MCP stdio adapter；運作不需要 Linear 帳號。
 
 ## 介面語言
@@ -66,7 +70,7 @@ python3 server.py
 
 Automation 可建立 draft／evidence 附件，不能核准視覺或把 issue 轉為 Done；這兩項由使用者在 UI 操作。一般 metadata 修訂會保留 Done。附件上傳以 `content_base64` 提供，或使用 `external_url`，上限 15 MB。Markdown 經 DOMPurify 清理；只有辨識為 PNG/JPEG 的 bytes 會 inline，其餘以下載提供。
 
-## MCP 與 linear-tpm 邊界
+## MCP 與 LinearBoard skill
 
 ```json
 {
@@ -99,9 +103,7 @@ Automation 可建立 draft／evidence 附件，不能核准視覺或把 issue �
 
 1. **LinearBoard** 提供可持久化的紀錄、關聯、Views、附件、歷史與驗證資料。
 2. **Codex／外部工具** 解讀 `planning`、產出產品文字、訪談、生成視覺與 gallery、選擇批次、執行 coding agents、實際操作待測產品並做獨立驗證。
-3. **目的地轉接** 將 skill 的 Linear CRUD／document／View 操作改用上述 LinearBoard 工具。原 skill 的 Linear-only 規則和工具名稱不會因 UI 相似就自動改變；在該工作流程明確授權 LinearBoard 為紀錄目的地之前，不能將原 skill 的 Linear 寫入靜默重新導向本機。
-
-使用新目的地時需在該次工作指示中明確指定：「這次工作以 LinearBoard 為正式紀錄目的地，沿用 linear-tpm 的流程、授權、追溯及審閱規則，透過 linearboard MCP 工具讀寫；不要寫入真實 Linear。」這是使用者可選的轉接指示，本 README 不會自行執行它。
+3. **LinearBoard skill** 定義本應用程式的規劃、需求、設計、交付、除錯與同步流程，透過原生 REST API 或 MCP 工具讀寫紀錄。以隨附的 `skills/linearboard/SKILL.md` 為流程依據。
 
 沒有內建 AI、API key、遠端同步、imagegen 或 agent runner。`dispatches` 是真實的派工紀錄，不是假裝已執行的 worker。`create-visuals` 的圖片生成與 HTML gallery 由現有外部工具完成，核准後才能保存正式 reference。不能將這些外部工作標成 App 已執行。
 

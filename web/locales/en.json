@@ -269,7 +269,6 @@
   "已還原；{0} 筆關聯需檢查": "Restored; review {0} unresolved link(s)",
   "已還原": "Restored",
   "還原": "Restore",
-  "使用 linear-tpm 時，需明確指定 LinearBoard 為紀錄目的地。": "When using linear-tpm, explicitly select LinearBoard as the record destination.",
   "啟動 MCP adapter": "Start the MCP adapter",
   "在 MCP 客戶端設定為 stdio server。": "Configure this as a stdio server in your MCP client.",
   "工具介面": "Tool interface",
@@ -320,5 +319,6 @@
   "、": ", ",
   "展開{0}群組": "Expand {0} group",
   "收合{0}群組": "Collapse {0} group",
-  "在{0}新增任務": "New issue in {0}"
+  "在{0}新增任務": "New issue in {0}",
+  "LinearBoard skill 透過 REST API 與 MCP 工具管理本機工作區。": "The LinearBoard skill manages this local workspace through the REST API and MCP tools."
 }

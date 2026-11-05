@@ -4,13 +4,13 @@ from pathlib import Path
 from http.server import ThreadingHTTPServer
 from server import Handler
 from linearboard.store import Store
-skill=Path(sys.argv[1]).resolve() if len(sys.argv)>1 else Path.home()/'.codex/skills/linearboard'
-source=Path('/Users/chuang/.codex/skills/linear-tpm/SKILL.md').read_text()
-new=(skill/'SKILL.md').read_text()
-def commands(s):
- s=s.split('## Commands\n')[1].split('Technology lookup')[0]
- return re.findall(r'^- `([^`]+)`',s,re.M)
-assert commands(source)==commands(new), 'Commands or aliases changed'
+skill=Path(sys.argv[1]).resolve() if len(sys.argv)>1 else Path(__file__).resolve().parents[1]/'skills/linearboard'
+source=(skill/'SKILL.md').read_text()
+section=source.split('## Commands\n')[1].split('Technology lookup')[0]
+commands={match.split()[0] for match in re.findall(r'^- `([^`]+)`',section,re.M)}
+expected={'help','planning','create-vision-document','create-milestones','create-PRDs','prd-demystify','create-designs','create-visuals','create-issues-FE','organize-task-batch','dispatch','debug','sync'}
+assert commands==expected, 'Standalone skill command router changed'
+assert '`create-issues-BE`' in section, 'Backend delivery command missing'
 for file in skill.rglob('*.md'):
  for target in re.findall(r'\]\(([^)]+)\)',file.read_text()):
   if ':' in target or target.startswith('#') or '<' in target or ' ' in target: continue
@@ -57,5 +57,5 @@ with tempfile.TemporaryDirectory() as temp:
   call('linearboard_update',{'kind':'issues','id':issue['id'],'data':{'expected_version':a['version'],'status':'Done'},'idempotency_key':'done'},fail=True)
   call('linearboard_update',{'kind':'attachments','id':attachment['id'],'data':{'expected_version':1,'approval':'approved'},'idempotency_key':'approve'},fail=True)
   assert len(call('linearboard_get',{'kind':'issues','id':issue['id'],'history':True}))==2
-  print('PASS: identical command/alias signatures, local reference links, CLI capability/pagination, every resource kind, View membership, history, retries, stale-write rejection, user-only Done/approval')
+  print('PASS: standalone LinearBoard command router, local reference links, CLI capability/pagination, every resource kind, View membership, history, retries, stale-write rejection, user-only Done/approval')
  finally: server.shutdown();server.server_close()

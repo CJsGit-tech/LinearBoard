@@ -87,7 +87,7 @@ class Handler(BaseHTTPRequestHandler):
             if method == 'GET':
                 if parsed.path == '/guide/download':
                     return self.send(200, offline_guide(), 'text/html; charset=utf-8', {
-                        'Content-Disposition':'attachment; filename="linear-tpm-command-tutorial.html"'})
+                        'Content-Disposition':'attachment; filename="linearboard-command-tutorial.html"'})
                 if path == ['api', 'state']:
                     return self.send(200, store.snapshot(query.get('archived') == 'true'))
                 if path == ['api', 'trash']:

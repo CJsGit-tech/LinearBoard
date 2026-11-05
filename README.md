@@ -2,6 +2,10 @@
 
 [English](README.md) · [繁體中文](README.zh-TW.md)
 
+## Inspired by Linear
+
+This application and its companion management skill are inspired by [Linear](https://linear.app) and its approach to organizing product work. LinearBoard is developed independently as a standalone local workspace.
+
 A standalone, local product-delivery workspace with a React interface, PostgreSQL storage, a REST API, and an MCP stdio adapter. A Linear account is not required.
 
 Manage projects, milestones, issues, documents, saved Views, attachments, delivery batches, dispatch records, and verification evidence in one local application. The included [LinearBoard skill](skills/linearboard/SKILL.md) gives Codex a workflow for managing those records.

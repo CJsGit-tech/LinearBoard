@@ -111,7 +111,7 @@ class GuideRouteTests(unittest.TestCase):
         self.assertEqual(len(executable), 1)
         self.assertEqual(executable[0]['attrs']['src'], 'guide.js')
         self.assertEqual(executable[0]['text'], '')
-        self.assertIn('$linear-tpm help', raw.decode())
+        self.assertIn('$linearboard help', raw.decode())
         self.assertEqual(page.download['href'], 'guide/download')
         self.assertIn('built', page.ids)
 
@@ -172,7 +172,7 @@ class GuideRouteTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(headers['Content-Type'], 'text/html; charset=utf-8')
         self.assertIn('attachment;', headers['Content-Disposition'])
-        self.assertIn('linear-tpm-command-tutorial.html', headers['Content-Disposition'])
+        self.assertIn('linearboard-command-tutorial.html', headers['Content-Disposition'])
         self.assertTrue(raw.lower().startswith(b'<!doctype html>'))
         self.assertIn('<style>', raw.decode())
         page = GuideHTML(raw.decode())

@@ -1,4 +1,4 @@
-function initializeLinearTPMGuide(){'use strict';const $=id=>document.getElementById(id),data=JSON.parse($('command-data').textContent);let toastTimer;function toast(s){$('toast').textContent=s;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').textContent='',3000)}
+function initializeLinearBoardGuide(){'use strict';const $=id=>document.getElementById(id),data=JSON.parse($('command-data').textContent);let toastTimer;function toast(s){$('toast').textContent=s;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').textContent='',3000)}
 document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',async()=>{const el=b.closest('.codebox').querySelector('code');try{if(!navigator.clipboard)throw new Error('clipboard unavailable');await navigator.clipboard.writeText(el.textContent);const prev=b.textContent;b.textContent='已複製';toast('已複製文字。貼到 Codex 並送出才會執行。');setTimeout(()=>b.textContent=prev,1800)}catch(e){const range=document.createRange();range.selectNodeContents(el);const s=window.getSelection();s.removeAllRanges();s.addRange(range);toast('指令已選取，請按 ⌘C／Ctrl+C 複製。')}}));
 // Export only this trusted runtime and the inert command data. The online page
 // keeps script-src self; each standalone download authorizes its exact script hash.
@@ -6,7 +6,7 @@ const download=document.querySelector('a.download');
 download.addEventListener('click',async event=>{
  event.preventDefault();
  try{
-  const runtime=('('+initializeLinearTPMGuide.toString()+')();').replace(/<\/script/gi,'<\\/script');
+  const runtime=('('+initializeLinearBoardGuide.toString()+')();').replace(/<\/script/gi,'<\\/script');
   const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(runtime));
   const hash=btoa(String.fromCharCode(...new Uint8Array(digest)));
   const copy=document.documentElement.cloneNode(true);
@@ -30,7 +30,7 @@ download.addEventListener('click',async event=>{
   copy.querySelector('a.download').setAttribute('href','#download');
   const blob=new Blob(['<!doctype html>\n',copy.outerHTML],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob),link=document.createElement('a');
-  link.href=url;link.download='linear-tpm-command-tutorial.html';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  link.href=url;link.download='linearboard-command-tutorial.html';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   toast('已下載完整離線版 HTML；頁面中的指令不會自動執行。');
  }catch(error){
   if(location.protocol==='http:'||location.protocol==='https:')location.assign(download.href);
@@ -51,8 +51,8 @@ function build(){
  if(name==='organize-task-batch'&&ids)arg+=' '+ids;
  if(name==='dispatch'&&mode==='batch')arg+=' Batch '+(validBatch?batch:'〈批次編號〉');
  if(name==='dispatch'&&mode==='issues')arg+=' '+(ids||'〈issue IDs〉');
- if(name==='debug')arg+=' '+($('debugsource').value.trim()||'〈Linear 回報文件 URL 或來源 issue IDs〉');
- let text='$linear-tpm '+name+(arg?' '+arg:'');
+ if(name==='debug')arg+=' '+($('debugsource').value.trim()||'〈LinearBoard 回報文件 URL 或來源 issue IDs〉');
+ let text='$linearboard '+name+(arg?' '+arg:'');
  if(name==='create-issues-FE')text+='\n'+c.extended.replaceAll('PocketMap',p).replaceAll('M1',m);
  else if(name==='create-issues-BE'){
   text+='\n根據既有 US、PRDs 與已確認的資料／服務範圍建立或重用 BE issues。由 agent 先查核現有服務、相依套件與官方 SDK／API 文件，選用符合平台與資料邊界的技術。保留原生 '+m+'、'+m+'＋所有來源 US labels、Category BackEnd 及 Coder；共用契約指定負責票，選型依據、限制、待驗證項目與相依寫入 tickets，建立或重用團隊 Issues 上方的 '+p+'-BE View，不 dispatch。';
@@ -73,7 +73,7 @@ inputs.forEach(id=>$(id).addEventListener('input',build));build();
 let activeStage=document.querySelector('[data-stage][aria-pressed="true"]')?.dataset.stage||'';function filterCommands(){const q=$('search').value.trim().toLowerCase();let n=0;document.querySelectorAll('#catalog tbody tr').forEach(r=>{const hay=r.dataset.search.toLowerCase(),name=r.querySelector('code').textContent,cmd=data.find(c=>c.name===name);const stageOK=!activeStage||(activeStage==='交付'?['開發拆票','交付規劃','交付'].includes(cmd.phase):cmd.phase===activeStage);const ok=hay.includes(q)&&stageOK;r.hidden=!ok;if(ok)n++});$('result-count').textContent=n+' / '+data.length+' 個指令';$('search-empty').hidden=n!==0} filterCommands(); $('search').addEventListener('input',filterCommands);document.querySelectorAll('[data-stage]').forEach(b=>b.addEventListener('click',()=>{activeStage=b.dataset.stage;document.querySelectorAll('[data-stage]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));filterCommands()}));$('clear-search').addEventListener('click',()=>{$('search').value='';activeStage='';document.querySelectorAll('[data-stage]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.stage==='')));filterCommands();$('search').focus()});
 function composeCommand(name){$('action').value=name;build();location.hash='builder';$('action').focus({preventScroll:true})}document.querySelectorAll('[data-command]').forEach(b=>b.addEventListener('click',()=>composeCommand(b.dataset.command)));
 $('menu-toggle').addEventListener('click',()=>{const open=$('menu-toggle').getAttribute('aria-expanded')!=='true';$('menu-toggle').setAttribute('aria-expanded',String(open));$('guide-nav').classList.toggle('is-open',open)});document.querySelectorAll('#guide-nav a').forEach(a=>a.addEventListener('click',()=>{$('guide-nav').classList.remove('is-open');$('menu-toggle').setAttribute('aria-expanded','false')}));
-const marks=[...document.querySelectorAll('[data-progress]')],key='linear-tpm-guide-reading-v1';let stored={};try{stored=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}function progress(){const n=marks.filter(c=>c.checked).length;$('progress').value=n;$('progress-label').textContent='閱讀進度 '+n+' / '+marks.length;const saved={};marks.forEach(c=>saved[c.dataset.progress]=c.checked);try{localStorage.setItem(key,JSON.stringify(saved))}catch(e){}}marks.forEach(c=>{c.checked=!!stored[c.dataset.progress];c.addEventListener('change',progress)});$('reset').addEventListener('click',()=>{marks.forEach(c=>c.checked=false);progress();toast('已重設閱讀進度；未修改 Linear。')});progress();
+const marks=[...document.querySelectorAll('[data-progress]')],key='linearboard-guide-reading-v1';let stored={};try{stored=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}function progress(){const n=marks.filter(c=>c.checked).length;$('progress').value=n;$('progress-label').textContent='閱讀進度 '+n+' / '+marks.length;const saved={};marks.forEach(c=>saved[c.dataset.progress]=c.checked);try{localStorage.setItem(key,JSON.stringify(saved))}catch(e){}}marks.forEach(c=>{c.checked=!!stored[c.dataset.progress];c.addEventListener('change',progress)});$('reset').addEventListener('click',()=>{marks.forEach(c=>c.checked=false);progress();toast('已重設閱讀進度；未修改 LinearBoard。')});progress();
 const links=[...document.querySelectorAll('nav a')];if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{for(const e of entries)if(e.isIntersecting)links.forEach(a=>(a.classList.toggle('active',a.hash==='#'+e.target.id),a.hash==='#'+e.target.id?a.setAttribute('aria-current','location'):a.removeAttribute('aria-current')))},{rootMargin:'-5% 0px -65% 0px',threshold:0});document.querySelectorAll('main>section').forEach(s=>observer.observe(s))}
 }
-initializeLinearTPMGuide();
+initializeLinearBoardGuide();

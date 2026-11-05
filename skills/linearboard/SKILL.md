@@ -1,11 +1,11 @@
 ---
 name: linearboard
-description: "Plan products and manage requirements, design, visual references, FE/BE delivery, scoped dispatch, synchronization and verified review in the standalone local LinearBoard application. Use linear-tpm instead for the Linear SaaS service."
+description: "Plan products and manage requirements, design, visual references, FE/BE delivery, scoped dispatch, synchronization and verified review in the standalone local LinearBoard application."
 ---
 
 # LinearBoard
 
-This skill's command router and local application rules are authoritative. Use `linear-tpm` instead for the Linear SaaS service. Read [application operations](references/linearboard-operations.md) before any LinearBoard operation.
+This standalone skill's command router and local application rules are authoritative. Read [application operations](references/linearboard-operations.md) before any LinearBoard operation.
 
 ## Destination and storage boundary
 
