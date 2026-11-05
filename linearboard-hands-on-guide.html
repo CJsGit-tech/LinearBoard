@@ -1,0 +1,312 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="LinearBoard skill Hands-on 操作指南：以佔位符示範從願景、里程碑故事、PRD、視覺、交付到除錯同步。"><title>LinearBoard｜Hands-on 操作指南</title><style>
+    :root {
+      --paper: #f7f8f4;
+      --surface: #ffffff;
+      --soft: #edf2eb;
+      --ink: #20302a;
+      --muted: #617067;
+      --line: #dce4dc;
+      --green: #1f6548;
+      --green-dark: #174d38;
+      --amber: #a8662d;
+      --nav: 252px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 28px; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font: 15px/1.82 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    }
+    a { color: var(--green); text-underline-offset: 4px; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+      outline: 3px solid #7ba17c;
+      outline-offset: 3px;
+    }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; overflow-wrap: anywhere; }
+    [hidden] { display: none !important; }
+
+    .skip-link {
+      position: fixed;
+      top: -100px;
+      left: 20px;
+      z-index: 100;
+      padding: 10px 16px;
+      color: white;
+      background: var(--green);
+      border-radius: 4px;
+    }
+    .skip-link:focus { top: 12px; }
+
+    aside {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: var(--nav);
+      padding: 29px 20px;
+      overflow-y: auto;
+      color: var(--ink);
+      background: #eef2ec;
+      border-right: 1px solid var(--line);
+    }
+    .brand { font-size: 22px; font-weight: 800; letter-spacing: -1px; }
+    .brand span { color: var(--green); }
+    .small { color: var(--muted); font-size: 10px; line-height: 1.7; letter-spacing: .06em; }
+    nav { display: grid; gap: 3px; margin: 24px 0; }
+    nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 38px;
+      padding: 8px 10px;
+      color: #4e6155;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    nav a span { color: #78887d; font: 11px/1.6 ui-monospace, monospace; }
+    nav a:hover, nav a.active { color: var(--green-dark); background: #dfe8dc; }
+    nav a.active { font-weight: 700; }
+    .nav-label { margin: 15px 10px 5px; color: #66776b; font-size: 10px; letter-spacing: .1em; }
+    .nav-arrow { margin-left: auto; }
+    .aside-bottom { padding: 20px 10px 0; border-top: 1px solid var(--line); }
+    .progress-label { color: #52675a; font-size: 11px; }
+    progress { width: 100%; height: 5px; margin: 9px 0; accent-color: var(--green); }
+    #reset, #menu-toggle {
+      min-height: 38px;
+      padding: 6px 0;
+      color: var(--green);
+      background: transparent;
+      border: 0;
+      font-size: 11px;
+    }
+    #menu-toggle { display: none; }
+
+    main { margin-left: var(--nav); max-width: 1480px; padding: 34px clamp(30px, 5vw, 82px) 82px; }
+    .topline { display: flex; align-items: center; justify-content: space-between; gap: 18px; color: var(--muted); font-size: 11px; }
+    .page-tools { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .page-tools a { color: var(--muted); text-decoration: none; }
+    .page-tools .app-link { color: white; background: var(--green); padding: 8px 13px; border-radius: 4px; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: clamp(28px, 5vw, 76px);
+      align-items: center;
+      padding: 62px 0 42px;
+    }
+    .eyebrow { color: var(--green); font-size: 10px; font-weight: 750; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 15px 0 20px; font-size: clamp(38px, 4.4vw, 62px); line-height: 1.2; letter-spacing: -.065em; }
+    h1 em { color: var(--green); font-style: normal; }
+    .lead { max-width: 560px; color: #4d6055; font-size: 16px; line-height: 1.9; }
+    .hero-actions { display: flex; align-items: center; gap: 22px; margin-top: 27px; flex-wrap: wrap; }
+    .primary-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 28px;
+      min-height: 44px;
+      padding: 10px 18px;
+      color: white;
+      background: var(--green);
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .primary-action:hover { background: var(--green-dark); }
+    .secondary-action { font-size: 12px; text-decoration: none; }
+    .hero-index > a {
+      position: relative;
+      display: block;
+      padding: 17px 26px 17px 0;
+      color: var(--ink);
+      border-bottom: 1px solid var(--line);
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .hero-index > a span { display: block; margin-bottom: 4px; color: var(--muted); font-size: 10px; letter-spacing: .05em; }
+    .hero-index > a b { position: absolute; right: 0; top: 36px; color: var(--green); font-weight: 400; }
+    .hero-index > a:hover { color: var(--green); }
+    .meta { display: flex; gap: 24px; flex-wrap: wrap; padding: 16px 0; margin-bottom: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+    .status-dot { display: inline-block; width: 6px; height: 6px; margin-right: 6px; background: var(--green); border-radius: 50%; }
+
+    section { padding: 55px 0 24px; scroll-margin-top: 20px; }
+    section > h2, .tutorial-intro h2 { margin: 10px 0 14px; font-size: 29px; line-height: 1.45; letter-spacing: -.045em; }
+    section > p, .tutorial-intro p { max-width: 790px; color: var(--muted); }
+    h3 { line-height: 1.45; }
+    p { margin: 11px 0 18px; }
+    ul, ol { padding-left: 23px; }
+    li { margin: 7px 0; }
+    .tutorial-intro { padding-top: 68px; margin-top: 24px; border-top: 1px solid var(--line); }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 38px; }
+    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .route { padding: 20px 0; border-top: 2px solid var(--ink); }
+    .route h3 { margin: 8px 0; font-size: 17px; }
+    .route .path { color: var(--green); font: 12px/1.9 ui-monospace, monospace; }
+    .flow { display: flex; gap: 7px; flex-wrap: wrap; margin: 25px 0; }
+    .flow a { padding: 8px 0; margin-right: 5px; text-decoration: none; font-size: 12px; }
+    .flow b { align-self: center; color: #94a098; font-weight: 400; }
+    .note { padding: 18px 22px; margin: 22px 0; color: #28513e; background: #edf3e9; border-radius: 4px; font-size: 13px; }
+    .note.warm { color: #73522f; background: #f5eee3; }
+    .mini-card { padding: 17px 0; border-top: 2px solid var(--line); }
+    .mini-card h3 { margin: 7px 0; font-size: 16px; }
+    .mini-card p { color: var(--muted); font-size: 13px; }
+
+    .build-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; padding: 24px 0; }
+    .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 17px 19px; }
+    .fields label { display: grid; gap: 7px; color: var(--muted); font-size: 11px; font-weight: 650; }
+    .fields label:first-child, .fields .wide { grid-column: 1 / -1; }
+    .fields input, .fields select {
+      width: 100%;
+      min-width: 0;
+      min-height: 44px;
+      padding: 11px 12px;
+      color: var(--ink);
+      background: #edf1e9;
+      border: 0;
+      border-bottom: 1px solid #b8c5b8;
+      border-radius: 3px 3px 0 0;
+      font-size: 13px;
+    }
+    .builder-help { color: var(--green); font-size: 12px; }
+    .output-label { display: flex; justify-content: space-between; gap: 12px; margin: 0 0 9px; color: var(--green); font-size: 11px; font-weight: 700; }
+    .output-label span { color: var(--muted); font-size: 10px; font-weight: 400; }
+    .codebox { overflow: hidden; margin: 16px 0 22px; color: #eef5eb; background: #21372d; border-radius: 5px; }
+    .code-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 9px 14px; color: #c8d8c4; background: #294437; font: 9px/1.6 ui-monospace, monospace; letter-spacing: .1em; }
+    .codebox pre { margin: 0; padding: 18px 20px; white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.9 ui-monospace, monospace; }
+    .copy, .compose-command {
+      min-height: 34px;
+      color: var(--green);
+      background: transparent;
+      border: 0;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .copy { min-width: 58px; color: #eef5e9; border: 1px solid #5b7460; border-radius: 3px; }
+    .copy:hover { background: #3a5b46; }
+    .compose-command:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+    .stage-filters { display: flex; gap: 20px; flex-wrap: wrap; margin: 22px 0 16px; }
+    .stage-filters button { min-height: 40px; padding: 8px 0; color: var(--muted); background: transparent; border: 0; border-bottom: 2px solid transparent; font-size: 12px; }
+    .stage-filters button[aria-pressed="true"] { color: var(--green); border-bottom-color: var(--green); font-weight: 700; }
+    #search { width: 100%; min-height: 46px; padding: 11px 16px; background: #edf1e9; border: 0; border-radius: 4px; }
+    .table-count { color: var(--muted); font-size: 11px; }
+    .table-scroll { width: 100%; min-width: 0; max-width: 100%; overflow-x: auto; contain: inline-size paint; }
+    table { width: 100%; min-width: 660px; border-collapse: collapse; margin: 18px 0; }
+    th { padding: 10px; color: var(--muted); border-bottom: 1px solid #aebcaf; text-align: left; font-size: 10px; letter-spacing: .03em; }
+    td { padding: 11px 10px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 12px; }
+    tbody tr:hover { background: #f0f4ec; }
+    .use-command { min-height: 36px; color: var(--green); background: transparent; border: 0; font-size: 11px; }
+
+    .command { padding: 27px 0 34px; margin: 25px 0 14px; border-bottom: 1px solid var(--line); }
+    .command-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+    .command h3 { margin: 6px 0; font: 700 clamp(17px, 1.8vw, 23px)/1.4 ui-monospace, monospace; letter-spacing: -.035em; }
+    .subtitle { margin: 2px 0 6px; font-size: 14px; }
+    .badge { flex-shrink: 0; padding: 4px 9px; color: #46604d; background: #e8eee6; border-radius: 3px; font-size: 10px; }
+    .command dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin: 24px 0; }
+    .command dl > div { min-width: 0; }
+    dt { margin-bottom: 7px; color: var(--green); font-size: 11px; font-weight: 750; }
+    dd { margin: 0; color: #4d6154; font-size: 13px; }
+    .boundary { color: var(--muted); font-size: 12px; }
+    details { margin: 14px 0; font-size: 13px; }
+    summary { min-height: 38px; padding: 7px 0; color: var(--green); cursor: pointer; font-weight: 700; }
+    .checklist { padding: 0; list-style: none; }
+    .checklist label { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; font-size: 13px; }
+    .checklist input { margin-top: 6px; accent-color: var(--green); }
+    .done-row { display: flex; gap: 9px; align-items: center; margin-top: 24px; color: var(--green); font-size: 12px; }
+    .done-row input { width: 16px; height: 16px; accent-color: var(--green); }
+    .finish { margin-top: 30px; padding: 24px 28px; background: #e7efe3; }
+    .finish h3 { margin: 0 0 7px; font-size: 20px; }
+    .finish p { margin: 0; color: var(--muted); }
+    footer { padding-top: 28px; margin-top: 45px; border-top: 1px solid var(--line); }
+    footer p { color: var(--muted); font-size: 11px; }
+    .toast { position: fixed; right: 22px; bottom: 22px; z-index: 30; max-width: calc(100vw - 44px); padding: 11px 17px; color: white; background: #213d2a; border-radius: 5px; font-size: 12px; }
+    .toast:empty { display: none; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 1050px) {
+      :root { --nav: 220px; }
+      main { padding-left: 31px; padding-right: 31px; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-index { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+      .build-panel { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      aside { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 12px 20px; background: #eef2ecf5; backdrop-filter: blur(12px); }
+      aside > .small, .aside-bottom { display: none; }
+      #menu-toggle { display: block; }
+      aside nav { display: none; width: 100%; max-height: 67vh; margin: 10px 0 4px; overflow: auto; grid-template-columns: 1fr 1fr; }
+      aside nav.is-open { display: grid; }
+      .nav-label { grid-column: 1 / -1; }
+      main { margin: 0; padding: 21px 20px 55px; }
+      .hero { padding: 37px 0 27px; }
+      .hero h1 { font-size: 40px; }
+      .hero-index { grid-template-columns: 1fr; gap: 0; }
+      .two, .three { grid-template-columns: 1fr; gap: 0; }
+      .fields { grid-template-columns: 1fr; }
+      .fields label:first-child, .fields .wide { grid-column: auto; }
+      .command dl { grid-template-columns: 1fr; gap: 15px; }
+      section { padding-top: 42px; scroll-margin-top: 74px; }
+      .topline > span { max-width: 140px; }
+      .page-tools { gap: 10px; }
+    }
+    
+  
+.guide-table{overflow-x:auto}.guide-table table{min-width:700px}.guide-section-title{margin-top:45px}.codebox pre{padding-right:74px}.command .practice-check{margin:16px 0}.guide-check{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--green)}.guide-check input{margin-top:6px}.command-follow{white-space:pre-wrap;overflow-wrap:anywhere;padding:16px;border-left:2px solid var(--line);font-size:13px}.project-example{font:14px/1.8 ui-monospace,monospace;padding:16px 20px;background:var(--surface)}.copy:focus-visible{outline:2px solid white}.guide-status{font-size:12px;color:var(--muted)}.fields textarea{width:100%;min-height:100px;padding:10px;border:1px solid var(--line);border-radius:4px;background:#f6f7f3;color:var(--ink);font:inherit}.aside-bottom{font-size:12px}.fields .wide{grid-column:1/-1}.hero{grid-template-columns:1.4fr 1fr}.command-search{width:100%;padding:12px;border:1px solid var(--line);background:white;border-radius:4px}.command[data-match="false"]{display:none}section[id]{scroll-margin-top:20px}.toc-mobile{display:none}@media(max-width:760px){.hero{grid-template-columns:1fr}.hero-index{display:none}.fields{grid-template-columns:1fr}.command dl{grid-template-columns:1fr}.topline{flex-wrap:wrap}.fields .wide{grid-column:auto}}
+</style></head><body><aside aria-label="章節導覽"><div class="brand">LinearBoard</div><div class="small">HANDS-ON GUIDE</div><nav><a href="#workflow"><span>01</span>工作流程</a><a href="#setup"><span>02</span>開始前</a><a href="#builder"><span>03</span>指令組合器</a><a href="#catalog"><span>04</span>指令速查</a><a href="#practice"><span>05</span>逐步操作</a><a href="#review"><span>06</span>審閱與驗收</a><a href="#troubleshoot"><span>07</span>常見問題</a><a href="#sources"><span>08</span>依據與版本</a></nav><div class="aside-bottom"><label class="progress-label" for="progress">練習進度 <span id="progress-label">0 / 14</span></label><progress id="progress" max="14" value="0"></progress><p>勾選只記錄本頁練習進度。<br>不代表 App 紀錄已通過驗收。</p><button id="reset" type="button">重設練習進度</button></div></aside><main><div class="topline"><span>操作手冊 / $linearboard</span><span>依據已安裝 skill · 2026-11-05</span></div><header class="hero"><div><div class="eyebrow">Hands-on guideline</div><h1>用 LinearBoard<br>完成一次<em>產品交付</em></h1><p class="lead">從願景、故事與 PRD，到設計、派工和驗收。每一步都有可複製指令、App 中應看到的產出，以及操作後的檢查方式。</p><div class="hero-actions"><a class="primary-action" href="#workflow">查看流程 →</a><a class="secondary-action" href="#builder">組合這次的指令</a></div></div><div class="hero-index"><a href="#setup"><span>01 / 準備</span>替換佔位符，確認目的地 <b>↗</b></a><a href="#practice"><span>02 / 操作</span>依現況選擇第一個缺少的步驟 <b>↗</b></a><a href="#review"><span>03 / 審閱</span>分清設計核准、交審與最終驗收 <b>↗</b></a></div></header><section id="workflow"><div class="eyebrow">01 / Workflow</div><h2>從第一個缺口接續</h2><p>這是參考路徑，不是一次送出的批次命令。每個寫入或執行步驟都由你單獨提出；已有合格產出就重用，不重跑。</p><div class="flow"><a href="#cmd-planning">構想</a><b>→</b><a href="#cmd-create-vision-document">願景</a><b>→</b><a href="#cmd-create-milestones">里程碑＋故事文件</a><b>→</b><a href="#cmd-create-PRDs">PRDs</a><b>→</b><a href="#cmd-create-designs">設計規格</a><b>→</b><a href="#cmd-create-visuals">完整視覺核准</a><b>→</b><a href="#cmd-create-issues-FE">FE／BE 開發票</a><b>→</b><a href="#cmd-dispatch">派工</a><b>→</b><a href="#review">交審與驗收</a></div><div class="two"><article class="route"><h3>只有構想</h3><p>先 planning；確認後保存願景，再從故事分組建立里程碑。不要直接要求 dispatch。</p></article><article class="route"><h3>已經有需求或工程進度</h3><p>先讀目前紀錄，找第一個缺少的交付物。PRD 有重大未決問題才進行 prd-demystify；多張就緒票需要排序時才 organize-task-batch。</p></article></div><div class="note">經確認的 BE-only 或非視覺範圍，可略過不適用的設計階段；這個判斷必須有需求紀錄依據。</div></section><section id="setup"><div class="eyebrow">02 / Setup</div><h2>先替換佔位符</h2><p>以下是貼到 Codex 的 skill 指令，不是 Terminal 指令。指南只產生文字，不會呼叫 API、啟動派工或修改你的專案。</p><div class="project-example">&lt;Team&gt; / &lt;Project&gt; / &lt;Milestone&gt;<br>&lt;Issue IDs&gt; · &lt;Repo path&gt; · &lt;App URL or run target&gt;</div><ul><li><code>&lt;Project&gt;</code> 是 LinearBoard 的專案名稱；<code>&lt;Repo path&gt;</code> 才是工程目錄。</li><li><code>&lt;Milestone&gt;</code> 請填實際里程碑名稱或可唯一解析的 ID，不要假設第一個就是 M1。</li><li><code>&lt;Issue IDs&gt;</code> 請填從 App 讀到的確切識別碼。送出前替換所有剩餘佔位符。</li></ul><h3>啟動與儲存</h3><p>預設應用程式位址為 <a href="http://127.0.0.1:8765/">http://127.0.0.1:8765</a>。透過 operate.py 執行時會先檢查服務；已啟動就沿用，未啟動時檢查既有 Docker Compose、secret 與 PostgreSQL volume，再啟動服務。使用 connected MCP tools 前，Codex 先執行相同 preflight。</p><p>若既有部署、volume、image 或權限不可用，受影響操作會停止並回報。啟動檢查不會另建資料庫、遷移資料或改用舊 SQLite。</p><div class="two"><article class="route"><h3>產品工作紀錄</h3><p>願景、故事、PRD、決策、設計規格、票、派工與驗證，保存到 LinearBoard 的 PostgreSQL。工程目錄不另存 PM 文件副本。</p></article><article class="route"><h3>工程與視覺產物</h3><p>程式、測試、設定保留在 repo。create-visuals 的唯讀 HTML gallery 與 imagegen 原圖可保留，供視覺審閱；核准與狀態仍以 App 紀錄為準。</p></article></div></section><section id="builder"><div class="eyebrow">03 / Command builder</div><h2>組合這次的指令</h2><div class="build-panel"><div class="fields"><label>指令<select id="action"><option value="help">help — 查看可用指令</option><option value="planning">planning — 整理產品構想</option><option value="create-vision-document">create-vision-document — 保存產品願景</option><option value="create-milestones">create-milestones — 從故事分組成里程碑</option><option value="create-PRDs">create-PRDs — 建立可追溯的產品規則</option><option value="prd-demystify">prd-demystify — 直接釐清並修訂 PRD</option><option value="create-designs">create-designs — 保存設計方向與互動規格</option><option value="create-visuals">create-visuals — 從版型比較到完整視覺審閱</option><option value="create-issues-FE">create-issues-FE — 拆出前端交付責任</option><option value="create-issues-BE">create-issues-BE — 拆出資料與服務責任</option><option value="organize-task-batch">organize-task-batch — 提議可審閱的交付批次</option><option value="dispatch">dispatch — 實作指定的交付範圍</option><option value="debug">debug — 從問題回報到修復驗證</option><option value="sync">sync — 對齊已確認的紀錄與 UI 證據</option></select></label><label>專案<input id="project" placeholder="<Project>" autocomplete="off"></label><label>里程碑<input id="milestone" placeholder="<Milestone>" autocomplete="off"></label><label>派工對象<select id="dispatch-mode"><option value="issues">指定 issue IDs</option><option value="batch">已保存的 Batch</option></select></label><label id="ids-field">Issue IDs<input id="issueids" placeholder="<Issue IDs>" autocomplete="off"></label><label id="batch-field" hidden>已保存 Batch 編號<input id="batch" inputmode="numeric" placeholder="<Batch number>"></label><label class="wide" id="report-field" hidden>問題來源<input id="report" placeholder="<Report document URL or issue IDs>"></label><label class="wide" id="scope-field" hidden>同步範圍<input id="scope" placeholder="<Scope>"></label><label class="wide">補充條件<textarea id="additional" placeholder="例如：已確認的需求、這次的畫面範圍或執行目標。"></textarea></label></div><p class="builder-help" id="builder-help"></p><div class="codebox"><button class="copy" type="button">複製</button><pre><code id="built"></code></pre></div><p class="guide-status" id="placeholder-status" role="status"></p></div></section><section id="catalog"><div class="eyebrow">04 / Quick reference</div><h2>指令與寫入範圍</h2><input class="command-search" id="search" type="search" aria-label="搜尋指令" placeholder="搜尋指令、用途或產出"><p id="result-count" class="guide-status" aria-live="polite"></p><div class="guide-table"><table><thead><tr><th>指令</th><th>用途</th><th>影響</th><th>操作</th></tr></thead><tbody><tr data-command-row="help"><td><a href="#cmd-help"><code>help</code></a></td><td>查看可用指令</td><td>唯讀</td><td><button type="button" class="use-command" data-command="help">帶入指令 ↗</button></td></tr><tr data-command-row="planning"><td><a href="#cmd-planning"><code>planning</code></a></td><td>整理產品構想</td><td>討論</td><td><button type="button" class="use-command" data-command="planning">帶入指令 ↗</button></td></tr><tr data-command-row="create-vision-document"><td><a href="#cmd-create-vision-document"><code>create-vision-document</code></a></td><td>保存產品願景</td><td>寫入文件</td><td><button type="button" class="use-command" data-command="create-vision-document">帶入指令 ↗</button></td></tr><tr data-command-row="create-milestones"><td><a href="#cmd-create-milestones"><code>create-milestones</code></a></td><td>從故事分組成里程碑</td><td>寫入里程碑與文件</td><td><button type="button" class="use-command" data-command="create-milestones">帶入指令 ↗</button></td></tr><tr data-command-row="create-PRDs"><td><a href="#cmd-create-PRDs"><code>create-PRDs</code></a></td><td>建立可追溯的產品規則</td><td>寫入 PRD issues 與 View</td><td><button type="button" class="use-command" data-command="create-PRDs">帶入指令 ↗</button></td></tr><tr data-command-row="prd-demystify"><td><a href="#cmd-prd-demystify"><code>prd-demystify</code></a></td><td>直接釐清並修訂 PRD</td><td>更新原 PRD</td><td><button type="button" class="use-command" data-command="prd-demystify">帶入指令 ↗</button></td></tr><tr data-command-row="create-designs"><td><a href="#cmd-create-designs"><code>create-designs</code></a></td><td>保存設計方向與互動規格</td><td>寫入兩份文件</td><td><button type="button" class="use-command" data-command="create-designs">帶入指令 ↗</button></td></tr><tr data-command-row="create-visuals"><td><a href="#cmd-create-visuals"><code>create-visuals</code></a></td><td>從版型比較到完整視覺審閱</td><td>產圖；授權後上傳與建票</td><td><button type="button" class="use-command" data-command="create-visuals">帶入指令 ↗</button></td></tr><tr data-command-row="create-issues-FE"><td><a href="#cmd-create-issues-FE"><code>create-issues-FE</code></a></td><td>拆出前端交付責任</td><td>寫入 FE issues 與 View</td><td><button type="button" class="use-command" data-command="create-issues-FE">帶入指令 ↗</button></td></tr><tr data-command-row="create-issues-BE"><td><a href="#cmd-create-issues-BE"><code>create-issues-BE</code></a></td><td>拆出資料與服務責任</td><td>寫入 BE issues 與 View</td><td><button type="button" class="use-command" data-command="create-issues-BE">帶入指令 ↗</button></td></tr><tr data-command-row="organize-task-batch"><td><a href="#cmd-organize-task-batch"><code>organize-task-batch</code></a></td><td>提議可審閱的交付批次</td><td>唯讀</td><td><button type="button" class="use-command" data-command="organize-task-batch">帶入指令 ↗</button></td></tr><tr data-command-row="dispatch"><td><a href="#cmd-dispatch"><code>dispatch</code></a></td><td>實作指定的交付範圍</td><td>派工、實作與獨立驗證</td><td><button type="button" class="use-command" data-command="dispatch">帶入指令 ↗</button></td></tr><tr data-command-row="debug"><td><a href="#cmd-debug"><code>debug</code></a></td><td>從問題回報到修復驗證</td><td>預設包含修復</td><td><button type="button" class="use-command" data-command="debug">帶入指令 ↗</button></td></tr><tr data-command-row="sync"><td><a href="#cmd-sync"><code>sync</code></a></td><td>對齊已確認的紀錄與 UI 證據</td><td>更新限定範圍</td><td><button type="button" class="use-command" data-command="sync">帶入指令 ↗</button></td></tr></tbody></table></div><p class="muted">相容別名：create-userstories／user-stories／stories 都會執行合併後的 create-milestones，建立原生里程碑與分組故事文件，不是獨立建故事票。其他既有別名以安裝的 skill 為準。</p></section><section id="practice"><div class="eyebrow">05 / Practice</div><h2>逐步操作與讀回檢查</h2><p>每次選一個適用步驟。送出後依「檢查」開啟 App 產出，再決定下一步；複製指令本身不代表已執行。</p><article class="command" id="cmd-help"><div class="command-top"><div><div class="eyebrow">01 / 起步</div><h3>help</h3><p class="subtitle">查看可用指令</p></div><span class="badge">唯讀</span></div><dl><div><dt>準備</dt><dd>目前安裝的 skill。</dd></div><div><dt>產出</dt><dd>只有指令及用途清單。</dd></div><div><dt>檢查</dt><dd>對照本頁 14 個主要指令；story 指令是相容別名。</dd></div></dl><div class="codebox"><button class="copy" type="button">複製</button><pre><code>$linearboard help</code></pre></div><p class="boundary">不寫入應用程式，也不執行後續步驟。</p><button type="button" class="use-command" data-command="help">帶入指令組合器 ↗</button><label class="guide-check"><input type="checkbox" data-progress="help">我已練習並檢查這一步的適用產出</label></article><article class="command" id="cmd-planning"><div class="command-top"><div><div class="eyebrow">02 / 規劃</div><h3>planning</h3><p class="subtitle">整理產品構想</p></div><span class="badge">討論</span></div><dl><div><dt>準備</dt><dd>&lt;Product idea&gt;、&lt;Target user&gt;、&lt;Constraints&gt;。</dd></div><div><dt>產出</dt><dd>聊天中的產品問題、價值、範圍與待驗證假設。</dd></div><div><dt>檢查</dt><dd>你能指出產品服務誰、解決什麼問題，以及這輪不做什麼。</dd></div></dl><div class="codebox"><button class="copy" type="button">複製</button><pre><code>$linearboard planning &lt;Project&gt;
+產品構想：&lt;Product idea&gt;
+目標使用者／玩家：&lt;Target user&gt;
+限制：&lt;Constraints&gt;
+先討論方向，不保存紀錄。</code></pre></div><p class="boundary">只有明確要求保存，才會寫入 LinearBoard。</p><button type="button" class="use-command" data-command="planning">帶入指令組合器 ↗</button><label class="guide-check"><input type="checkbox" data-progress="planning">我已練習並檢查這一步的適用產出</label></article><article class="command" id="cmd-create-vision-document"><div class="command-top"><div><div class="eyebrow">03 / 規劃</div><h3>create-vision-document</h3><p class="subtitle">保存產品願景</p></div><span class="badge">寫入文件</span></div><dl><div><dt>準備</dt><dd>已確認的 planning 結論與目的地 &lt;Team&gt;／&lt;Project&gt;。</dd></div><div><dt>產出</dt><dd>原生 Vision Project Document，整理 4W1H、價值、邊界與假設。</dd></div><div><dt>檢查</dt><dd>在「文件」開啟願景，確認專案、內容與可存取的文件連結。</dd></div></dl><div class="codebox"><button class="copy" type="button">複製</button><pre><code>$linearboard create-vision-document &lt;Project&gt;
+團隊：&lt;Team&gt;
+依據以上已確認的 planning 結論建立或重用願景文件。保留尚未確認的假設。</code></pre></div><p class="boundary">不建立里程碑、故事票或開發票。</p><button type="button" class="use-command" data-command="create-vision-document">帶入指令組合器 ↗</button><label class="guide-check"><input type="checkbox" data-progress="create-vision-document">我已練習並檢查這一步的適用產出</label></article><article class="command" id="cmd-create-milestones"><div class="command-top"><div><div class="eyebrow">04 / 規劃</div><h3>create-milestones</h3><p class="subtitle">從故事分組成里程碑</p></div><span class="badge">寫入里程碑與文件</span></div><dl><div><dt>準備</dt><dd>願景、已確認範圍與既有里程碑／故事。</dd></div><div><dt>產出</dt><dd>原生 milestones ＋一份按里程碑分組的故事總覽文件；故事有穩定 US ID、anchor 與結構索引。</dd></div><div><dt>檢查</dt><dd>「里程碑」可見原生紀錄；「文件」中每則故事有核心驗收且只歸屬一個原生 milestone。索引與可讀段落一致。</dd></div></dl><div class="codebox"><button class="copy" type="button">複製</button><pre><code>$linearboard create-milestones &lt;Project&gt;
+依據既有願景產生故事並按可觀察成果分組。重用既有里程碑與故事 ID，不虛構日期。</code></pre></div><p class="boundary">不建立 UserStory issues 或 UserStories View；已有舊故事票保留。</p><button type="button" class="use-command" data-command="create-milestones">帶入指令組合器 ↗</button><label class="guide-check"><input type="checkbox" data-progress="create-milestones">我已練習並檢查這一步的適用產出</label></article><article class="command" id="cmd-create-PRDs"><div class="command-top"><div><div class="eyebrow">05 / 需求</div><h3>create-PRDs</h3><p class="subtitle">建立可追溯的產品規則</p></div><span class="badge">寫入 PRD issues 與 View</span></div><dl><div><dt>準備</dt><dd>&lt;Milestone&gt; 的故事文件、穩定 US ID 與已確認規則。</dd></div><div><dt>產出</dt><dd>ProductRequirement issues、來源文件／故事連結、原生 milestone 與 &lt;Project&gt;-PRDs saved View。</dd></div><div><dt>檢查</dt><dd>開啟 PRD：來源故事能對上文件段落；原生 milestone 正確；來源索引含真實 document ID 與 story IDs；View 包含預期 PRDs。</dd></div></dl><div class="codebox"><button class="copy" type="button">複製</button><pre><code>$linearboard create-PRDs &lt;Project&gt; &lt;Milestone&gt;
+依據該里程碑的分組故事建立或重用 PRDs，保留待決問題；建立或重用 PRDs View 並驗證成員。</code></pre></div><p class="boundary">新票 Backlog；M／US labels 是選用輔助，保留既有標籤。文件段落不偽造為 issue relations。</p><button type="button" class="use-command" data-command="create-PRDs">帶入指令組合器 ↗</button><label class="guide-check"><input type="checkbox" data-progress="create-PRDs">我已練習並檢查這一步的適用產出</label></article><article class="command" id="cmd-prd-demystify"><div class="command-top"><div><div class="eyebrow">06 / 需求</div><h3>prd-demystify</h3><p class="subtitle">直接釐清並修訂 PRD</p></div><span class="badge">更新原 PRD</span></div><dl><div><dt>準備</dt><dd>現有 PRDs、來源故事與尚未決定的產品範圍／邊界。</dd></div><div><dt>產出</dt><dd>使用者確認後，直接更新擁有該規則的 PRD；需要時保留原生留言。</dd></div><div><dt>檢查</dt><dd>一次回答一個關鍵問題後，重開 PRD 檢查行為與驗收已反映答案；未回答的問題仍標示未決。</dd></div></dl><div class="codebox"><button class="copy" type="button">複製</button><pre><code>$linearboard prd-demystify &lt;Project&gt; &lt;Milestone&gt;
+先檢查既有答案，只問會影響產品範圍或驗收的未決問題，一次一題，確認後直接更新原 PRD。</code></pre></div><p class="boundary">不新增 QA 文件，不重寫既有歷史 QA，也不改 issue 狀態。</p><button type="button" class="use-command" data-command="prd-demystify">帶入指令組合器 ↗</button><label class="guide-check"><input type="checkbox" data-progress="prd-demystify">我已練習並檢查這一步的適用產出</label></article><article class="command" id="cmd-create-designs"><div class="command-top"><div><div class="eyebrow">07 / 設計</div><h3>create-designs</h3><p class="subtitle">保存設計方向與互動規格</p></div><span class="badge">寫入兩份文件</span></div><dl><div><dt>準備</dt><dd>來源故事、PRDs、已確認決策與可用參考。</dd></div><div><dt>產出</dt><dd>設計總覽、畫面／互動規格兩份 Project Documents，包含具產品特色的方向與具體建議。</dd></div><div><dt>檢查</dt><dd>在「文件」檢查兩份規格互連；screen／flow 可追到需求；入口、操作與 loading／empty／error 等適用狀態清楚。</dd></div></dl><div class="codebox"><button class="copy" type="button">複製</button><pre><code>$linearboard create-designs &lt;Project&gt; &lt;Milestone&gt;
+參考：&lt;Design references&gt;
+限制與偏好：&lt;Design constraints&gt;
+研究參考後提出設計建議，保存設計總覽與畫面／互動規格。</code></pre></div><p class="boundary">這一步只有文件，不產圖、不建立 Design tickets／View。</p><button type="button" class="use-command" data-command="create-designs">帶入指令組合器 ↗</button><label class="guide-check"><input type="checkbox" data-progress="create-designs">我已練習並檢查這一步的適用產出</label></article><article class="command" id="cmd-create-visuals"><div class="command-top"><div><div class="eyebrow">08 / 設計</div><h3>create-visuals</h3><p class="subtitle">從版型比較到完整視覺審閱</p></div><span class="badge">產圖；授權後上傳與建票</span></div><dl><div><dt>準備</dt><dd>既有設計規格、這次的畫面／元件／狀態範圍與已核准方向。</dd></div><div><dt>產出</dt><dd>imagegen studies、可開啟的唯讀 gallery；完整設計核准後建立或重用 Design tickets 與 &lt;Project&gt;-Designs View。</dd></div><div><dt>檢查</dt><dd>先核對生成範圍與批次，再檢查每張圖與 gallery；選定版型後補齊完整範圍。核准後讀回附件、Design tickets 與 View。</dd></div></dl><div class="codebox"><button class="copy" type="button">複製</button><pre><code>$linearboard create-visuals &lt;Project&gt; &lt;Milestone&gt;
+本次範圍：&lt;Screens, components and key states&gt;
+先說明覆蓋範圍與批次。新構圖比較適量代表版型；若是已選版型的小修，直接修訂。保留 imagegen 原圖。</code></pre></div><details><summary>接續對話範例</summary><div class="command-follow">選定版型後可回覆：「選 &lt;Layout&gt;，繼續原先指定的完整畫面與狀態範圍。」
+上傳時明說：「上傳 &lt;Exact versions&gt; 到所屬規格文件。」
+完整審閱後明說：「核准 &lt;Exact screen/version inventory&gt; 的完整設計範圍，建立或重用 Design tickets 與 View。」
+原生附件 approved 欄位仍由使用者在 App 操作；Codex 不代填。</div></details><p class="boundary">新構圖通常比較 2–3 版代表畫面；小修直接改選定版型。選版、上傳、完整設計核准、附件原生核准分開。</p><button type="button" class="use-command" data-command="create-visuals">帶入指令組合器 ↗</button><label class="guide-check"><input type="checkbox" data-progress="create-visuals">我已練習並檢查這一步的適用產出</label></article><article class="command" id="cmd-create-issues-FE"><div class="command-top"><div><div class="eyebrow">09 / 交付</div><h3>create-issues-FE</h3><p class="subtitle">拆出前端交付責任</p></div><span class="badge">寫入 FE issues 與 View</span></div><dl><div><dt>準備</dt><dd>來源故事、PRDs、設計規格、確切核准的視覺版本與 &lt;Repo path&gt;。</dd></div><div><dt>產出</dt><dd>FrontEnd delivery issues、驗收、來源、阻擋相依與 &lt;Project&gt;-FE View。</dd></div><div><dt>檢查</dt><dd>任務可獨立審閱；路由、狀態、資料效果與 UI 驗證目標清楚。確切視覺參照能從 issue 開啟。</dd></div></dl><div class="codebox"><button class="copy" type="button">複製</button><pre><code>$linearboard create-issues-FE &lt;Project&gt; &lt;Milestone&gt;
+工程目錄：&lt;Repo path&gt;
+根據既有來源與核准視覺建立或重用 FE issues、相依與 FE View。缺少必要來源就回報，不派工。</code></pre></div><p class="boundary">新票 Backlog；保留既有狀態。不自動建立 BE 或派工。技術查核在此指令內進行。</p><button type="button" class="use-command" data-command="create-issues-FE">帶入指令組合器 ↗</button><label class="guide-check"><input type="checkbox" data-progress="create-issues-FE">我已練習並檢查這一步的適用產出</label></article><article class="command" id="cmd-create-issues-BE"><div class="command-top"><div><div class="eyebrow">10 / 交付</div><h3>create-issues-BE</h3><p class="subtitle">拆出資料與服務責任</p></div><span class="badge">寫入 BE issues 與 View</span></div><dl><div><dt>準備</dt><dd>來源故事、PRDs、資料／服務邊界與既有工程實作。</dd></div><div><dt>產出</dt><dd>BackEnd delivery issues、共用契約 owner、相依與 &lt;Project&gt;-BE View。</dd></div><div><dt>檢查</dt><dd>檢查資料一致性、錯誤／重試／復原、權限與可觀察驗收；共用規則有單一負責票。</dd></div></dl><div class="codebox"><button class="copy" type="button">複製</button><pre><code>$linearboard create-issues-BE &lt;Project&gt; &lt;Milestone&gt;
+工程目錄：&lt;Repo path&gt;
+資料／服務邊界：&lt;Confirmed data and service scope&gt;
+先查核現有實作與官方文件，建立或重用 BE issues 與 BE View，不派工。</code></pre></div><p class="boundary">BE 可能是 App 內資料／服務，不預設新增雲端或伺服器。新票 Backlog，不派工。</p><button type="button" class="use-command" data-command="create-issues-BE">帶入指令組合器 ↗</button><label class="guide-check"><input type="checkbox" data-progress="create-issues-BE">我已練習並檢查這一步的適用產出</label></article><article class="command" id="cmd-organize-task-batch"><div class="command-top"><div><div class="eyebrow">11 / 交付</div><h3>organize-task-batch</h3><p class="subtitle">提議可審閱的交付批次</p></div><span class="badge">唯讀</span></div><dl><div><dt>準備</dt><dd>既有 FE／BE issues、來源與依賴；可指定 &lt;Issue IDs&gt;。</dd></div><div><dt>產出</dt><dd>聊天中的順序提案：Batch Name、FE Issues、BE Issues、分組原因、Expected Checkpoint Outcomes。</dd></div><div><dt>檢查</dt><dd>每張選定票恰好出現一次或有排除理由；checkpoint 有可觀察成果與前置條件。</dd></div></dl><div class="codebox"><button class="copy" type="button">複製</button><pre><code>$linearboard organize-task-batch &lt;Project&gt; &lt;Milestone&gt; &lt;Issue IDs&gt;
+依既有相依提出可審閱 checkpoints，列出排除項與阻擋；只提案，不寫入或派工。</code></pre></div><details><summary>接續對話範例</summary><div class="command-follow">若想把提案保存到 App 的「交付」頁，另行明確要求：「將剛確認的 &lt;Batch proposal&gt; 保存為 &lt;Project&gt; 的交付批次，保留確切 issue IDs；不要派工。」</div></details><p class="boundary">不保存 batch、不修改票、不實作。批次大小不等於三個 worker 上限。</p><button type="button" class="use-command" data-command="organize-task-batch">帶入指令組合器 ↗</button><label class="guide-check"><input type="checkbox" data-progress="organize-task-batch">我已練習並檢查這一步的適用產出</label></article><article class="command" id="cmd-dispatch"><div class="command-top"><div><div class="eyebrow">12 / 交付</div><h3>dispatch</h3><p class="subtitle">實作指定的交付範圍</p></div><span class="badge">派工、實作與獨立驗證</span></div><dl><div><dt>準備</dt><dd>明確 issue IDs 或已存在、可解析的 Batch；必要來源、設計、工程目錄與實際執行目標。</dd></div><div><dt>產出</dt><dd>派工紀錄、通過檢查的 worker 計畫、實作回報、TPM 獨立證據；可供審閱的工作到 In Review。</dd></div><div><dt>檢查</dt><dd>從實際 App 正常入口驗證主要流程；報告結果、環境限制與 remaining checks，並讀回 issue 與派工紀錄。</dd></div></dl><div class="codebox"><button class="copy" type="button">複製</button><pre><code>$linearboard dispatch &lt;Project&gt; &lt;Milestone&gt; &lt;Issue IDs&gt;
+工程目錄：&lt;Repo path&gt;
+實際驗證目標：&lt;App URL or run target&gt;
+只派工指定 IDs，先核對來源、相依、核准設計與可存取的執行目標。驗證後交審，不改 Done。</code></pre></div><details><summary>接續對話範例</summary><div class="command-follow">使用已保存批次時，第一行可改成：
+$linearboard dispatch &lt;Project&gt; &lt;Milestone&gt; Batch &lt;Batch number&gt;
+Batch 必須已存在且能解析確切 IDs；前一步的唯讀提案不代表它已保存。</div></details><p class="boundary">先做 readiness preflight；缺必要資料就停在缺口。最多三個並行 workers，worker 不寫 LinearBoard。Done 由使用者決定。</p><button type="button" class="use-command" data-command="dispatch">帶入指令組合器 ↗</button><label class="guide-check"><input type="checkbox" data-progress="dispatch">我已練習並檢查這一步的適用產出</label></article><article class="command" id="cmd-debug"><div class="command-top"><div><div class="eyebrow">13 / 維護</div><h3>debug</h3><p class="subtitle">從問題回報到修復驗證</p></div><span class="badge">預設包含修復</span></div><dl><div><dt>準備</dt><dd>&lt;Report document URL or issue IDs&gt;、重現步驟、預期行為與環境。</dd></div><div><dt>產出</dt><dd>Bugs Project Document 中的 Datetime／User Report、對應 FIX issues、FE／BE View、驗證證據與 Bugs 文件結果留言。</dd></div><div><dt>檢查</dt><dd>FIX 指向正確回報批次／項目；Bugs 文件原生留言回連 FIX 與結果。不能只有 issue 而沒有回報日誌。</dd></div></dl><div class="codebox"><button class="copy" type="button">複製</button><pre><code>$linearboard debug &lt;Project&gt; &lt;Milestone&gt; &lt;Report document URL or issue IDs&gt;
+重現：&lt;Reproduction steps&gt;
+預期：&lt;Expected behavior&gt;
+環境：&lt;Target environment&gt;
+記錄回報、建立或重用 bounded FIX issues，修復並獨立驗證。</code></pre></div><details><summary>接續對話範例</summary><div class="command-follow">這次若只想整理問題，將最後一行改為：「triage-only：只記錄回報與建立／重用 FIX issues，不實作、不宣稱已修復。」</div></details><p class="boundary">只做分類建票時必須指定 triage-only。預設會實作與驗證；不把問題記錄留成本機 PM 檔案。</p><button type="button" class="use-command" data-command="debug">帶入指令組合器 ↗</button><label class="guide-check"><input type="checkbox" data-progress="debug">我已練習並檢查這一步的適用產出</label></article><article class="command" id="cmd-sync"><div class="command-top"><div><div class="eyebrow">14 / 維護</div><h3>sync</h3><p class="subtitle">對齊已確認的紀錄與 UI 證據</p></div><span class="badge">更新限定範圍</span></div><dl><div><dt>準備</dt><dd>&lt;Scope&gt;、已確認來源、受影響 issue／規格與目前 UI。</dd></div><div><dt>產出</dt><dd>差異與已驗證更新；涉及 UI 變動時，補齊／更新實際 UI 截圖、附件與 owning specification index。</dd></div><div><dt>檢查</dt><dd>分開回報 Updated／Already aligned／Conflict／Unverified；截圖分 Missing／Stale／Consistent／Unverified。讀回內容、關聯與圖像。</dd></div></dl><div class="codebox"><button class="copy" type="button">複製</button><pre><code>$linearboard sync &lt;Project&gt; &lt;Milestone&gt; &lt;Scope&gt;
+只對齊以上範圍的已確認紀錄。若 UI 已改動，檢查截圖是否缺漏或過時，從實際介面擷取並驗證上傳。保留歷史，不實作。</code></pre></div><p class="boundary">不實作、不以 imagegen 代替實際截圖、不自動改狀態／核准、不因時間較新就覆蓋。清理圖片須另有授權。</p><button type="button" class="use-command" data-command="sync">帶入指令組合器 ↗</button><label class="guide-check"><input type="checkbox" data-progress="sync">我已練習並檢查這一步的適用產出</label></article></section><section id="review"><div class="eyebrow">06 / Review</div><h2>分清儲存、核准與驗收</h2><div class="guide-table"><table><thead><tr><th>看到的結果</th><th>代表什麼</th><th>還要做什麼</th></tr></thead><tbody><tr><td>文件／PRD 已保存</td><td>紀錄存在，可能仍有未決範圍。</td><td>讀回內容、來源與原生關聯；先處理影響後續交付的缺口。</td></tr><tr><td>已選版型</td><td>只確定構圖方向。</td><td>繼續原定完整畫面、元件與關鍵狀態。</td></tr><tr><td>完整設計已核准</td><td>確切畫面／版本範圍有使用者核准紀錄。</td><td>驗證 Design tickets、Designs View 與可存取的 exact references；附件原生欄位單獨回報。</td></tr><tr><td>In Review</td><td>實作完成並經 TPM 獨立檢查，可以交給使用者審閱。</td><td>使用者操作並決定是否接受；環境限制與未測項仍要明列。</td></tr><tr><td>Done</td><td>最終使用者接受交付。</td><td>由使用者決定並在 App 操作；Codex 不代替決定。</td></tr></tbody></table></div><h3>Saved Views 檢查</h3><p>PRDs、Designs、FE、BE 是實際保存的分類 View，預設位於專案上方分頁，跨該專案的所有里程碑與狀態；使用者指定時才放在 shared 或縮小範圍。重用既有自訂 View，核對實際成員，不能把臨時 filter 當成 saved View。</p><h3>在 App 找到紀錄</h3><ul><li>「文件」：願景、分組故事總覽、設計總覽與畫面互動規格、Bugs 回報日誌。</li><li>「里程碑」：原生 milestone；故事分組仍在總覽文件。</li><li>「任務」與分類 Views：PRDs、Design tickets、FE／BE 與 FIX issues。</li><li>側欄目前專案下的「交付」：已保存批次與派工紀錄。唯讀批次提案不會自動出現在這裡。</li></ul><div class="note warm">worker 回報、綠色測試結果或上傳成功回應，都不能單獨證明整個流程通過。主 App、實際來源／關聯與適用證據必須獨立檢查。</div></section><section id="troubleshoot"><div class="eyebrow">07 / Troubleshooting</div><h2>常見問題</h2><details><summary>找不到專案、團隊或里程碑？</summary><p>提供可唯一識別的名稱或連結。Codex 先完整分頁查找並核對目的地，不能因同名就直接建立副本。新產品只有在目的地與授權產出明確時，才建立必要的專案容器。</p></details><details><summary>重複送出，會不會重複建票？</summary><p>指令應先讀現況，重用相同目的與來源的文件、票與 View；API 同名不會自動去重。部分成功時只補缺少的工作，不重播全部建立步驟。</p></details><details><summary>更新時出現版本衝突？</summary><p>重新讀取最新版本並對齊差異，不強行覆蓋。歷史、關聯與範圍外內容都保留。</p></details><details><summary>沒有 UserStories View，是否少做一步？</summary><p>新版 create-milestones 把故事保存在分組文件中，不建立新故事票或 View。既有 UserStory issues／Views 可作歷史來源保留。</p></details><details><summary>刪除與還原怎麼辦？</summary><p>需明確指定要刪除的紀錄；先預覽影響，再移到可還原的垃圾桶。沒有封存概念。還原需要的團隊／專案／父項先存在；永久刪除由使用者在 App 手動確認。本指南不會執行刪除。</p></details><details><summary>Skill 沒有真的派工或操作外部工具？</summary><p>App 保存紀錄與提供 API；Codex 負責命令流程，imagegen 負責視覺生成，coding agents 負責實作。單純建立 dispatch row 不會啟動 worker；缺少必要工具時必須回報阻擋。</p></details><details><summary>測試或執行環境不可用？</summary><p>報告確切環境、受影響驗收與已驗證範圍。未測項保持 Not tested／Environment-blocked。核心流程未驗證或產品仍有問題時，不能宣稱可交審；只有證據明確歸因於狹窄環境限制的情況，才依 skill 規則列明限制後交審。</p></details></section><section id="sources"><div class="eyebrow">08 / Sources</div><h2>依據與版本</h2><p>本頁是操作教學，不是特定專案的 PM 紀錄。所有專案範例都使用佔位符；指令文字與模板不會自動執行。</p><ul class="source-list"><li>已安裝：<code>/Users/chuang/.codex/skills/linearboard/SKILL.md</code>，2026-11-05 讀取版本。</li><li>相關 references：application operations、milestones、PRDs、PRD decisions、designs、visuals、delivery issues、task batches、issue Views、sync。</li><li>版型參考：提供的 Linear TPM 指令教學與專案現有指南。內容以目前 LinearBoard skill 為準；skill 更新後需再核對本頁。</li></ul><a class="secondary-action" href="#workflow">返回工作流程 ↑</a></section></main><div id="toast" class="toast" role="status" aria-live="polite"></div><script id="command-data" type="application/json">[{"name": "help", "title": "查看可用指令", "phase": "起步", "effect": "唯讀", "inputs": "目前安裝的 skill。", "outputs": "只有指令及用途清單。", "check": "對照本頁 14 個主要指令；story 指令是相容別名。", "limit": "不寫入應用程式，也不執行後續步驟。", "prompt": "$linearboard help", "follow": ""}, {"name": "planning", "title": "整理產品構想", "phase": "規劃", "effect": "討論", "inputs": "\u003cProduct idea\u003e、\u003cTarget user\u003e、\u003cConstraints\u003e。", "outputs": "聊天中的產品問題、價值、範圍與待驗證假設。", "check": "你能指出產品服務誰、解決什麼問題，以及這輪不做什麼。", "limit": "只有明確要求保存，才會寫入 LinearBoard。", "prompt": "$linearboard planning \u003cProject\u003e\n產品構想：\u003cProduct idea\u003e\n目標使用者／玩家：\u003cTarget user\u003e\n限制：\u003cConstraints\u003e\n先討論方向，不保存紀錄。", "follow": ""}, {"name": "create-vision-document", "title": "保存產品願景", "phase": "規劃", "effect": "寫入文件", "inputs": "已確認的 planning 結論與目的地 \u003cTeam\u003e／\u003cProject\u003e。", "outputs": "原生 Vision Project Document，整理 4W1H、價值、邊界與假設。", "check": "在「文件」開啟願景，確認專案、內容與可存取的文件連結。", "limit": "不建立里程碑、故事票或開發票。", "prompt": "$linearboard create-vision-document \u003cProject\u003e\n團隊：\u003cTeam\u003e\n依據以上已確認的 planning 結論建立或重用願景文件。保留尚未確認的假設。", "follow": ""}, {"name": "create-milestones", "title": "從故事分組成里程碑", "phase": "規劃", "effect": "寫入里程碑與文件", "inputs": "願景、已確認範圍與既有里程碑／故事。", "outputs": "原生 milestones ＋一份按里程碑分組的故事總覽文件；故事有穩定 US ID、anchor 與結構索引。", "check": "「里程碑」可見原生紀錄；「文件」中每則故事有核心驗收且只歸屬一個原生 milestone。索引與可讀段落一致。", "limit": "不建立 UserStory issues 或 UserStories View；已有舊故事票保留。", "prompt": "$linearboard create-milestones \u003cProject\u003e\n依據既有願景產生故事並按可觀察成果分組。重用既有里程碑與故事 ID，不虛構日期。", "follow": ""}, {"name": "create-PRDs", "title": "建立可追溯的產品規則", "phase": "需求", "effect": "寫入 PRD issues 與 View", "inputs": "\u003cMilestone\u003e 的故事文件、穩定 US ID 與已確認規則。", "outputs": "ProductRequirement issues、來源文件／故事連結、原生 milestone 與 \u003cProject\u003e-PRDs saved View。", "check": "開啟 PRD：來源故事能對上文件段落；原生 milestone 正確；來源索引含真實 document ID 與 story IDs；View 包含預期 PRDs。", "limit": "新票 Backlog；M／US labels 是選用輔助，保留既有標籤。文件段落不偽造為 issue relations。", "prompt": "$linearboard create-PRDs \u003cProject\u003e \u003cMilestone\u003e\n依據該里程碑的分組故事建立或重用 PRDs，保留待決問題；建立或重用 PRDs View 並驗證成員。", "follow": ""}, {"name": "prd-demystify", "title": "直接釐清並修訂 PRD", "phase": "需求", "effect": "更新原 PRD", "inputs": "現有 PRDs、來源故事與尚未決定的產品範圍／邊界。", "outputs": "使用者確認後，直接更新擁有該規則的 PRD；需要時保留原生留言。", "check": "一次回答一個關鍵問題後，重開 PRD 檢查行為與驗收已反映答案；未回答的問題仍標示未決。", "limit": "不新增 QA 文件，不重寫既有歷史 QA，也不改 issue 狀態。", "prompt": "$linearboard prd-demystify \u003cProject\u003e \u003cMilestone\u003e\n先檢查既有答案，只問會影響產品範圍或驗收的未決問題，一次一題，確認後直接更新原 PRD。", "follow": ""}, {"name": "create-designs", "title": "保存設計方向與互動規格", "phase": "設計", "effect": "寫入兩份文件", "inputs": "來源故事、PRDs、已確認決策與可用參考。", "outputs": "設計總覽、畫面／互動規格兩份 Project Documents，包含具產品特色的方向與具體建議。", "check": "在「文件」檢查兩份規格互連；screen／flow 可追到需求；入口、操作與 loading／empty／error 等適用狀態清楚。", "limit": "這一步只有文件，不產圖、不建立 Design tickets／View。", "prompt": "$linearboard create-designs \u003cProject\u003e \u003cMilestone\u003e\n參考：\u003cDesign references\u003e\n限制與偏好：\u003cDesign constraints\u003e\n研究參考後提出設計建議，保存設計總覽與畫面／互動規格。", "follow": ""}, {"name": "create-visuals", "title": "從版型比較到完整視覺審閱", "phase": "設計", "effect": "產圖；授權後上傳與建票", "inputs": "既有設計規格、這次的畫面／元件／狀態範圍與已核准方向。", "outputs": "imagegen studies、可開啟的唯讀 gallery；完整設計核准後建立或重用 Design tickets 與 \u003cProject\u003e-Designs View。", "check": "先核對生成範圍與批次，再檢查每張圖與 gallery；選定版型後補齊完整範圍。核准後讀回附件、Design tickets 與 View。", "limit": "新構圖通常比較 2–3 版代表畫面；小修直接改選定版型。選版、上傳、完整設計核准、附件原生核准分開。", "prompt": "$linearboard create-visuals \u003cProject\u003e \u003cMilestone\u003e\n本次範圍：\u003cScreens, components and key states\u003e\n先說明覆蓋範圍與批次。新構圖比較適量代表版型；若是已選版型的小修，直接修訂。保留 imagegen 原圖。", "follow": "選定版型後可回覆：「選 \u003cLayout\u003e，繼續原先指定的完整畫面與狀態範圍。」\n上傳時明說：「上傳 \u003cExact versions\u003e 到所屬規格文件。」\n完整審閱後明說：「核准 \u003cExact screen/version inventory\u003e 的完整設計範圍，建立或重用 Design tickets 與 View。」\n原生附件 approved 欄位仍由使用者在 App 操作；Codex 不代填。"}, {"name": "create-issues-FE", "title": "拆出前端交付責任", "phase": "交付", "effect": "寫入 FE issues 與 View", "inputs": "來源故事、PRDs、設計規格、確切核准的視覺版本與 \u003cRepo path\u003e。", "outputs": "FrontEnd delivery issues、驗收、來源、阻擋相依與 \u003cProject\u003e-FE View。", "check": "任務可獨立審閱；路由、狀態、資料效果與 UI 驗證目標清楚。確切視覺參照能從 issue 開啟。", "limit": "新票 Backlog；保留既有狀態。不自動建立 BE 或派工。技術查核在此指令內進行。", "prompt": "$linearboard create-issues-FE \u003cProject\u003e \u003cMilestone\u003e\n工程目錄：\u003cRepo path\u003e\n根據既有來源與核准視覺建立或重用 FE issues、相依與 FE View。缺少必要來源就回報，不派工。", "follow": ""}, {"name": "create-issues-BE", "title": "拆出資料與服務責任", "phase": "交付", "effect": "寫入 BE issues 與 View", "inputs": "來源故事、PRDs、資料／服務邊界與既有工程實作。", "outputs": "BackEnd delivery issues、共用契約 owner、相依與 \u003cProject\u003e-BE View。", "check": "檢查資料一致性、錯誤／重試／復原、權限與可觀察驗收；共用規則有單一負責票。", "limit": "BE 可能是 App 內資料／服務，不預設新增雲端或伺服器。新票 Backlog，不派工。", "prompt": "$linearboard create-issues-BE \u003cProject\u003e \u003cMilestone\u003e\n工程目錄：\u003cRepo path\u003e\n資料／服務邊界：\u003cConfirmed data and service scope\u003e\n先查核現有實作與官方文件，建立或重用 BE issues 與 BE View，不派工。", "follow": ""}, {"name": "organize-task-batch", "title": "提議可審閱的交付批次", "phase": "交付", "effect": "唯讀", "inputs": "既有 FE／BE issues、來源與依賴；可指定 \u003cIssue IDs\u003e。", "outputs": "聊天中的順序提案：Batch Name、FE Issues、BE Issues、分組原因、Expected Checkpoint Outcomes。", "check": "每張選定票恰好出現一次或有排除理由；checkpoint 有可觀察成果與前置條件。", "limit": "不保存 batch、不修改票、不實作。批次大小不等於三個 worker 上限。", "prompt": "$linearboard organize-task-batch \u003cProject\u003e \u003cMilestone\u003e \u003cIssue IDs\u003e\n依既有相依提出可審閱 checkpoints，列出排除項與阻擋；只提案，不寫入或派工。", "follow": "若想把提案保存到 App 的「交付」頁，另行明確要求：「將剛確認的 \u003cBatch proposal\u003e 保存為 \u003cProject\u003e 的交付批次，保留確切 issue IDs；不要派工。」"}, {"name": "dispatch", "title": "實作指定的交付範圍", "phase": "交付", "effect": "派工、實作與獨立驗證", "inputs": "明確 issue IDs 或已存在、可解析的 Batch；必要來源、設計、工程目錄與實際執行目標。", "outputs": "派工紀錄、通過檢查的 worker 計畫、實作回報、TPM 獨立證據；可供審閱的工作到 In Review。", "check": "從實際 App 正常入口驗證主要流程；報告結果、環境限制與 remaining checks，並讀回 issue 與派工紀錄。", "limit": "先做 readiness preflight；缺必要資料就停在缺口。最多三個並行 workers，worker 不寫 LinearBoard。Done 由使用者決定。", "prompt": "$linearboard dispatch \u003cProject\u003e \u003cMilestone\u003e \u003cIssue IDs\u003e\n工程目錄：\u003cRepo path\u003e\n實際驗證目標：\u003cApp URL or run target\u003e\n只派工指定 IDs，先核對來源、相依、核准設計與可存取的執行目標。驗證後交審，不改 Done。", "follow": "使用已保存批次時，第一行可改成：\n$linearboard dispatch \u003cProject\u003e \u003cMilestone\u003e Batch \u003cBatch number\u003e\nBatch 必須已存在且能解析確切 IDs；前一步的唯讀提案不代表它已保存。"}, {"name": "debug", "title": "從問題回報到修復驗證", "phase": "維護", "effect": "預設包含修復", "inputs": "\u003cReport document URL or issue IDs\u003e、重現步驟、預期行為與環境。", "outputs": "Bugs Project Document 中的 Datetime／User Report、對應 FIX issues、FE／BE View、驗證證據與 Bugs 文件結果留言。", "check": "FIX 指向正確回報批次／項目；Bugs 文件原生留言回連 FIX 與結果。不能只有 issue 而沒有回報日誌。", "limit": "只做分類建票時必須指定 triage-only。預設會實作與驗證；不把問題記錄留成本機 PM 檔案。", "prompt": "$linearboard debug \u003cProject\u003e \u003cMilestone\u003e \u003cReport document URL or issue IDs\u003e\n重現：\u003cReproduction steps\u003e\n預期：\u003cExpected behavior\u003e\n環境：\u003cTarget environment\u003e\n記錄回報、建立或重用 bounded FIX issues，修復並獨立驗證。", "follow": "這次若只想整理問題，將最後一行改為：「triage-only：只記錄回報與建立／重用 FIX issues，不實作、不宣稱已修復。」"}, {"name": "sync", "title": "對齊已確認的紀錄與 UI 證據", "phase": "維護", "effect": "更新限定範圍", "inputs": "\u003cScope\u003e、已確認來源、受影響 issue／規格與目前 UI。", "outputs": "差異與已驗證更新；涉及 UI 變動時，補齊／更新實際 UI 截圖、附件與 owning specification index。", "check": "分開回報 Updated／Already aligned／Conflict／Unverified；截圖分 Missing／Stale／Consistent／Unverified。讀回內容、關聯與圖像。", "limit": "不實作、不以 imagegen 代替實際截圖、不自動改狀態／核准、不因時間較新就覆蓋。清理圖片須另有授權。", "prompt": "$linearboard sync \u003cProject\u003e \u003cMilestone\u003e \u003cScope\u003e\n只對齊以上範圍的已確認紀錄。若 UI 已改動，檢查截圖是否缺漏或過時，從實際介面擷取並驗證上傳。保留歷史，不實作。", "follow": ""}]</script><script>
+'use strict';
+const commands=JSON.parse(document.getElementById('command-data').textContent),$=id=>document.getElementById(id);
+let timer;function toast(message){$('toast').textContent=message;clearTimeout(timer);timer=setTimeout(()=>$('toast').textContent='',3000)}
+document.querySelectorAll('.copy').forEach(button=>button.addEventListener('click',async()=>{const code=button.closest('.codebox').querySelector('code');try{if(!navigator.clipboard)throw Error();await navigator.clipboard.writeText(code.textContent);toast('已複製。替換佔位符後，貼到 Codex 送出。')}catch{const range=document.createRange();range.selectNodeContents(code);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);toast('文字已選取，請按 ⌘C／Ctrl+C 複製。')}}));
+function build(){const c=commands.find(c=>c.name===$('action').value),name=c.name;let text=c.prompt;
+for(const [token,id] of [['<Project>','project'],['<Milestone>','milestone'],['<Issue IDs>','issueids']])text=text.replaceAll(token,$(id).value.trim()||token);
+$('dispatch-mode').closest('label').hidden=name!=='dispatch';$('batch-field').hidden=name!=='dispatch'||$('dispatch-mode').value!=='batch';$('ids-field').hidden=!['dispatch','organize-task-batch'].includes(name)||(name==='dispatch'&&$('dispatch-mode').value==='batch');$('report-field').hidden=name!=='debug';$('scope-field').hidden=name!=='sync';
+if(name==='dispatch'&&$('dispatch-mode').value==='batch'){let lines=text.split('\n');const number=$('batch').value.trim();lines[0]='$linearboard dispatch '+($('project').value.trim()||'<Project>')+' '+($('milestone').value.trim()||'<Milestone>')+' Batch '+(/^[1-9]\d*$/.test(number)?number:'<Batch number>');text=lines.join('\n').replace('只派工指定 IDs','只派工該已保存批次的確切 IDs');}
+if(name==='debug')text=text.replaceAll('<Report document URL or issue IDs>',$('report').value.trim()||'<Report document URL or issue IDs>');
+if(name==='sync')text=text.replaceAll('<Scope>',$('scope').value.trim()||'<Scope>');
+if(name==='organize-task-batch'&&!$('issueids').value.trim())text=text.replace(' <Issue IDs>','');
+if($('additional').value.trim())text+='\n'+$('additional').value.trim();$('built').textContent=text;$('builder-help').textContent=c.effect+' · '+c.limit;const tokens=[...new Set(text.match(/<[^>]+>/g)||[])];$('placeholder-status').textContent=tokens.length?'送出前替換：'+tokens.join('、'):'請確認目的地與範圍後，再貼到 Codex 送出。';}
+for(const id of ['action','project','milestone','dispatch-mode','issueids','batch','report','scope','additional'])$(id).addEventListener('input',build);build();
+document.querySelectorAll('[data-command]').forEach(button=>button.addEventListener('click',()=>{$('action').value=button.dataset.command;build();location.hash='builder';$('action').focus({preventScroll:true})}));
+$('search').addEventListener('input',filter);function filter(){const q=$('search').value.trim().toLowerCase();let count=0;for(const row of document.querySelectorAll('[data-command-row]')){const c=commands.find(c=>c.name===row.dataset.commandRow);row.hidden=!Object.values(c).join(' ').toLowerCase().includes(q);if(!row.hidden)count++}$('result-count').textContent=count+' / '+commands.length+' 個主要指令'}filter();
+const key='linearboard-hands-on-guide-v1',marks=[...document.querySelectorAll('[data-progress]')];let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch{}
+function progress(){const n=marks.filter(x=>x.checked).length;$('progress').value=n;$('progress-label').textContent=n+' / '+marks.length;const state={};for(const mark of marks)state[mark.dataset.progress]=mark.checked;try{localStorage.setItem(key,JSON.stringify(state))}catch{}}
+for(const mark of marks){mark.checked=saved[mark.dataset.progress]===true;mark.addEventListener('change',progress)}progress();$('reset').addEventListener('click',()=>{for(const mark of marks)mark.checked=false;progress()});
+const links=[...document.querySelectorAll('aside nav a')];function active(){for(const link of links)link.classList.toggle('active',link.hash===location.hash)}window.addEventListener('hashchange',active);active();
+</script></body></html>

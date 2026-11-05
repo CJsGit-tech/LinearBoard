@@ -1,0 +1,36 @@
+{
+  "name": "linearboard",
+  "version": "0.1.0",
+  "description": "Standalone local product-delivery workspace",
+  "main": "index.js",
+  "scripts": {
+    "build": "esbuild web/app.jsx --bundle --format=esm --jsx=automatic --minify --define:process.env.NODE_ENV=\\\"production\\\" --outfile=web/dist/app.js",
+    "start": "python3 server.py",
+    "test": "python3 -m unittest discover -s tests -v",
+    "test:ui": "node tests/ui.cjs",
+    "test:selects": "node tests/selects.cjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@playwright/test": "^1.64.1",
+    "@radix-ui/react-context-menu": "2.4.1",
+    "@radix-ui/react-dropdown-menu": "2.2.1",
+    "@radix-ui/react-select": "2.3.8",
+    "@tiptap/extension-image": "3.32.2",
+    "@tiptap/extension-list": "3.32.2",
+    "@tiptap/extension-table": "3.32.2",
+    "@tiptap/markdown": "3.32.2",
+    "@tiptap/react": "3.32.2",
+    "@tiptap/starter-kit": "3.32.2",
+    "dompurify": "^3.4.17",
+    "esbuild": "^0.28.2",
+    "lucide-react": "1.66.0",
+    "marked": "^18.1.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "private": true
+}

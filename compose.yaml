@@ -1,0 +1,52 @@
+name: linearboard
+services:
+  db:
+    image: postgres:17-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: linearboard
+      POSTGRES_USER: linearboard
+      POSTGRES_PASSWORD_FILE: /run/secrets/database_password
+    secrets: [database_password]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U linearboard -d linearboard']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:8765:8765'
+    environment:
+      DATABASE_URL: postgresql://linearboard@db:5432/linearboard
+      DATABASE_PASSWORD_FILE: /run/secrets/database_password
+    secrets: [database_password]
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, python, -c, 'import urllib.request; urllib.request.urlopen("http://127.0.0.1:8765/api/health", timeout=5)']
+      interval: 10s
+      timeout: 6s
+      retries: 10
+  migrate:
+    build: .
+    profiles: [tools]
+    environment:
+      DATABASE_URL: postgresql://linearboard@db:5432/linearboard
+      DATABASE_PASSWORD_FILE: /run/secrets/database_password
+    secrets: [database_password]
+    volumes:
+      - ./data:/source:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: [python, scripts/migrate_postgres.py]
+secrets:
+  database_password:
+    file: ./data/docker/database-password
+volumes:
+  postgres_data:

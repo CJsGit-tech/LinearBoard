@@ -1,0 +1,10 @@
+.git
+node_modules
+data
+output/*
+!output/visual-review
+tests
+__pycache__
+**/__pycache__
+*.pyc
+.env*

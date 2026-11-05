@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="LinearBoard standalone 本機產品交付操作指南：規劃、需求、設計、視覺、FE/BE 拆票、派工、驗證、debug 與同步。">
+  <title>LinearBoard｜指令操作教學</title>
+  <style>
+    :root {
+      --paper: #f7f8f4;
+      --surface: #ffffff;
+      --soft: #edf2eb;
+      --ink: #20302a;
+      --muted: #617067;
+      --line: #dce4dc;
+      --green: #1f6548;
+      --green-dark: #174d38;
+      --amber: #a8662d;
+      --nav: 252px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 28px; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font: 15px/1.82 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    }
+    a { color: var(--green); text-underline-offset: 4px; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+      outline: 3px solid #7ba17c;
+      outline-offset: 3px;
+    }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; overflow-wrap: anywhere; }
+    [hidden] { display: none !important; }
+
+    .skip-link {
+      position: fixed;
+      top: -100px;
+      left: 20px;
+      z-index: 100;
+      padding: 10px 16px;
+      color: white;
+      background: var(--green);
+      border-radius: 4px;
+    }
+    .skip-link:focus { top: 12px; }
+
+    aside {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: var(--nav);
+      padding: 29px 20px;
+      overflow-y: auto;
+      color: var(--ink);
+      background: #eef2ec;
+      border-right: 1px solid var(--line);
+    }
+    .brand { font-size: 22px; font-weight: 800; letter-spacing: -1px; }
+    .brand span { color: var(--green); }
+    .small { color: var(--muted); font-size: 10px; line-height: 1.7; letter-spacing: .06em; }
+    nav { display: grid; gap: 3px; margin: 24px 0; }
+    nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 38px;
+      padding: 8px 10px;
+      color: #4e6155;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    nav a span { color: #78887d; font: 11px/1.6 ui-monospace, monospace; }
+    nav a:hover, nav a.active { color: var(--green-dark); background: #dfe8dc; }
+    nav a.active { font-weight: 700; }
+    .nav-label { margin: 15px 10px 5px; color: #66776b; font-size: 10px; letter-spacing: .1em; }
+    .nav-arrow { margin-left: auto; }
+    .aside-bottom { padding: 20px 10px 0; border-top: 1px solid var(--line); }
+    .progress-label { color: #52675a; font-size: 11px; }
+    progress { width: 100%; height: 5px; margin: 9px 0; accent-color: var(--green); }
+    #reset, #menu-toggle {
+      min-height: 38px;
+      padding: 6px 0;
+      color: var(--green);
+      background: transparent;
+      border: 0;
+      font-size: 11px;
+    }
+    #menu-toggle { display: none; }
+
+    main { margin-left: var(--nav); max-width: 1480px; padding: 34px clamp(30px, 5vw, 82px) 82px; }
+    .topline { display: flex; align-items: center; justify-content: space-between; gap: 18px; color: var(--muted); font-size: 11px; }
+    .page-tools { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .page-tools a { color: var(--muted); text-decoration: none; }
+    .page-tools .app-link { color: white; background: var(--green); padding: 8px 13px; border-radius: 4px; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: clamp(28px, 5vw, 76px);
+      align-items: center;
+      padding: 62px 0 42px;
+    }
+    .eyebrow { color: var(--green); font-size: 10px; font-weight: 750; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 15px 0 20px; font-size: clamp(38px, 4.4vw, 62px); line-height: 1.2; letter-spacing: -.065em; }
+    h1 em { color: var(--green); font-style: normal; }
+    .lead { max-width: 560px; color: #4d6055; font-size: 16px; line-height: 1.9; }
+    .hero-actions { display: flex; align-items: center; gap: 22px; margin-top: 27px; flex-wrap: wrap; }
+    .primary-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 28px;
+      min-height: 44px;
+      padding: 10px 18px;
+      color: white;
+      background: var(--green);
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .primary-action:hover { background: var(--green-dark); }
+    .secondary-action { font-size: 12px; text-decoration: none; }
+    .hero-index > a {
+      position: relative;
+      display: block;
+      padding: 17px 26px 17px 0;
+      color: var(--ink);
+      border-bottom: 1px solid var(--line);
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .hero-index > a span { display: block; margin-bottom: 4px; color: var(--muted); font-size: 10px; letter-spacing: .05em; }
+    .hero-index > a b { position: absolute; right: 0; top: 36px; color: var(--green); font-weight: 400; }
+    .hero-index > a:hover { color: var(--green); }
+    .meta { display: flex; gap: 24px; flex-wrap: wrap; padding: 16px 0; margin-bottom: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+    .status-dot { display: inline-block; width: 6px; height: 6px; margin-right: 6px; background: var(--green); border-radius: 50%; }
+
+    section { padding: 55px 0 24px; scroll-margin-top: 20px; }
+    section > h2, .tutorial-intro h2 { margin: 10px 0 14px; font-size: 29px; line-height: 1.45; letter-spacing: -.045em; }
+    section > p, .tutorial-intro p { max-width: 790px; color: var(--muted); }
+    h3 { line-height: 1.45; }
+    p { margin: 11px 0 18px; }
+    ul, ol { padding-left: 23px; }
+    li { margin: 7px 0; }
+    .tutorial-intro { padding-top: 68px; margin-top: 24px; border-top: 1px solid var(--line); }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 38px; }
+    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .route { padding: 20px 0; border-top: 2px solid var(--ink); }
+    .route h3 { margin: 8px 0; font-size: 17px; }
+    .route .path { color: var(--green); font: 12px/1.9 ui-monospace, monospace; }
+    .flow { display: flex; gap: 7px; flex-wrap: wrap; margin: 25px 0; }
+    .flow a { padding: 8px 0; margin-right: 5px; text-decoration: none; font-size: 12px; }
+    .flow b { align-self: center; color: #94a098; font-weight: 400; }
+    .note { padding: 18px 22px; margin: 22px 0; color: #28513e; background: #edf3e9; border-radius: 4px; font-size: 13px; }
+    .note.warm { color: #73522f; background: #f5eee3; }
+    .mini-card { padding: 17px 0; border-top: 2px solid var(--line); }
+    .mini-card h3 { margin: 7px 0; font-size: 16px; }
+    .mini-card p { color: var(--muted); font-size: 13px; }
+
+    .build-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; padding: 24px 0; }
+    .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 17px 19px; }
+    .fields label { display: grid; gap: 7px; color: var(--muted); font-size: 11px; font-weight: 650; }
+    .fields label:first-child, .fields .wide { grid-column: 1 / -1; }
+    .fields input, .fields select {
+      width: 100%;
+      min-width: 0;
+      min-height: 44px;
+      padding: 11px 12px;
+      color: var(--ink);
+      background: #edf1e9;
+      border: 0;
+      border-bottom: 1px solid #b8c5b8;
+      border-radius: 3px 3px 0 0;
+      font-size: 13px;
+    }
+    .builder-help { color: var(--green); font-size: 12px; }
+    .output-label { display: flex; justify-content: space-between; gap: 12px; margin: 0 0 9px; color: var(--green); font-size: 11px; font-weight: 700; }
+    .output-label span { color: var(--muted); font-size: 10px; font-weight: 400; }
+    .codebox { overflow: hidden; margin: 16px 0 22px; color: #eef5eb; background: #21372d; border-radius: 5px; }
+    .code-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 9px 14px; color: #c8d8c4; background: #294437; font: 9px/1.6 ui-monospace, monospace; letter-spacing: .1em; }
+    .codebox pre { margin: 0; padding: 18px 20px; white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.9 ui-monospace, monospace; }
+    .copy, .compose-command {
+      min-height: 34px;
+      color: var(--green);
+      background: transparent;
+      border: 0;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .copy { min-width: 58px; color: #eef5e9; border: 1px solid #5b7460; border-radius: 3px; }
+    .copy:hover { background: #3a5b46; }
+    .compose-command:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+    .stage-filters { display: flex; gap: 20px; flex-wrap: wrap; margin: 22px 0 16px; }
+    .stage-filters button { min-height: 40px; padding: 8px 0; color: var(--muted); background: transparent; border: 0; border-bottom: 2px solid transparent; font-size: 12px; }
+    .stage-filters button[aria-pressed="true"] { color: var(--green); border-bottom-color: var(--green); font-weight: 700; }
+    #search { width: 100%; min-height: 46px; padding: 11px 16px; background: #edf1e9; border: 0; border-radius: 4px; }
+    .table-count { color: var(--muted); font-size: 11px; }
+    .table-scroll { width: 100%; min-width: 0; max-width: 100%; overflow-x: auto; contain: inline-size paint; }
+    table { width: 100%; min-width: 660px; border-collapse: collapse; margin: 18px 0; }
+    th { padding: 10px; color: var(--muted); border-bottom: 1px solid #aebcaf; text-align: left; font-size: 10px; letter-spacing: .03em; }
+    td { padding: 11px 10px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 12px; }
+    tbody tr:hover { background: #f0f4ec; }
+    .use-command { min-height: 36px; color: var(--green); background: transparent; border: 0; font-size: 11px; }
+
+    .command { padding: 27px 0 34px; margin: 25px 0 14px; border-bottom: 1px solid var(--line); }
+    .command-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+    .command h3 { margin: 6px 0; font: 700 clamp(17px, 1.8vw, 23px)/1.4 ui-monospace, monospace; letter-spacing: -.035em; }
+    .subtitle { margin: 2px 0 6px; font-size: 14px; }
+    .badge { flex-shrink: 0; padding: 4px 9px; color: #46604d; background: #e8eee6; border-radius: 3px; font-size: 10px; }
+    .command dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin: 24px 0; }
+    .command dl > div { min-width: 0; }
+    dt { margin-bottom: 7px; color: var(--green); font-size: 11px; font-weight: 750; }
+    dd { margin: 0; color: #4d6154; font-size: 13px; }
+    .boundary { color: var(--muted); font-size: 12px; }
+    details { margin: 14px 0; font-size: 13px; }
+    summary { min-height: 38px; padding: 7px 0; color: var(--green); cursor: pointer; font-weight: 700; }
+    .checklist { padding: 0; list-style: none; }
+    .checklist label { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; font-size: 13px; }
+    .checklist input { margin-top: 6px; accent-color: var(--green); }
+    .done-row { display: flex; gap: 9px; align-items: center; margin-top: 24px; color: var(--green); font-size: 12px; }
+    .done-row input { width: 16px; height: 16px; accent-color: var(--green); }
+    .finish { margin-top: 30px; padding: 24px 28px; background: #e7efe3; }
+    .finish h3 { margin: 0 0 7px; font-size: 20px; }
+    .finish p { margin: 0; color: var(--muted); }
+    footer { padding-top: 28px; margin-top: 45px; border-top: 1px solid var(--line); }
+    footer p { color: var(--muted); font-size: 11px; }
+    .toast { position: fixed; right: 22px; bottom: 22px; z-index: 30; max-width: calc(100vw - 44px); padding: 11px 17px; color: white; background: #213d2a; border-radius: 5px; font-size: 12px; }
+    .toast:empty { display: none; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 1050px) {
+      :root { --nav: 220px; }
+      main { padding-left: 31px; padding-right: 31px; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-index { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+      .build-panel { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      aside { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 12px 20px; background: #eef2ecf5; backdrop-filter: blur(12px); }
+      aside > .small, .aside-bottom { display: none; }
+      #menu-toggle { display: block; }
+      aside nav { display: none; width: 100%; max-height: 67vh; margin: 10px 0 4px; overflow: auto; grid-template-columns: 1fr 1fr; }
+      aside nav.is-open { display: grid; }
+      .nav-label { grid-column: 1 / -1; }
+      main { margin: 0; padding: 21px 20px 55px; }
+      .hero { padding: 37px 0 27px; }
+      .hero h1 { font-size: 40px; }
+      .hero-index { grid-template-columns: 1fr; gap: 0; }
+      .two, .three { grid-template-columns: 1fr; gap: 0; }
+      .fields { grid-template-columns: 1fr; }
+      .fields label:first-child, .fields .wide { grid-column: auto; }
+      .command dl { grid-template-columns: 1fr; gap: 15px; }
+      section { padding-top: 42px; scroll-margin-top: 74px; }
+      .topline > span { max-width: 140px; }
+      .page-tools { gap: 10px; }
+    }
+    @media print {
+      aside, .hero-actions, .page-tools, .stage-filters, .copy, .compose-command, .use-command, .done-row, .toast { display: none !important; }
+      main { margin: 0; max-width: none; padding: 0; }
+      body { background: white; font-size: 11pt; }
+      .hero { display: block; padding-top: 0; }
+      .hero-index { display: none; }
+      .command { break-inside: avoid-page; }
+      .codebox { color: black; background: #f1f3ef; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#builder">跳至指令產生器</a>
+
+  <aside>
+    <div>
+      <div class="brand">LinearBoard <span>/</span></div>
+      <div class="small">LOCAL PRODUCT DELIVERY PLAYBOOK<br>規劃・設計・拆票・交付・驗證</div>
+    </div>
+    <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="guide-nav">章節目錄 ＋</button>
+    <nav id="guide-nav" aria-label="教學章節">
+      <span class="nav-label">操作工具</span>
+      <a href="#builder">組合指令 <span class="nav-arrow">↗</span></a>
+      <a href="#reference">搜尋指令</a>
+      <span class="nav-label">完整教學</span>
+      <a href="#start"><span>01</span>從這裡開始</a>
+      <a href="#workflow"><span>02</span>選擇你的起點</a>
+      <a href="#storage"><span>03</span>本機服務與資料邊界</a>
+      <a href="#planning"><span>04</span>願景、里程碑與 Stories</a>
+      <a href="#requirements"><span>05</span>PRDs 與逐題釐清</a>
+      <a href="#design"><span>06</span>設計文件與視覺</a>
+      <a href="#delivery"><span>07</span>FE／BE 與 checkpoints</a>
+      <a href="#execution"><span>08</span>派工與驗證</a>
+      <a href="#maintenance"><span>09</span>Debug 與同步</a>
+      <a href="#troubleshoot"><span>10</span>常見問題</a>
+    </nav>
+    <div class="aside-bottom">
+      <div class="progress-label" id="progress-label">閱讀進度 0 / 8</div>
+      <progress id="progress" max="8" value="0" aria-labelledby="progress-label"></progress>
+      <div class="small">只記錄瀏覽器閱讀進度，<br>不代表 LinearBoard 專案狀態。</div>
+      <button id="reset" type="button">重設閱讀進度</button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topline">
+      <span>Standalone local app / 以 PocketScheduler M1 示範</span>
+      <div class="page-tools">
+        <a href="linearboard-guide.html" download>下載 HTML</a>
+        <a class="app-link" href="http://127.0.0.1:8765" target="_blank" rel="noopener">開啟 LinearBoard ↗</a>
+      </div>
+    </div>
+
+    <header class="hero">
+      <div>
+        <span class="eyebrow">LinearBoard / 操作指南</span>
+        <h1>把產品工作，<br>留在一條<em>可追溯鏈。</em></h1>
+        <p class="lead">從願景、User Stories、PRDs、設計與視覺，到 FE／BE issues、checkpoint、派工與獨立驗證。沿用現有成果，只執行這次真正授權的階段。</p>
+        <div class="hero-actions">
+          <a class="primary-action" href="#builder">組合我的指令 <span aria-hidden="true">↗</span></a>
+          <a class="secondary-action" href="#start">第一次使用？閱讀教學 ↓</a>
+        </div>
+      </div>
+      <div class="hero-index">
+        <span class="eyebrow">從現況出發</span>
+        <a href="#cmd-create-PRDs"><span>01 / 需求</span>把故事轉成產品規則 <b>↗</b></a>
+        <a href="#cmd-create-visuals"><span>02 / 設計</span>完成版面選擇與全套視覺 <b>↗</b></a>
+        <a href="#cmd-dispatch"><span>03 / 交付</span>派工指定 issues 並驗證 <b>↗</b></a>
+      </div>
+    </header>
+
+    <div class="meta">
+      <span><i class="status-dot"></i>15 個主要指令</span>
+      <span>預設服務：http://127.0.0.1:8765</span>
+      <span>更新：2026-11-03</span>
+      <span>可離線閱讀</span>
+    </div>
+
+    <section id="builder">
+      <span class="eyebrow">Command composer</span>
+      <h2>設定範圍，複製指令。</h2>
+      <p>這只是文字產生器，不會直接呼叫 Codex、LinearBoard 或 imagegen。檢查目的地與授權範圍後，再把結果貼到 Codex。</p>
+      <div class="build-panel">
+        <div>
+          <div class="fields">
+            <label>指令<select id="action"></select></label>
+            <label>專案<input id="project" value="PocketScheduler" maxlength="100" autocomplete="off"></label>
+            <label>Milestone<input id="milestone" value="M1" maxlength="40" autocomplete="off"></label>
+            <label id="dispatch-scope-field" hidden>派工範圍
+              <select id="dispatchscope">
+                <option value="milestone">里程碑內所有就緒 FE／BE</option>
+                <option value="batch">既有 Batch</option>
+                <option value="issues">指定 issue IDs</option>
+              </select>
+            </label>
+            <label id="batch-field" hidden>Batch 編號<input id="batch" type="number" min="1" step="1" value="1"></label>
+            <label id="issue-field" class="wide" hidden><span id="issue-label">Issue IDs</span><input id="issueids" placeholder="例如 LB-78 LB-81" maxlength="300" autocomplete="off"></label>
+            <label id="debug-field" class="wide" hidden>問題來源<input id="debugsource" placeholder="Bugs 文件、回報文件 URL 或 issue IDs" maxlength="1000" autocomplete="off"></label>
+            <label class="wide">補充要求（選填）<input id="additional" placeholder="例如：重用既有票；不要變更狀態" maxlength="1000" autocomplete="off"></label>
+          </div>
+          <p class="builder-help" id="builder-help" aria-live="polite"></p>
+        </div>
+        <div>
+          <p class="output-label">指令預覽 <span>貼到 Codex 後才會執行</span></p>
+          <div class="codebox">
+            <div class="code-toolbar"><span>CODEX PROMPT</span><button class="copy" type="button" data-copy="#built">複製</button></div>
+            <pre><code id="built">$linearboard help</code></pre>
+          </div>
+          <p class="boundary">建立 draft 也是 LinearBoard 寫入；只有明確要求建立或修改，才代表有寫入授權。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="reference">
+      <span class="eyebrow">Command directory</span>
+      <h2>找到這次需要的指令。</h2>
+      <div class="stage-filters" role="group" aria-label="依階段篩選">
+        <button type="button" data-stage="" aria-pressed="true">全部</button>
+        <button type="button" data-stage="規劃" aria-pressed="false">規劃</button>
+        <button type="button" data-stage="需求" aria-pressed="false">需求</button>
+        <button type="button" data-stage="設計" aria-pressed="false">設計</button>
+        <button type="button" data-stage="交付" aria-pressed="false">交付</button>
+        <button type="button" data-stage="維護" aria-pressed="false">維護</button>
+      </div>
+      <label class="sr-only" for="search">搜尋指令</label>
+      <input id="search" type="search" placeholder="搜尋 FE、PRD、設計、派工、debug…" autocomplete="off">
+      <p class="table-count" id="result-count">15 / 15 個指令</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>指令</th><th>用途</th><th>效果</th><th>Saved View</th><th><span class="sr-only">組合</span></th></tr></thead>
+          <tbody id="catalog"></tbody>
+        </table>
+      </div>
+      <p id="search-empty" hidden>沒有符合的指令。</p>
+      <details>
+        <summary>既有別名</summary>
+        <p><code>user-stories</code>／<code>stories</code> → <code>create-userstories</code>；<code>create-prds</code>／<code>prd</code> → <code>create-PRDs</code>；<code>prototype-ui*</code> → <code>create-designs</code>；<code>build-ui*</code> → <code>create-issues-FE</code>；<code>create-issues-be</code> → <code>create-issues-BE</code>。</p>
+      </details>
+    </section>
+
+    <div class="tutorial-intro">
+      <span class="eyebrow">The playbook</span>
+      <h2>需要細節時，從這裡往下讀。</h2>
+      <p>每個階段都先讀回目前 LinearBoard 狀態，再決定是否需要新增、修訂、派工或停止。</p>
+    </div>
+
+    <section id="start">
+      <span class="eyebrow">01 / Setup</span>
+      <h2>這些是 Codex 指令，不是 Terminal 指令。</h2>
+      <p>在 Codex 對話中選取 <code>linearboard</code> skill，或直接貼上以下文字：</p>
+      <div class="codebox">
+        <div class="code-toolbar"><span>CODEX PROMPT</span><button class="copy" type="button" data-copy="#start-command">複製</button></div>
+        <pre><code id="start-command">$linearboard help</code></pre>
+      </div>
+      <ol>
+        <li>確認本機 LinearBoard 預設服務是 <code>http://127.0.0.1:8765</code>，或明確提供另一個 loopback URL。</li>
+        <li>指定真正存在的 team、project 與 milestone；不要用目前瀏覽器頁面或資料夾名稱猜目的地。</li>
+        <li>檢查回傳的 LinearBoard document、issue 與 View 連結，以及讀回後的欄位與關聯。</li>
+        <li>把「討論」、「建立紀錄」、「派工實作」、「In Review」與最終使用者接受分開。</li>
+      </ol>
+      <div class="note">若 connected <code>linearboard_*</code> tools 不可用，skill 會改用 <code>scripts/operate.py</code> 進行服務 preflight 與操作。這不是改用 Linear SaaS。</div>
+      <div id="commands-start"></div>
+      <label class="done-row"><input type="checkbox" data-progress="start">我知道指令要送到 Codex，並能確認本機服務與目的地。</label>
+    </section>
+
+    <section id="workflow">
+      <span class="eyebrow">02 / Choose a path</span>
+      <h2>不用每次從第一步重跑。</h2>
+      <p>從第一個尚未完成的產出接續。已確認的回答、既有 issues、核准視覺與目前程式狀態應被重用。</p>
+      <div class="flow">
+        <a href="#planning">願景／Milestones</a><b>→</b>
+        <a href="#requirements">Stories／PRDs</a><b>→</b>
+        <a href="#design">Design documents</a><b>→</b>
+        <a href="#cmd-create-visuals">三版面／全套視覺／核准</a><b>→</b>
+        <a href="#delivery">Design／FE／BE issues</a><b>→</b>
+        <a href="#cmd-organize-task-batch">Checkpoints</a><b>→</b>
+        <a href="#execution">Dispatch／Review</a>
+      </div>
+      <div class="two">
+        <article class="route">
+          <span class="eyebrow">從零開始</span>
+          <h3>只有產品構想</h3>
+          <p class="path">planning → create-vision-document → create-milestones → create-userstories → create-PRDs</p>
+          <p>先建立可追溯需求，再進入設計。產品決策仍未確定時，用 <code>prd-demystify</code> 一次處理一題。</p>
+        </article>
+        <article class="route">
+          <span class="eyebrow">延續現有專案</span>
+          <h3>需求、設計或開發票已存在</h3>
+          <p class="path">sync（有差異才用） → 下一個缺少的產出 → organize-task-batch → dispatch</p>
+          <p>不要為了遵守指令順序而重做已完成文件，也不要把 read-only 規劃誤當成實作授權。</p>
+        </article>
+      </div>
+      <div class="note warm"><strong>先建票，後派工。</strong> <code>create-issues-FE</code>／<code>create-issues-BE</code> 只建立 Backlog issues 與 saved Views；<code>dispatch</code> 才讓 agents 實作。</div>
+      <label class="done-row"><input type="checkbox" data-progress="workflow">我能從現有產出選擇下一步，不會儀式性重跑整條流程。</label>
+    </section>
+
+    <section id="storage">
+      <span class="eyebrow">03 / Local system of record</span>
+      <h2>LinearBoard App 是唯一產品工作紀錄。</h2>
+      <div class="two">
+        <article class="route">
+          <span class="eyebrow">放在 LinearBoard</span>
+          <h3>產品與交付紀錄</h3>
+          <p>PRDs、Stories、acceptance criteria、決策、研究摘要、issue 狀態、dispatch records、agent reports、驗證證據與 approvals。</p>
+        </article>
+        <article class="route">
+          <span class="eyebrow">放在 repository</span>
+          <h3>工程產物</h3>
+          <p>Source code、tests、config、migrations、runtime assets、可重現產物與 <code>AGENTS.md</code>。不要在 repo 建第二份 backlog 或 agent report archive。</p>
+        </article>
+      </div>
+      <div class="three">
+        <article class="mini-card"><span class="eyebrow">Database</span><h3>PostgreSQL-backed</h3><p>應透過 App／tools 操作；不可直接改 database 或 legacy SQLite backup。</p></article>
+        <article class="mini-card"><span class="eyebrow">Deletion</span><h3>Recoverable trash</h3><p>先做 impact preview；record deletion 進入可復原垃圾桶，永久刪除留給使用者 UI。</p></article>
+        <article class="mini-card"><span class="eyebrow">Visual exception</span><h3>Read-only gallery</h3><p><code>create-visuals</code> 的 HTML gallery 可留在本機供審閱，但不能成為 approval 或 PM mirror。</p></article>
+      </div>
+      <div class="note">如果 LinearBoard、workspace、team、project 或必要權限不可用，停止受影響操作並回報 blocker；不要改存本機文件或切換到 Linear SaaS。</div>
+      <label class="done-row"><input type="checkbox" data-progress="storage">我能分辨 LinearBoard canonical records、repository 工程檔案與視覺 gallery 例外。</label>
+    </section>
+
+    <section id="planning">
+      <span class="eyebrow">04 / Intent → Stories</span>
+      <h2>願景、里程碑與 User Stories</h2>
+      <p>願景說明為誰解決什麼問題；Milestone 定義一階段的可觀察成果；User Story 保持在使用者結果與 acceptance criteria。</p>
+      <div id="commands-planning"></div>
+      <label class="done-row"><input type="checkbox" data-progress="planning">我能分辨 vision、milestone 與 User Story 的責任。</label>
+    </section>
+
+    <section id="requirements">
+      <span class="eyebrow">05 / Product rules</span>
+      <h2>PRDs 與逐題釐清</h2>
+      <p>PRD 可以涵蓋多個 User Stories，但每條規則要有唯一主要負責位置。未回答的選項是 unresolved，不是默認同意。</p>
+      <div id="commands-requirements"></div>
+      <label class="done-row"><input type="checkbox" data-progress="requirements">我能維持 US、PRD、labels、relations 與 QA 決策的追溯鏈。</label>
+    </section>
+
+    <section id="design">
+      <span class="eyebrow">06 / Design → Approval</span>
+      <h2>設計文件、三版面與完整視覺審閱</h2>
+      <p><code>create-designs</code> 與 <code>create-visuals</code> 是兩個不同階段。前者只建立設計文件；後者先選本次 layout，再完成全套 screens／components 與 key states。</p>
+      <div id="commands-design"></div>
+      <div class="note warm"><strong>核准順序：</strong>三個代表性 layout → 使用者選擇本次 layout → 產生完整範圍與關鍵狀態 → 選定 final images 並授權 upload → 使用者核准完整設計範圍 → 建立或重用 Design tickets 與 Design View。</div>
+      <label class="done-row"><input type="checkbox" data-progress="design">我不會把 theme、layout、final image upload 與完整設計 approval 混成同一個 gate。</label>
+    </section>
+
+    <section id="delivery">
+      <span class="eyebrow">07 / Delivery planning</span>
+      <h2>FE／BE issues 與 checkpoints</h2>
+      <p>Issue creation 會建立或重用 saved category View，但不會 dispatch。技術查核與選型在 FE／BE 建票內部進行，不是另一個使用者指令。</p>
+      <div id="commands-delivery"></div>
+      <div class="three">
+        <article class="mini-card"><span class="eyebrow">Ownership</span><h3>一票一個可審閱責任</h3><p>共用 data model、stable identity、file format 或 service interface 只指定一個 owner。</p></article>
+        <article class="mini-card"><span class="eyebrow">Relations</span><h3>Native dependency</h3><p>真實 prerequisite 使用 Blocks／Blocked by；來源 Stories／PRDs 保留 Related 與 body links。</p></article>
+        <article class="mini-card"><span class="eyebrow">Views</span><h3>Saved, not filtered</h3><p>Label 或暫時篩選不是 View。建票完成要驗證 View 條件、位置與完整 membership。</p></article>
+      </div>
+      <label class="done-row"><input type="checkbox" data-progress="delivery">我能把建票、分批與派工視為三個不同動作。</label>
+    </section>
+
+    <section id="execution">
+      <span class="eyebrow">08 / Dispatch → Review</span>
+      <h2>派工、獨立驗證與 final acceptance</h2>
+      <div id="commands-execution"></div>
+      <div class="three">
+        <article class="mini-card"><span class="eyebrow">In Progress</span><h3>仍需實作或修復</h3><p>產品缺陷、核心流程未驗證或 attribution 不明時，不能交審。</p></article>
+        <article class="mini-card"><span class="eyebrow">In Review</span><h3>可供使用者審閱</h3><p>Implementation complete，TPM 已做獨立檢查並記錄證據；不等於 production ready。</p></article>
+        <article class="mini-card"><span class="eyebrow">Done</span><h3>只由 final user 決定</h3><p>TPM 與 coding agents 都不能代替使用者接受交付。</p></article>
+      </div>
+      <div class="note"><strong>Agent lifecycle：</strong>worker 先讀來源並回報 <code>acknowledged</code>／<code>blocked</code>；TPM 驗證 plan 後才放行 implementation。Worker report 是 claim，TPM 仍需檢查 source／deployment、執行適當 checks，且只有 TPM 能寫 LinearBoard。</div>
+      <label class="done-row"><input type="checkbox" data-progress="execution">我能區分 worker report、TPM verification、In Review 與 user acceptance。</label>
+    </section>
+
+    <section id="maintenance">
+      <span class="eyebrow">09 / Maintenance</span>
+      <h2>Debug 與授權範圍內的同步</h2>
+      <p>Debug 要保留原始使用者回報、修復票與獨立驗證；sync 只修正有確認證據的差異，不會啟動實作。</p>
+      <div id="commands-maintenance"></div>
+      <label class="done-row"><input type="checkbox" data-progress="maintenance">我能保留 Bugs 文件、FIX issues、結果留言與 sync 差異的完整鏈結。</label>
+    </section>
+
+    <section id="troubleshoot">
+      <span class="eyebrow">10 / Practice</span>
+      <h2>常見問題</h2>
+      <details><summary>本機服務沒啟動，可以直接改資料庫嗎？</summary><p>不可以。使用 connected tools 或 <code>scripts/operate.py</code> 的 preflight；不可直接修改 PostgreSQL、legacy SQLite 或另建 PM database。</p></details>
+      <details><summary>create-designs 為什麼沒有 Design issues？</summary><p>目前規則是 document-only：只建立 design overview 與 screen／interaction specification。Design tickets 要等 <code>create-visuals</code> 的完整設計範圍明確核准後才建立。</p></details>
+      <details><summary>已經選過 theme，為什麼還要三個 layouts？</summary><p>Theme 決定 colors、typography 與 component language；不等於這次 surface 的 layout。每個新 layout scope 仍要先產生 exactly three representative layouts。</p></details>
+      <details><summary>View 看不到正確 issues，應該改 issue 狀態嗎？</summary><p>先修 View filters 與 membership。Saved View 應依 project 與精確 Category 組合；不要為了配合錯誤 View 改 issue 狀態或 labels。</p></details>
+      <details><summary>Worker 說 completed，可以直接移到 Done 嗎？</summary><p>不行。TPM 必須獨立驗證後才能交到 In Review；Done 永遠由 final user 決定。</p></details>
+      <details><summary>測試環境限制是否一定卡在 In Progress？</summary><p>只有狹窄、已明確 attribution 的 environment-only limitation，可以在主要 target 與流程已檢查、其他證據支持 review readiness 時保留於 In Review；該檢查必須標示 Not tested 或 Environment-blocked，不能寫 Pass。</p></details>
+      <h3>最後檢查</h3>
+      <ul class="checklist">
+        <li><label><input type="checkbox">我指定了正確 team、project、milestone 與本次產出。</label></li>
+        <li><label><input type="checkbox">我知道這次是 read-only、LinearBoard write、視覺生成，還是真的 dispatch。</label></li>
+        <li><label><input type="checkbox">我檢查實際 document／issue／View links 與 readback，不只相信完成宣告。</label></li>
+        <li><label><input type="checkbox">我沒有把 PM records 另存到 repository 或第二個 database。</label></li>
+        <li><label><input type="checkbox">我保留 unresolved、environment limits 與 user acceptance 的真實狀態。</label></li>
+      </ul>
+      <div class="finish">
+        <h3>從現況接續，讓每一步都有來源、授權與證據。</h3>
+        <p>選正確指令；確認目的地；讀回 canonical records；準備好才派工；驗證後交給使用者接受。</p>
+      </div>
+    </section>
+
+    <footer>
+      <h3>教學依據與版本</h3>
+      <p>依 2026-11-03 本機安裝的 <code>/Users/chuang/.codex/skills/linearboard/SKILL.md</code> 整理，並以 <code>references/linearboard-operations.md</code>、<code>issue-governance.md</code>、<code>create-designs.md</code>、<code>create-visuals.md</code>、<code>create-design-tickets.md</code>、<code>issue-views.md</code>、<code>coding-dispatch.md</code>、<code>debug.md</code> 與 <code>sync.md</code> 的責任邊界呈現。這份 HTML 是操作指南，不是另一份 backlog、PRD 或 LinearBoard 即時鏡像；skill 更新後，以當時安裝版本與 LinearBoard canonical records 為準。</p>
+      <p>示例使用 PocketScheduler M1。替換專案時，應使用真實 team／project／milestone、issue IDs、approved visuals 與 target application。</p>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script id="command-data" type="application/json">
+  [
+    {"name":"help","title":"查看指令與邊界","phase":"起步","effect":"唯讀","view":"無","when":"先理解目前 skill 支援的 commands、gates 與 authorization。","input":"目前安裝的 linearboard skill。","output":"指令、必要來源、輸出與限制；不寫入 LinearBoard。","check":"確認目的地是 standalone LinearBoard，不是 Linear SaaS。","example":"$linearboard help","limit":"不建立任何 record、View 或 agent dispatch。"},
+    {"name":"planning","title":"整理產品構想","phase":"規劃","effect":"討論","view":"無","when":"把模糊想法整理成使用者問題、價值與範圍。","input":"想法、既有對話、限制與研究問題。","output":"聊天中的規劃；只有明確要求保存才寫入 canonical record。","check":"目標使用者、問題、價值與不做事項清楚。","example":"$linearboard planning PocketScheduler：先整理產品範圍，不保存紀錄。","limit":"不把討論自動轉成文件、issues 或 implementation。"},
+    {"name":"create-vision-document","title":"建立產品願景","phase":"規劃","effect":"寫入 Project Document","view":"無","when":"將已確認方向保存為產品定位與邊界。","input":"已整理構想、證據、假設與限制。","output":"LinearBoard native vision Project Document。","check":"文件屬於正確 project；事實、假設與 unknowns 分開。","example":"$linearboard create-vision-document PocketScheduler","limit":"不建立 milestones、issues、design 或 dispatch。"},
+    {"name":"create-milestones","title":"建立成果型里程碑","phase":"規劃","effect":"寫入 milestones／document","view":"無","when":"把願景拆成可觀察的交付階段。","input":"Vision、優先順序與已知 dependency。","output":"Native milestones 與 milestone overview Project Document。","check":"每個 milestone 有 outcome、scope、completion gate；未授權日期不補造。","example":"$linearboard create-milestones PocketScheduler","limit":"不建立 issues；M label 也不等於 native milestone。"},
+    {"name":"create-userstories","title":"建立 User Story issues","phase":"需求","effect":"寫入 issues","view":"{Project}-UserStories","when":"以使用者 outcome 建立可驗收 stories。","input":"Milestone scope、vision 與確認需求。","output":"Milestone-linked UserStory issues 與 saved View；新票 Backlog。","check":"每票只有 story 與 acceptance criteria；native milestone、Category、M label 與 View membership 正確。","example":"$linearboard create-userstories PocketScheduler M1","limit":"缺 milestone 時，只有 source plan 已明確授權該 scope 才可建立；否則先釐清。"},
+    {"name":"create-PRDs","title":"建立 PRD issues","phase":"需求","effect":"寫入 issues／relations","view":"{Project}-PRDs","when":"把 User Stories 轉成產品規則與行為。","input":"指定 milestone 的 Stories、vision 與 shared constraints。","output":"ProductRequirement issues、Related relations、M＋所有來源 US labels 與 saved View。","check":"每個 PRD 聚焦一致 task；source relations、labels、milestone 與 View membership 全部讀回。","example":"$linearboard create-PRDs PocketScheduler M1","limit":"新票 Backlog；不實作、不 dispatch，unresolved 不視為 approved。"},
+    {"name":"prd-demystify","title":"逐題釐清 PRD 決策","phase":"需求","effect":"更新 PRDs／QA document","view":"無","when":"存在會影響 product behavior、scope 或 data result 的 unresolved decisions。","input":"Milestone PRDs、既有回答與 QA history。","output":"逐題修訂 PRDs，維護 {Project} {Milestone}-工能釐清QA紀錄。","check":"每題有 example、options、behavior、pros／cons 與 recommendation；history 不補造。","example":"$linearboard prd-demystify PocketScheduler M1","limit":"一次一題；可 defer 或 pause；技術實作問題留在 engineering issue。"},
+    {"name":"create-designs","title":"建立設計文件","phase":"設計","effect":"寫入 2 份 documents","view":"無","when":"把需求轉成 screen、flow、interaction 與 state specification。","input":"Stories、PRDs、QA decisions 與可用技術背景。","output":"Design overview 與 screen／interaction specification Project Documents。","check":"入口、出口、actions、normal／loading／empty／error states 可追到來源規則。","example":"$linearboard create-designs PocketScheduler M1","limit":"Document-only；不建立 Design issues／View，也不執行 create-visuals。"},
+    {"name":"create-visuals","title":"產生與核准完整視覺","phase":"設計","effect":"生成 gallery／授權後 upload","view":"核准後 {Project}-Design","when":"先選擇本次 layout，再完成全部 screens／components 與 key states。","input":"Design documents、requirements、established theme 與 references。","output":"三個 representative layouts、selected-layout 後的完整 gallery；final selection／upload／full approval 後建立 Design tickets 與 View。","check":"Theme、layout、detail review、final upload 與 full design approval 是分開 gates；gallery links 與 images 全部驗證。","example":"$linearboard create-visuals PocketScheduler M1","limit":"探索與詳細生成期間不建 tickets、不改 statuses；upload 不等於 native attachment approval。"},
+    {"name":"create-issues-FE","title":"建立 FrontEnd delivery issues","phase":"交付","effect":"寫入 issues","view":"{Project}-FE","when":"把需求與 approved visuals 拆成 independently reviewable UI work。","input":"Stories、PRDs、design documents、exact approved visuals 與 repository context。","output":"FrontEnd issues、native milestone、M＋所有來源 US labels、Coder 與 saved FE View；新票 Backlog。","check":"Routes、states、data effects、errors、accessibility、responsive scope、evidence requirements 與 exact visual version 完整。","example":"$linearboard create-issues-FE PocketScheduler M1","limit":"只建 FE 不授權 BE 或 dispatch；technical lookup 是內部流程。"},
+    {"name":"create-issues-BE","title":"建立 BackEnd delivery issues","phase":"交付","effect":"寫入 issues","view":"{Project}-BE","when":"把 confirmed data／service scope 拆成明確 ownership。","input":"Stories、PRDs、data boundaries、existing services 與 repository context。","output":"BackEnd issues、native milestone、M＋所有來源 US labels、Coder 與 saved BE View；新票 Backlog。","check":"Shared contracts 有單一 owner；authorization、consistency、failure／retry／recovery 與 compatibility 有驗收。","example":"$linearboard create-issues-BE PocketScheduler M1","limit":"BackEnd 不自動代表 server／cloud；technical lookup 是內部流程。"},
+    {"name":"organize-task-batch","title":"整理 checkpoint batches","phase":"交付","effect":"唯讀","view":"無","when":"依 observable outcome 與 dependencies 組織既有 FE／BE issues。","input":"Project、milestone 或 issue IDs，以及完整 issue／dependency evidence。","output":"聊天中的 ordered batches：Batch Name、FE Issues、BE Issues、grouping reason、expected outcomes。","check":"每張 selected issue 恰好出現一次或有排除理由；links、prerequisites、blockers 與 verification scenario 清楚。","example":"$linearboard organize-task-batch PocketScheduler M1","limit":"不寫 LinearBoard、不排日期、不 dispatch；batch 不是 concurrent worker allocation。"},
+    {"name":"dispatch","title":"派工指定 delivery issues","phase":"交付","effect":"派工／實作／驗證","view":"無","when":"使用者已授權 exact issue IDs、既有 Batch 或 bounded milestone selection。","input":"Ready FE／BE issues、canonical requirements、approved design、repository、target app 與 checks。","output":"最多三個 concurrent workers；validated plans、implementation reports、TPM independent evidence 與 review-ready In Review handoff。","check":"Worker scope 不重疊；先 acknowledged 再 release；actual target UI／service 驗證；Done 留給 user。","example":"$linearboard dispatch PocketScheduler M1 Batch 1","limit":"不擴張 issue selection；workers 不寫 LinearBoard；worker report 不是 acceptance evidence。"},
+    {"name":"debug","title":"從回報到修復與驗證","phase":"維護","effect":"記錄／建票／實作／驗證","view":"{Project}-FE／BE","when":"處理使用者選定的 bug reports 或 FIX issues。","input":"Project／milestone、Bugs document 或 issue IDs、reproduction、expected behavior 與 target environment。","output":"Bugs Project Document 的 Datetime／User Report、bounded FIX issues、saved View、independent evidence 與文件原生結果留言。","check":"每張 FIX 指回正確 report batch／bullet；result comment 回連 FIX；readback 與 target verification 完成。","example":"$linearboard debug PocketScheduler M1 〈Bugs 文件或 issue IDs〉","limit":"Triage-only 要明說；Bugs document 不可用就停止，不另存本機或以 issue-only 取代。"},
+    {"name":"sync","title":"同步已確認 records","phase":"維護","effect":"更新授權範圍","view":"依範圍","when":"Canonical records 之間存在有證據的缺漏或 drift。","input":"Project、milestone、scope 與 confirmed owner records。","output":"差異報告與 verified updates，涵蓋 content、milestone、labels、relations、status 與 Views。","check":"Updated、already aligned、conflict、unverified 分開回報；每次 write 後 readback。","example":"$linearboard sync PocketScheduler M1","limit":"不靠較新 timestamp 自動勝出；不補造 history、不重設 progress、不實作。"}
+  ]
+  </script>
+
+  <script>
+    (() => {
+      const commands = JSON.parse(document.getElementById('command-data').textContent);
+      const $ = id => document.getElementById(id);
+      const escapeHTML = value => String(value).replace(/[&<>"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[char]));
+      const toast = message => {
+        $('toast').textContent = message;
+        clearTimeout(window.linearboardToast);
+        window.linearboardToast = setTimeout(() => $('toast').textContent = '', 1800);
+      };
+
+      const phaseSection = phase => {
+        if (phase === '起步') return 'start';
+        if (phase === '規劃') return 'planning';
+        if (phase === '需求') return 'requirements';
+        if (phase === '設計') return 'design';
+        if (phase === '維護') return 'maintenance';
+        return 'delivery';
+      };
+
+      const action = $('action');
+      commands.forEach(command => {
+        const option = document.createElement('option');
+        option.value = command.name;
+        option.textContent = `${command.name} · ${command.title}`;
+        if (command.name === 'create-issues-FE') option.selected = true;
+        action.append(option);
+
+        const row = document.createElement('tr');
+        row.dataset.phase = command.phase;
+        row.dataset.search = Object.values(command).join(' ').toLowerCase();
+        row.innerHTML = `<td><a href="#cmd-${escapeHTML(command.name)}"><code>${escapeHTML(command.name)}</code></a></td><td>${escapeHTML(command.title)}</td><td>${escapeHTML(command.effect)}</td><td>${escapeHTML(command.view)}</td><td><button type="button" class="use-command" data-command="${escapeHTML(command.name)}">組合 ↗</button></td>`;
+        $('catalog').append(row);
+
+        const card = document.createElement('article');
+        card.className = 'command';
+        card.id = `cmd-${command.name}`;
+        card.innerHTML = `
+          <div class="command-top"><div><span class="eyebrow">${escapeHTML(command.phase)}</span><h3>${escapeHTML(command.name)}</h3><p class="subtitle">${escapeHTML(command.title)}</p></div><span class="badge">${escapeHTML(command.effect)}</span></div>
+          <p>${escapeHTML(command.when)}</p>
+          <div class="codebox"><div class="code-toolbar"><span>CODEX PROMPT</span><button class="copy" type="button" data-copy="#example-${escapeHTML(command.name)}">複製</button></div><pre><code id="example-${escapeHTML(command.name)}">${escapeHTML(command.example)}</code></pre></div>
+          <dl><div><dt>先準備</dt><dd>${escapeHTML(command.input)}</dd></div><div><dt>會得到</dt><dd>${escapeHTML(command.output)}</dd></div><div><dt>怎麼確認</dt><dd>${escapeHTML(command.check)}</dd></div></dl>
+          <p class="boundary"><strong>邊界：</strong>${escapeHTML(command.limit)}</p>
+          <button type="button" class="compose-command" data-command="${escapeHTML(command.name)}">用這個指令組合範圍 ↗</button>`;
+        const target = command.name === 'organize-task-batch' ? $('commands-delivery') : command.name === 'dispatch' ? $('commands-execution') : $(`commands-${phaseSection(command.phase)}`);
+        target.append(card);
+      });
+
+      function build() {
+        const command = commands.find(item => item.name === action.value);
+        const project = $('project').value.trim() || '〈Project〉';
+        const milestone = $('milestone').value.trim() || '〈Milestone〉';
+        const scope = $('dispatchscope').value;
+        const ids = $('issueids').value.trim();
+        const batch = $('batch').value.trim();
+        $('dispatch-scope-field').hidden = command.name !== 'dispatch';
+        $('batch-field').hidden = command.name !== 'dispatch' || scope !== 'batch';
+        $('issue-field').hidden = !(command.name === 'organize-task-batch' || (command.name === 'dispatch' && scope === 'issues'));
+        $('issue-label').textContent = command.name === 'organize-task-batch' ? 'Issue IDs（選填）' : 'Issue IDs（必填）';
+        $('debug-field').hidden = command.name !== 'debug';
+
+        let args = command.name === 'help' ? '' : ` ${project}`;
+        if (!['help', 'planning', 'create-vision-document', 'create-milestones'].includes(command.name)) args += ` ${milestone}`;
+        if (command.name === 'organize-task-batch' && ids) args += ` ${ids}`;
+        if (command.name === 'dispatch' && scope === 'batch') args += ` Batch ${batch || '〈n〉'}`;
+        if (command.name === 'dispatch' && scope === 'issues') args += ` ${ids || '〈issue IDs〉'}`;
+        if (command.name === 'debug') args += ` ${$('debugsource').value.trim() || '〈Bugs 文件或 issue IDs〉'}`;
+        let prompt = `$linearboard ${command.name}${args}`;
+        const extra = $('additional').value.trim();
+        if (extra) prompt += `\n${extra}`;
+        $('built').textContent = prompt;
+        $('builder-help').textContent = `${command.effect} · ${command.when} ${command.limit}`;
+      }
+
+      ['action','project','milestone','dispatchscope','batch','issueids','debugsource','additional'].forEach(id => $(id).addEventListener('input', build));
+      build();
+
+      document.addEventListener('click', async event => {
+        const copy = event.target.closest('[data-copy]');
+        if (copy) {
+          const text = document.querySelector(copy.dataset.copy)?.textContent || '';
+          try { await navigator.clipboard.writeText(text); toast('已複製指令。'); }
+          catch { toast('瀏覽器未允許剪貼簿，請手動選取。'); }
+        }
+        const commandButton = event.target.closest('[data-command]');
+        if (commandButton) {
+          action.value = commandButton.dataset.command;
+          build();
+          location.hash = 'builder';
+          action.focus({preventScroll: true});
+        }
+      });
+
+      let activeStage = '';
+      function filterCommands() {
+        const query = $('search').value.trim().toLowerCase();
+        let count = 0;
+        [...$('catalog').rows].forEach(row => {
+          const phase = row.dataset.phase;
+          const stageMatch = !activeStage || (activeStage === '交付' ? ['交付'].includes(phase) : phase === activeStage);
+          const visible = stageMatch && row.dataset.search.includes(query);
+          row.hidden = !visible;
+          if (visible) count += 1;
+        });
+        $('result-count').textContent = `${count} / ${commands.length} 個指令`;
+        $('search-empty').hidden = count !== 0;
+      }
+      $('search').addEventListener('input', filterCommands);
+      document.querySelectorAll('[data-stage]').forEach(button => button.addEventListener('click', () => {
+        activeStage = button.dataset.stage;
+        document.querySelectorAll('[data-stage]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+        filterCommands();
+      }));
+
+      const menu = $('menu-toggle');
+      menu.addEventListener('click', () => {
+        const open = menu.getAttribute('aria-expanded') !== 'true';
+        menu.setAttribute('aria-expanded', String(open));
+        $('guide-nav').classList.toggle('is-open', open);
+      });
+      document.querySelectorAll('#guide-nav a').forEach(link => link.addEventListener('click', () => {
+        $('guide-nav').classList.remove('is-open');
+        menu.setAttribute('aria-expanded', 'false');
+      }));
+
+      const marks = [...document.querySelectorAll('[data-progress]')];
+      const progressKey = 'linearboard-guide-reading-v1';
+      let saved = {};
+      try { saved = JSON.parse(localStorage.getItem(progressKey) || '{}'); } catch {}
+      function updateProgress() {
+        const completed = marks.filter(mark => mark.checked).length;
+        $('progress').value = completed;
+        $('progress-label').textContent = `閱讀進度 ${completed} / ${marks.length}`;
+        const state = {};
+        marks.forEach(mark => state[mark.dataset.progress] = mark.checked);
+        try { localStorage.setItem(progressKey, JSON.stringify(state)); } catch {}
+      }
+      marks.forEach(mark => {
+        mark.checked = Boolean(saved[mark.dataset.progress]);
+        mark.addEventListener('change', updateProgress);
+      });
+      $('reset').addEventListener('click', () => { marks.forEach(mark => mark.checked = false); updateProgress(); toast('已重設閱讀進度；未修改 LinearBoard。'); });
+      updateProgress();
+
+      const navLinks = [...document.querySelectorAll('#guide-nav a')];
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          navLinks.forEach(link => link.classList.toggle('active', link.hash === `#${entry.target.id}`));
+        }), {rootMargin: '-8% 0px -70% 0px'});
+        document.querySelectorAll('main > section').forEach(section => observer.observe(section));
+      }
+    })();
+  </script>
+</body>
+</html>

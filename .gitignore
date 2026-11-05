@@ -1,0 +1,29 @@
+# Local workspace data, credentials, backups and generated review artifacts
+/data/
+/output/
+.env
+.env.*
+!.env.example
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+*.pgdump
+*.dump
+*.pem
+*.key
+
+# Dependencies, build output and caches
+node_modules/
+/web/dist/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+coverage/
+playwright-report/
+test-results/
+.DS_Store
+*.log

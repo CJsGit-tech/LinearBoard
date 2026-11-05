@@ -1,0 +1,4 @@
+interface:
+  display_name: "LinearBoard"
+  short_description: "Plan and manage delivery in the local LinearBoard app"
+  default_prompt: "Use $linearboard to run the requested planning, requirements, design, visual, issue, dispatch, debug or sync workflow in the standalone local LinearBoard app."
