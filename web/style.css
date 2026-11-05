@@ -3435,3 +3435,27 @@ body {
   .dialog-head button[form] { padding: 6px 9px; font-size: 12px; }
 }
 @media (max-width: 760px) { .milestone-row > .record-actions { grid-column: 3; grid-row: 1; } }
+
+/* The native language selector remains available before a project is created. */
+.language-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 12px 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.language-control select {
+  min-width: 0;
+  width: auto;
+  max-width: 140px;
+  padding: 5px 8px;
+  background: var(--surface, #242321);
+  color: var(--text);
+  border: 1px solid var(--line, #4a4842);
+  border-radius: 5px;
+  font: inherit;
+  color-scheme: dark;
+}
+.language-control select:focus-visible { outline: 2px solid var(--accent, #c2b096); outline-offset: 2px; }

@@ -1,3 +1,4 @@
+import { t, getLanguage, setLanguage } from "./i18n.js";
 import React, { useEffect, useState, useLayoutEffect, useRef } from "react";
 import {
   S,
@@ -9,11 +10,11 @@ import {
   notify,
 } from "./model.js";
 import { Button, Icon } from "./ui.jsx";
-const projectPages = [
-  ["overview", "總覽", "folder"],
-  ["issues", "任務", "layout-list"],
-  ["documents", "文件", "file-text"],
-  ["milestones", "里程碑", "flag"],
+const projectPages = () => [
+  ["overview", t("總覽"), "folder"],
+  ["issues", t("任務"), "layout-list"],
+  ["documents", t("文件"), "file-text"],
+  ["milestones", t("里程碑"), "flag"],
 ];
 function ProjectTabs({ inspectorOpen }) {
   const scroll = useRef();
@@ -28,9 +29,9 @@ function ProjectTabs({ inspectorOpen }) {
     return () => observer.disconnect();
   }, [S.page, S.view]);
   return (
-    <nav className="project-tabs" aria-label="專案分頁">
+    <nav className="project-tabs" aria-label={t("專案分頁")}>
       <div className="project-tab-scroll" ref={scroll}>
-        {projectPages.map(([page, name, icon]) => (
+        {projectPages().map(([page, name, icon]) => (
           <Button
             key={page}
             action="nav"
@@ -73,7 +74,7 @@ function ProjectTabs({ inspectorOpen }) {
         <Button
           action="new-view"
           icon="plus"
-          aria-label="新增分頁 View"
+          aria-label={t("新增分頁 View")}
           className="icon-button"
         />
       </div>
@@ -83,13 +84,13 @@ function ProjectTabs({ inspectorOpen }) {
             <Button
               action="focus-search"
               icon="search"
-              aria-label="搜尋目前任務"
+              aria-label={t("搜尋目前任務")}
               className="icon-button"
             />
             <Button
               action="toggle-filters"
               icon="list-filter"
-              aria-label="篩選任務"
+              aria-label={t("篩選任務")}
               aria-expanded={Boolean(S.filtersOpen)}
               className="icon-button"
             />
@@ -97,7 +98,7 @@ function ProjectTabs({ inspectorOpen }) {
               action="layout"
               layout="list"
               icon="layout-list"
-              aria-label="清單檢視"
+              aria-label={t("清單檢視")}
               className={
                 "icon-button" + (S.layout === "list" ? " selected" : "")
               }
@@ -106,7 +107,7 @@ function ProjectTabs({ inspectorOpen }) {
               action="layout"
               layout="board"
               icon="columns-3"
-              aria-label="看板檢視"
+              aria-label={t("看板檢視")}
               className={
                 "icon-button" + (S.layout === "board" ? " selected" : "")
               }
@@ -118,14 +119,14 @@ function ProjectTabs({ inspectorOpen }) {
           <><Button
             action="edit-view"
             icon="settings-2"
-            aria-label="編輯目前 View"
+            aria-label={t("編輯目前 View")}
             className="icon-button"
-          /><Button action="trash-confirm" kind="views" id={S.view} icon="trash" aria-label="刪除目前 View" className="icon-button" /></>
+          /><Button action="trash-confirm" kind="views" id={S.view} icon="trash" aria-label={t("刪除目前 View")} className="icon-button" /></>
         )}
         <Button
           action="toggle-inspector"
           icon="panel-right"
-          aria-label={inspectorOpen ? "收合專案資訊" : "顯示專案資訊"}
+          aria-label={inspectorOpen ? t("收合專案資訊") : t("顯示專案資訊")}
           aria-expanded={inspectorOpen}
           className={"icon-button" + (inspectorOpen ? " selected" : "")}
         />
@@ -148,22 +149,22 @@ export function ProjectInspector() {
       S.q = S.category = S.status = "";
     });
   return (
-    <aside className="project-inspector" aria-label="專案資訊">
+    <aside className="project-inspector" aria-label={t("專案資訊")}>
       <details className="inspector-section" open>
-        <summary>專案屬性</summary>
+        <summary>{t("專案屬性")}</summary>
         <div className="inspector-properties">
-          <span>團隊</span>
+          <span>{t("團隊")}</span>
           <strong>{get("teams", p.team_id)?.name}</strong>
-          <span>任務</span>
+          <span>{t("任務")}</span>
           <strong>{issues.length}</strong>
-          <span>待審閱</span>
+          <span>{t("待審閱")}</span>
           <strong>{review}</strong>
-          <span>已驗收</span>
+          <span>{t("已驗收")}</span>
           <strong>{done} / {issues.length}</strong>
         </div>
       </details>
       {!["milestones", "overview"].includes(S.page) && <details className="inspector-section" open>
-        <summary>里程碑</summary>
+        <summary>{t("里程碑")}</summary>
         <div className="inspector-milestones">
           {list("milestones").map((m) => {
             const rows = milestoneIssues(m),
@@ -184,16 +185,14 @@ export function ProjectInspector() {
             );
           })}
           {!list("milestones").length && (
-            <span className="small muted">尚無里程碑</span>
+            <span className="small muted">{t("尚無里程碑")}</span>
           )}
         </div>
         <Button
           action="new-milestone"
           icon="plus"
           className="quiet inspector-add"
-        >
-          新增里程碑
-        </Button>
+        >{t("新增里程碑")}</Button>
       </details>}
     </aside>
   );
@@ -222,25 +221,32 @@ export function Shell({ children }) {
             <Button
               action="search-issues"
               icon="search"
-              aria-label="前往任務搜尋"
+              aria-label={t("前往任務搜尋")}
               className="icon-button"
             />
           </div>
         </div>
+        <label className="language-control">
+          <span>{t("語言")}</span>
+          <select aria-label="Language / 語言" value={getLanguage()} onChange={event => setLanguage(event.target.value)}>
+            <option value="en">English</option>
+            <option value="zh-TW">繁體中文</option>
+          </select>
+        </label>
         <div className="team-name">
           <Icon name="circle" />
-          <span>{team?.name || "個人工作區"}</span>
+          <span>{team?.name || t("個人工作區")}</span>
         </div>
         <div className="sidebar-project-title">
-          <span>專案</span>
+          <span>{t("專案")}</span>
           <Button
             action="new-project"
             icon="plus"
-            aria-label="建立專案"
+            aria-label={t("建立專案")}
             className="icon-button"
           />
         </div>
-        <nav className="project-list" aria-label="專案清單">
+        <nav className="project-list" aria-label={t("專案清單")}>
           {S.db.projects.filter(item => !item.archived).map(item => <div key={item.id} className="project-list-group">
           <div className={'project-list-row' + (S.project === item.id ? ' active' : '')}>
           <button type="button" className="project-list-item" data-project-id={item.id}
@@ -253,26 +259,23 @@ export function Shell({ children }) {
             kind="projects"
             id={item.id}
             icon="trash"
-            aria-label={'刪除專案 ' + item.name}
-            title={'刪除專案 ' + item.name}
+            aria-label={t("刪除專案 ") + item.name}
+            title={t("刪除專案 ") + item.name}
             className="icon-button project-delete"
           />
           </div>
           {S.project === item.id && <div className="project-tools">
           <Button action="nav" page="delivery" icon="git-branch"
             className={"nav-item" + (S.page === "delivery" ? " active" : "")}
-            aria-current={S.page === "delivery" ? "page" : undefined}>
-            交付
-          </Button>
+            aria-current={S.page === "delivery" ? "page" : undefined}>{t("交付")}</Button>
           </div>}
           </div>)}
         </nav>
-        {list("views").some((v) => v.placement === "shared") && <div className="sidebar-heading">
-          共享 Views{" "}
+        {list("views").some((v) => v.placement === "shared") && <div className="sidebar-heading">{t("共享 Views")}{" "}
           <Button
             action="new-view"
             icon="plus"
-            aria-label="建立 View"
+            aria-label={t("建立 View")}
             className="icon-button"
           />
         </div>}
@@ -300,9 +303,7 @@ export function Shell({ children }) {
             page="settings"
             icon="settings-2"
             className="nav-item"
-          >
-            工作區設定
-          </Button>
+          >{t("工作區設定")}</Button>
         </div>
       </aside>
       <main className="workspace-frame">
@@ -310,13 +311,13 @@ export function Shell({ children }) {
           <Button
             action="menu"
             icon={S.menu ? "x" : "menu"}
-            aria-label={S.menu ? "關閉導覽" : "開啟導覽"}
+            aria-label={S.menu ? t("關閉導覽") : t("開啟導覽")}
             aria-expanded={Boolean(S.menu)}
             aria-controls="workspace-navigation"
             className="icon-button mobile-only navigation-toggle"
           />
           <div className="breadcrumb">
-            <span className="breadcrumb-team">{team?.name || "工作區"}</span>
+            <span className="breadcrumb-team">{team?.name || t("工作區")}</span>
             <Icon name="chevron-right" />
             <Icon name="boxes" />
             <b>{p?.name || "LinearBoard"}</b>
@@ -328,19 +329,15 @@ export function Shell({ children }) {
                 page="issues"
                 icon="arrow-left"
                 className="quiet compact"
-              >
-                返回專案
-              </Button>
+              >{t("返回專案")}</Button>
             )}
 
             <Button
               action="new-issue"
               icon="plus"
               className="quiet compact"
-              aria-label="在專案新增任務"
-            >
-              新增任務
-            </Button>
+              aria-label={t("在專案新增任務")}
+            >{t("新增任務")}</Button>
           </div>
         </header>
         {projectContext && <ProjectTabs inspectorOpen={inspectorOpen} />}

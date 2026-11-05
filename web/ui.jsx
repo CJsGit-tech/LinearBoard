@@ -1,3 +1,4 @@
+import { t } from "./i18n.js";
 import React, { useLayoutEffect, useRef, useState, useId } from "react";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
@@ -173,7 +174,7 @@ export function Picker({ name, items = [], value, defaultValue, blank = "", plac
       }}>
       <SelectPrimitive.Trigger ref={trigger} className={"select-trigger " + className}
         data-value={selected} {...props}>
-        <SelectPrimitive.Value placeholder={placeholder || blank || "請選擇"} />
+        <SelectPrimitive.Value placeholder={placeholder || blank || t("請選擇")} />
         <SelectPrimitive.Icon className="select-chevron"><Icon name="chevron-down" /></SelectPrimitive.Icon>
       </SelectPrimitive.Trigger>
       <SelectPrimitive.Portal container={container}>
@@ -233,12 +234,12 @@ export function Area({ name, value = "", rows = 6, ...props }) {
 }
 export function MilestoneField({ record }) {
   return (
-    <Field label="里程碑">
+    <Field label={t("里程碑")}>
       <Select
         name="milestone_id"
         items={list("milestones")}
         value={record.milestone_id}
-        blank="無里程碑"
+        blank={t("無里程碑")}
       />
     </Field>
   );
@@ -265,7 +266,7 @@ export function LabelsSelect({ selected = [] }) {
         </label>
       ))}
       {!labels.length && (
-        <span className="muted small">在工作區設定新增 M／US 或角色標籤。</span>
+        <span className="muted small">{t("在工作區設定新增 M／US 或角色標籤。")}</span>
       )}
     </div>
   );
@@ -312,7 +313,7 @@ export function Attachment({ record: a }) {
         <Icon name="arrow-up-right" />
       </a>
       <Picker
-        aria-label={a.name + "審閱標記"}
+        aria-label={a.name + t("審閱標記")}
         data-approval={a.id}
         value={a.approval}
         disabled={busy}
@@ -324,7 +325,7 @@ export function Attachment({ record: a }) {
             await persist("attachments", a, { approval: value });
             await refresh();
             render();
-            notify("已更新審閱標記");
+            notify(t("已更新審閱標記"));
           } catch (error) {
             notify(error.message, true);
           } finally {
@@ -333,7 +334,7 @@ export function Attachment({ record: a }) {
         }}
         items={approvalOptions}
       />
-      <Button action="trash-confirm" kind="attachments" id={a.id} icon="trash" className="icon-button" aria-label={'刪除附件 ' + a.name} />
+      <Button action="trash-confirm" kind="attachments" id={a.id} icon="trash" className="icon-button" aria-label={t("刪除附件 ") + a.name} />
     </div>
   );
 }

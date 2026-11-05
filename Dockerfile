@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY server.py mcp_server.py guide.js linearboard-guide.html ./
 COPY linearboard ./linearboard
 COPY scripts ./scripts
-COPY web/index.html web/style.css ./web/
+COPY web/index.html web/style.css web/guide.en.html ./web/
 COPY --from=frontend /build/web/dist ./web/dist
 USER app
 EXPOSE 8765

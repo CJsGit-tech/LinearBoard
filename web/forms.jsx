@@ -1,3 +1,4 @@
+import { t } from "./i18n.js";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import {
   S,
@@ -37,7 +38,7 @@ import {
   AutoTitle,
   BodyEditor,
 } from "./ui.jsx";
-function FormShell({ title, children, onSubmit, submit = "儲存" }) {
+function FormShell({ title, children, onSubmit, submit = t("儲存") }) {
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   return (
@@ -63,7 +64,7 @@ function FormShell({ title, children, onSubmit, submit = "儲存" }) {
         <Button
           action="close"
           icon="x"
-          aria-label="關閉"
+          aria-label={t("關閉")}
           className="icon-button"
         />
       </header>
@@ -72,7 +73,7 @@ function FormShell({ title, children, onSubmit, submit = "儲存" }) {
         <span id="form-error" role="alert">
           {error}
         </span>
-        <Button action="close">取消</Button>
+        <Button action="close">{t("取消")}</Button>
         <button className="primary" type="submit" disabled={busy}>
           {submit}
         </button>
@@ -89,19 +90,19 @@ function RecordForm({ kind, record: r }) {
     ["FrontEnd", "BackEnd"].includes(i.category),
   );
   const names = {
-    projects: "專案",
-    teams: "團隊",
-    milestones: "里程碑",
-    labels: "標籤",
+    projects: t("專案"),
+    teams: t("團隊"),
+    milestones: t("里程碑"),
+    labels: t("標籤"),
     views: " View",
-    batches: "交付批次",
-    dispatches: "派工紀錄",
-    evidence: "驗證證據",
-    comments: "留言",
+    batches: t("交付批次"),
+    dispatches: t("派工紀錄"),
+    evidence: t("驗證證據"),
+    comments: t("留言"),
   };
   return (
     <FormShell
-      title={(r.id ? "編輯" : "新增") + names[kind]}
+      title={(r.id ? t("編輯") : t("新增")) + names[kind]}
       onSubmit={async (fd) => {
         const owner = S.modal;
         const data = Object.fromEntries(fd);
@@ -129,36 +130,36 @@ function RecordForm({ kind, record: r }) {
         if (S.modal !== owner) return;
         if (kind === "evidence" && r.issue_id) {
           await reopen("issues", r.issue_id, { owner });
-          notify("已儲存");
+          notify(t("已儲存"));
           return;
         }
         if (kind === "comments" && ["issues", "documents"].includes(r.target_kind)) {
           await reopen(r.target_kind, r.target_id, { owner });
-          notify("已儲存");
+          notify(t("已儲存"));
           return;
         }
         dismissDialog();
         if (kind === "projects") S.project = saved.id;
         await refresh();
         render();
-        notify("已儲存");
+        notify(t("已儲存"));
       }}
     >
       {kind === "teams" && (
         <>
-          <Field label="團隊名稱">
+          <Field label={t("團隊名稱")}>
             <Input name="name" value={r.name} required />
           </Field>
-          <Field label="團隊代碼">
+          <Field label={t("團隊代碼")}>
             <Input
               name="key"
               value={r.key}
               required
               pattern="[A-Z][A-Z0-9]{1,9}"
-              placeholder="例如 DEV"
+              placeholder={t("例如 DEV")}
             />
           </Field>
-          <Field label="工作流狀態（每行一個）">
+          <Field label={t("工作流狀態（每行一個）")}>
             <Area
               name="statuses"
               value={(r.id
@@ -168,15 +169,15 @@ function RecordForm({ kind, record: r }) {
               rows={7}
             />
           </Field>
-          <p className="muted small">仍被任務或 View 使用的狀態不可移除。</p>
+          <p className="muted small">{t("仍被任務或 View 使用的狀態不可移除。")}</p>
         </>
       )}
       {kind === "projects" && (
         <>
-          <Field label="專案名稱">
+          <Field label={t("專案名稱")}>
             <Input name="name" value={r.name} required autoFocus />
           </Field>
-          <Field label="團隊">
+          <Field label={t("團隊")}>
             <Select
               name="team_id"
               items={teams}
@@ -184,73 +185,69 @@ function RecordForm({ kind, record: r }) {
               disabled={Boolean(r.id)}
             />
           </Field>
-          <Field label="專案說明">
+          <Field label={t("專案說明")}>
             <Area name="body" value={r.body} />
           </Field>
         </>
       )}
       {kind === "milestones" && (
         <>
-          <Field label="名稱">
+          <Field label={t("名稱")}>
             <Input name="name" value={r.name} required />
           </Field>
-          <Field label="預期成果">
+          <Field label={t("預期成果")}>
             <Area name="description" value={r.description} rows={3} />
           </Field>
-          <Field label="目標日期（選填）">
+          <Field label={t("目標日期（選填）")}>
             <Input name="target_date" value={r.target_date} type="date" />
           </Field>
         </>
       )}
       {kind === "labels" && (
         <>
-          <Field label="名稱">
+          <Field label={t("名稱")}>
             <Input name="name" value={r.name} required />
           </Field>
-          <Field label="團隊">
+          <Field label={t("團隊")}>
             <Picker name="team_id" items={teams} value={labelTeam} onValueChange={(teamId) => {
               setLabelTeam(teamId);
               if (!S.db.labels.some((l) => l.id === labelParent && !l.archived && l.is_group && l.team_id === teamId))
                 setLabelParent("");
             }} />
           </Field>
-          <Field label="上層群組">
+          <Field label={t("上層群組")}>
             <Picker name="parent_id" value={labelParent} onValueChange={setLabelParent}
-              items={labelGroups} blank="無群組" />
+              items={labelGroups} blank={t("無群組")} />
           </Field>
           <label className="check-field">
             <input
               type="checkbox"
               name="is_group"
               defaultChecked={r.is_group || false}
-            />
-            建立為群組
-          </label>
+            />{t("建立為群組")}</label>
           <label className="check-field">
             <input
               type="checkbox"
               name="single_select"
               defaultChecked={r.single_select || false}
-            />
-            群組內單選
-          </label>
+            />{t("群組內單選")}</label>
         </>
       )}
       {kind === "views" && (
         <>
-          <Field label="View 名稱">
+          <Field label={t("View 名稱")}>
             <Input name="name" value={r.name} required />
           </Field>
-          <Field label="類別">
+          <Field label={t("類別")}>
             <Select
               name="category"
               items={S.db.categories}
               value={r.category}
-              blank="所有類別"
+              blank={t("所有類別")}
             />
           </Field>
           <MilestoneField record={r} />
-          <Field label="狀態（未選取時包含全部）">
+          <Field label={t("狀態（未選取時包含全部）")}>
             <div className="checkbox-grid">
               {teamStatuses().map((s) => (
                 <label key={s}>
@@ -265,27 +262,27 @@ function RecordForm({ kind, record: r }) {
               ))}
             </div>
           </Field>
-          <Field label="必含標籤">
+          <Field label={t("必含標籤")}>
             <LabelsSelect selected={r.label_ids || []} />
           </Field>
-          <Field label="分組">
+          <Field label={t("分組")}>
             <Select
               name="group_by"
               items={[
-                { id: "status", name: "狀態" },
-                { id: "category", name: "類別" },
-                { id: "milestone_id", name: "里程碑" },
-                { id: "priority", name: "優先級" },
+                { id: "status", name: t("狀態") },
+                { id: "category", name: t("類別") },
+                { id: "milestone_id", name: t("里程碑") },
+                { id: "priority", name: t("優先級") },
               ]}
               value={r.group_by || "status"}
             />
           </Field>
-          <Field label="顯示位置">
+          <Field label={t("顯示位置")}>
             <Select
               name="placement"
               items={[
-                { id: "tabs", name: "任務分頁列" },
-                { id: "shared", name: "側邊共享 Views" },
+                { id: "tabs", name: t("任務分頁列") },
+                { id: "shared", name: t("側邊共享 Views") },
               ]}
               value={r.placement || "tabs"}
             />
@@ -295,7 +292,7 @@ function RecordForm({ kind, record: r }) {
       {["batches", "dispatches"].includes(kind) && (
         <>
           {kind === "batches" ? (
-            <Field label="批次名稱">
+            <Field label={t("批次名稱")}>
               <Input name="name" value={r.name} required />
             </Field>
           ) : (
@@ -305,7 +302,7 @@ function RecordForm({ kind, record: r }) {
           )}
           <MilestoneField record={r} />
           <Field
-            label={kind === "batches" ? "FE／BE 任務" : "負責任務（選一張）"}
+            label={kind === "batches" ? t("FE／BE 任務") : t("負責任務（選一張）")}
           >
             <div className="issue-checklist">
               {available.map((i) => (
@@ -321,49 +318,49 @@ function RecordForm({ kind, record: r }) {
                 </label>
               ))}
               {!available.length && (
-                <p className="muted">請先建立 FE／BE 任務。</p>
+                <p className="muted">{t("請先建立 FE／BE 任務。")}</p>
               )}
             </div>
           </Field>
           {kind === "batches" ? (
             <>
-              <Field label="分組原因">
+              <Field label={t("分組原因")}>
                 <Area name="rationale" value={r.rationale} rows={3} />
               </Field>
-              <Field label="交付成果與驗證方式">
+              <Field label={t("交付成果與驗證方式")}>
                 <Area name="checkpoint" value={r.checkpoint} rows={4} />
               </Field>
-              <Field label="前置批次／阻礙">
+              <Field label={t("前置批次／阻礙")}>
                 <Area name="dependencies" value={r.dependencies} rows={2} />
               </Field>
             </>
           ) : (
             <>
-              <Field label="執行目標">
+              <Field label={t("執行目標")}>
                 <Input
                   name="target"
                   value={r.target}
                   required
-                  placeholder="Repository、App 入口或測試 URL"
+                  placeholder={t("Repository、App 入口或測試 URL")}
                 />
               </Field>
-              <Field label="範圍與來源">
+              <Field label={t("範圍與來源")}>
                 <Area name="scope" value={r.scope} rows={3} />
               </Field>
-              <Field label="已審閱計畫">
+              <Field label={t("已審閱計畫")}>
                 <Area name="plan" value={r.plan} rows={4} />
               </Field>
-              <Field label="狀態">
+              <Field label={t("狀態")}>
                 <Select
                   name="state"
                   items={dispatchOptions}
                   value={r.state || "review"}
                 />
               </Field>
-              <Field label="Worker 回報">
+              <Field label={t("Worker 回報")}>
                 <Area name="report" value={r.report} rows={4} />
               </Field>
-              <Field label="TPM 獨立檢查">
+              <Field label={t("TPM 獨立檢查")}>
                 <Area name="verification" value={r.verification} rows={3} />
               </Field>
             </>
@@ -371,26 +368,26 @@ function RecordForm({ kind, record: r }) {
         </>
       )}
       {kind === "comments" && (
-        <Field label="留言內容">
+        <Field label={t("留言內容")}>
           <Area name="body" value={r.body} rows={8} />
         </Field>
       )}
       {kind === "evidence" && (
         <>
-          <Field label="驗收條件">
+          <Field label={t("驗收條件")}>
             <Input name="criterion" value={r.criterion} required />
           </Field>
-          <Field label="結果">
+          <Field label={t("結果")}>
             <Select
               name="result"
               items={["Pass", "Fail", "Not tested", "Environment-blocked"]}
               value={r.result || "Not tested"}
             />
           </Field>
-          <Field label="環境／Viewport／路徑">
+          <Field label={t("環境／Viewport／路徑")}>
             <Input name="environment" value={r.environment} required />
           </Field>
-          <Field label="操作、觀察與限制">
+          <Field label={t("操作、觀察與限制")}>
             <Area name="body" value={r.body} rows={5} />
           </Field>
         </>
@@ -404,8 +401,8 @@ function NewIssue({ record: r }) {
     [explicitStatus, setExplicitStatus] = useState(Boolean(r.status && teamStatuses().includes(r.status)));
   return (
     <FormShell
-      title="新增任務"
-      submit="建立任務"
+      title={t("新增任務")}
+      submit={t("建立任務")}
       onSubmit={async (fd) => {
         const saved = await api("issues", {
           ...(r.priority ? { priority: r.priority } : {}),
@@ -417,14 +414,14 @@ function NewIssue({ record: r }) {
         await refresh();
         render();
         await openIssue(saved.id);
-        notify("已建立任務");
+        notify(t("已建立任務"));
       }}
     >
-      <Field label="任務標題">
+      <Field label={t("任務標題")}>
         <Input name="title" required autoFocus />
       </Field>
       <div className="field-grid">
-        <Field label="類別">
+        <Field label={t("類別")}>
           <Picker
             name="category"
             value={category}
@@ -435,7 +432,7 @@ function NewIssue({ record: r }) {
             items={S.db.categories}
           />
         </Field>
-        <Field label="狀態">
+        <Field label={t("狀態")}>
           <Picker
             name="status"
             value={status}
@@ -445,7 +442,7 @@ function NewIssue({ record: r }) {
         </Field>
         <MilestoneField record={r} />
       </div>
-      <Field label="標籤">
+      <Field label={t("標籤")}>
         <LabelsSelect selected={r.label_ids} />
       </Field>
       <BodyEditor value={r.body || ""} />
@@ -481,15 +478,13 @@ function CommentForm({ kind, id }) {
         name="body"
         rows={3}
         required
-        aria-label={kind === "issues" ? "任務留言" : "文件留言"}
-        placeholder="新增留言…"
+        aria-label={kind === "issues" ? t("任務留言") : t("文件留言")}
+        placeholder={t("新增留言…")}
         value={body}
         onChange={(e) => setBody(e.target.value)}
       />
       <button className="button" type="submit" disabled={busy}>
-        <Icon name="send" />
-        送出留言
-      </button>
+        <Icon name="send" />{t("送出留言")}</button>
     </form>
   );
 }
@@ -511,10 +506,8 @@ function Comment({ record: c, document = false }) {
           kind="comments"
           id={c.id}
           className="quiet comment-edit"
-        >
-          編輯
-        </Button>
-        <Button action="trash-confirm" kind="comments" id={c.id} icon="trash" className="icon-button" aria-label="刪除留言" />
+        >{t("編輯")}</Button>
+        <Button action="trash-confirm" kind="comments" id={c.id} icon="trash" className="icon-button" aria-label={t("刪除留言")} />
         <Markdown body={c.body} />
       </div>
     </article>
@@ -522,9 +515,9 @@ function Comment({ record: c, document = false }) {
 }
 function ObjectBack() {
   return <Button action="back-object" icon="arrow-left" className="quiet object-back"
-    disabled={!canGoBack()} title="返回（Alt+←）" aria-label="返回">返回</Button>;
+    disabled={!canGoBack()} title={t("返回（Alt+←）")} aria-label={t("返回")}>{t("返回")}</Button>;
 }
-const trashNames = { projects: '專案', issues: '任務', documents: '文件', milestones: '里程碑', views: 'View', labels: '標籤', teams: '團隊', comments: '留言', attachments: '附件', evidence: '驗證證據', batches: '交付批次', dispatches: '派工紀錄', relations: '關聯' };
+const trashNames = { get projects() { return t("專案"); }, get issues() { return t("任務"); }, get documents() { return t("文件"); }, get milestones() { return t("里程碑"); }, views: 'View', get labels() { return t("標籤"); }, get teams() { return t("團隊"); }, get comments() { return t("留言"); }, get attachments() { return t("附件"); }, get evidence() { return t("驗證證據"); }, get batches() { return t("交付批次"); }, get dispatches() { return t("派工紀錄"); }, get relations() { return t("關聯"); } };
 function TrashConfirm({ modal }) {
   const [busy, setBusy] = useState(false), [error, setError] = useState('');
   const groups = {};
@@ -533,34 +526,34 @@ function TrashConfirm({ modal }) {
   const root = modal.impact.deleted.find(entry => entry.record.id === (multiple ? modal.id[0] : modal.id))?.record;
   const relation = modal.kind === 'relations' && root && `${get('issues', root.source_id)?.identifier || root.source_id} ${relationLabels[root.relation] || root.relation} ${get('issues', root.target_id)?.identifier || root.target_id}`;
   return <div className="trash-confirm">
-    <header className="dialog-head"><h2 id="modal-title">移至垃圾桶</h2><Button action="close" icon="x" aria-label="關閉" className="icon-button" /></header>
+    <header className="dialog-head"><h2 id="modal-title">{t("移至垃圾桶")}</h2><Button action="close" icon="x" aria-label={t("關閉")} className="icon-button" /></header>
     <div className="form-content">
-      <p>{multiple ? `將選取的 ${modal.id.length} 個任務移至垃圾桶？` : `將「${root?.title || root?.name || root?.criterion || root?.worker || root?.body?.slice(0, 80) || relation || modal.id}」移至垃圾桶？`}</p>
-      <p className="muted small">包含 {Object.entries(groups).map(([kind, count]) => `${trashNames[kind] || kind} ${count}`).join('、')}。</p>
-      {modal.impact.affected.length > 0 && <p className="muted small">另有 {modal.impact.affected.length} 筆紀錄的關聯會調整。</p>}
+      <p>{multiple ? t("將選取的 {0} 個任務移至垃圾桶？", modal.id.length) : t("將「{0}」移至垃圾桶？", root?.title || root?.name || root?.criterion || root?.worker || root?.body?.slice(0, 80) || relation || modal.id)}</p>
+      <p className="muted small">{t("包含 ")}{Object.entries(groups).map(([kind, count]) => `${trashNames[kind] || kind} ${count}`).join(t('、'))}。</p>
+      {modal.impact.affected.length > 0 && <p className="muted small">{t("另有 {0} 筆紀錄的關聯會調整。", modal.impact.affected.length)}</p>}
       <span id="form-error" role="alert">{error}</span>
     </div>
-    <footer className="dialog-foot"><Button action="close">取消</Button><button type="button" className="primary" disabled={busy} onClick={async () => {
+    <footer className="dialog-foot"><Button action="close">{t("取消")}</Button><button type="button" className="primary" disabled={busy} onClick={async () => {
       if (busy) return; setBusy(true); setError('');
       try { await moveToTrash(modal.kind, modal.id, modal.impact.fingerprint); }
       catch (e) { setError(e.message); setBusy(false); }
-    }}>移至垃圾桶</button></footer>
+    }}>{t("移至垃圾桶")}</button></footer>
   </div>;
 }
 function TrashPurgeConfirm({ modal }) {
   const [busy, setBusy] = useState(false), [error, setError] = useState('');
   return <div className="trash-confirm">
-    <header className="dialog-head"><h2 id="modal-title">永久刪除</h2><Button action="close" icon="x" aria-label="關閉" className="icon-button" /></header>
+    <header className="dialog-head"><h2 id="modal-title">{t("永久刪除")}</h2><Button action="close" icon="x" aria-label={t("關閉")} className="icon-button" /></header>
     <div className="form-content">
-      <p>永久刪除 {modal.count} 筆垃圾桶紀錄？</p>
-      <p className="muted small">此操作無法還原；先前的資料庫備份仍可能包含這些資料。</p>
+      <p>{t("永久刪除 {0} 筆垃圾桶紀錄？", modal.count)}</p>
+      <p className="muted small">{t("此操作無法還原；先前的資料庫備份仍可能包含這些資料。")}</p>
       <span id="form-error" role="alert">{error}</span>
     </div>
-    <footer className="dialog-foot"><Button action="close">取消</Button><button type="button" className="primary" disabled={busy} onClick={async () => {
+    <footer className="dialog-foot"><Button action="close">{t("取消")}</Button><button type="button" className="primary" disabled={busy} onClick={async () => {
       if (busy) return; setBusy(true); setError('');
-      try { await api('trash/purge', { batch_ids: modal.batchIds }); dismissDialog(); S.trashRevision = (S.trashRevision || 0) + 1; render(); notify('已永久刪除'); }
+      try { await api('trash/purge', { batch_ids: modal.batchIds }); dismissDialog(); S.trashRevision = (S.trashRevision || 0) + 1; render(); notify(t("已永久刪除")); }
       catch (e) { setError(e.message); setBusy(false); }
-    }}>永久刪除</button></footer>
+    }}>{t("永久刪除")}</button></footer>
   </div>;
 }
 function IssueDetail({ record: r, history }) {
@@ -583,18 +576,18 @@ function IssueDetail({ record: r, history }) {
           <span className="badge">{cats[r.category]}</span>
         </div>
         <div className="actions">
-          <button type="submit" form="issue-form" className="primary" disabled={busy}>儲存變更</button>
-          <Button action="trash-confirm" kind="issues" id={r.id} icon="trash" className="quiet">刪除</Button>
+          <button type="submit" form="issue-form" className="primary" disabled={busy}>{t("儲存變更")}</button>
+          <Button action="trash-confirm" kind="issues" id={r.id} icon="trash" className="quiet">{t("刪除")}</Button>
           <Button
             action="copy-link"
             icon="link-2"
-            aria-label="複製任務連結"
+            aria-label={t("複製任務連結")}
             className="icon-button"
           />
           <Button
             action="close"
             icon="x"
-            aria-label="關閉任務"
+            aria-label={t("關閉任務")}
             className="icon-button"
           />
         </div>
@@ -622,7 +615,7 @@ function IssueDetail({ record: r, history }) {
                 label_ids: ids,
               });
               await reopen("issues", r.id, { saved: true, owner });
-              notify("已儲存變更");
+              notify(t("已儲存變更"));
             } catch (error) {
               setError(error.message);
               setBusy(false);
@@ -630,20 +623,20 @@ function IssueDetail({ record: r, history }) {
           }}
         >
           <div className="issue-edit-content">
-            <AutoTitle value={r.title} label="任務標題" />
+            <AutoTitle value={r.title} label={t("任務標題")} />
             <BodyEditor value={r.body} initialPreview={S.modal?.draft?.preview ?? true} />
             <span id="form-error" role="alert">{error}</span>
           </div>
-          <aside className="issue-properties" aria-label="任務屬性">
+          <aside className="issue-properties" aria-label={t("任務屬性")}>
             <div className="property-grid">
-              <Field label="狀態">
+              <Field label={t("狀態")}>
                 <Select
                   name="status"
                   items={teamStatuses(r.team_id)}
                   value={r.status}
                 />
               </Field>
-              <Field label="類別">
+              <Field label={t("類別")}>
                 <Select
                   name="category"
                   items={S.db.categories}
@@ -653,18 +646,18 @@ function IssueDetail({ record: r, history }) {
               <MilestoneField record={r} />
             </div>
             <details className="supplemental-properties">
-              <summary>其他屬性</summary>
-              <Field label="優先級">
+              <summary>{t("其他屬性")}</summary>
+              <Field label={t("優先級")}>
                 <Select
                   name="priority"
                   items={["No priority", "Urgent", "High", "Medium", "Low"]}
                   value={r.priority}
                 />
               </Field>
-              <Field label="負責人">
+              <Field label={t("負責人")}>
                 <Input name="assignee" value={r.assignee} />
               </Field>
-              <Field label="上層任務">
+              <Field label={t("上層任務")}>
                 <Select
                   name="parent_id"
                   items={list("issues")
@@ -674,13 +667,12 @@ function IssueDetail({ record: r, history }) {
                       name: i.identifier + " " + i.title,
                     }))}
                   value={r.parent_id}
-                  blank="無"
+                  blank={t("無")}
                 />
               </Field>
             </details>
             <details className="label-details">
-              <summary>
-                標籤{" "}
+              <summary>{t("標籤")}{" "}
                 <span className="muted">
                   {r.label_ids.filter((id) => get("labels", get("labels", id)?.parent_id)?.name !== "Category").map(labelName).join(" · ")}
                 </span>
@@ -689,15 +681,13 @@ function IssueDetail({ record: r, history }) {
             </details>
             <section className="detail-section">
               <div className="section-title">
-                <h3>關聯與依賴</h3>
+                <h3>{t("關聯與依賴")}</h3>
                 <Button
                   action="new-relation"
                   id={r.id}
                   icon="plus"
                   className="quiet"
-                >
-                  新增關聯
-                </Button>
+                >{t("新增關聯")}</Button>
               </div>
               {relations.map((rel) => {
                 const out = rel.source_id === r.id;
@@ -706,8 +696,8 @@ function IssueDetail({ record: r, history }) {
                     <span className="muted small">
                       {rel.relation === "blocks"
                         ? out
-                          ? "阻擋"
-                          : "受阻於"
+                          ? t("阻擋")
+                          : t("受阻於")
                         : relationLabels[rel.relation] || rel.relation}
                     </span>
                     <IssueChip
@@ -719,7 +709,7 @@ function IssueDetail({ record: r, history }) {
                       kind="relations"
                       id={rel.id}
                       icon="x"
-                      aria-label="移除關聯"
+                      aria-label={t("移除關聯")}
                       className="icon-button"
                     />
                   </div>
@@ -731,16 +721,14 @@ function IssueDetail({ record: r, history }) {
 
         <section className="detail-section">
           <div className="section-title">
-            <h3>視覺參考與附件</h3>
+            <h3>{t("視覺參考與附件")}</h3>
             <Button
               action="upload"
               kind="issues"
               id={r.id}
               icon="paperclip"
               className="quiet"
-            >
-              新增附件
-            </Button>
+            >{t("新增附件")}</Button>
           </div>
           <div className="attachments">
             {attachments.map((a) => (
@@ -750,19 +738,17 @@ function IssueDetail({ record: r, history }) {
         </section>
         <section className="detail-section">
           <div className="section-title">
-            <h3>驗證證據</h3>
+            <h3>{t("驗證證據")}</h3>
             <Button
               action="new-evidence"
               id={r.id}
               icon="plus"
               className="quiet"
-            >
-              記錄驗證
-            </Button>
+            >{t("記錄驗證")}</Button>
           </div>
           {evidence.map((e) => (
             <article className="evidence" key={e.id}>
-              <Button action="trash-confirm" kind="evidence" id={e.id} icon="trash" className="icon-button" aria-label="刪除驗證證據" />
+              <Button action="trash-confirm" kind="evidence" id={e.id} icon="trash" className="icon-button" aria-label={t("刪除驗證證據")} />
               <span className={"badge result-" + e.result.replaceAll(" ", "-")}>
                 {e.result}
               </span>
@@ -773,7 +759,7 @@ function IssueDetail({ record: r, history }) {
           ))}
         </section>
         <section className="detail-section">
-          <h3>活動</h3>
+          <h3>{t("活動")}</h3>
           {comments.map((c) => (
             <Comment key={c.id} record={c} />
           ))}
@@ -781,8 +767,7 @@ function IssueDetail({ record: r, history }) {
         </section>
         <details className="revisions">
           <summary>
-            <Icon name="history" />
-            修訂歷史 <span className="count">{history.length}</span>
+            <Icon name="history" />{t("修訂歷史 ")}<span className="count">{history.length}</span>
           </summary>
           {history.map((h) => (
             <details key={h.after_data.version}>
@@ -805,18 +790,16 @@ function DocumentDetail({ record: r, history }) {
       <header className="dialog-head">
         <span className="inline">
           <ObjectBack />
-          <Icon name="file-text" />
-          專案文件
-        </span>
+          <Icon name="file-text" />{t("專案文件")}</span>
         <div className="actions">
-          <button type="submit" form="document-form" className="primary" disabled={busy}>儲存文件</button>
+          <button type="submit" form="document-form" className="primary" disabled={busy}>{t("儲存文件")}</button>
           {r.id && (
             <>
-              <Button action="trash-confirm" kind="documents" id={r.id} icon="trash" className="quiet">刪除</Button>
+              <Button action="trash-confirm" kind="documents" id={r.id} icon="trash" className="quiet">{t("刪除")}</Button>
               <Button
                 action="copy-link"
                 icon="link-2"
-                aria-label="複製文件連結"
+                aria-label={t("複製文件連結")}
                 className="icon-button"
               />
             </>
@@ -824,7 +807,7 @@ function DocumentDetail({ record: r, history }) {
           <Button
             action="close"
             icon="x"
-            aria-label="關閉文件"
+            aria-label={t("關閉文件")}
             className="icon-button"
           />
         </div>
@@ -845,16 +828,16 @@ function DocumentDetail({ record: r, history }) {
                 project_id: S.project,
               });
               await reopen("documents", saved.id, { saved: true, owner });
-              notify("文件已儲存");
+              notify(t("文件已儲存"));
             } catch (error) {
               setError(error.message);
               setBusy(false);
             }
           }}
         >
-          <AutoTitle value={r.title} label="文件標題" placeholder="文件標題" />
+          <AutoTitle value={r.title} label={t("文件標題")} placeholder={t("文件標題")} />
           <div className="field-grid">
-            <Field label="文件類型">
+            <Field label={t("文件類型")}>
               <Select
                 name="doc_type"
                 items={[
@@ -884,16 +867,14 @@ function DocumentDetail({ record: r, history }) {
           <>
             <section className="detail-section">
               <div className="section-title">
-                <h3>附件</h3>
+                <h3>{t("附件")}</h3>
                 <Button
                   action="upload"
                   kind="documents"
                   id={r.id}
                   icon="paperclip"
                   className="quiet"
-                >
-                  新增附件
-                </Button>
+                >{t("新增附件")}</Button>
               </div>
               {list("attachments")
                 .filter((a) => a.target_id === r.id)
@@ -902,7 +883,7 @@ function DocumentDetail({ record: r, history }) {
                 ))}
             </section>
             <section className="detail-section">
-              <h3>文件留言</h3>
+              <h3>{t("文件留言")}</h3>
               {list("comments")
                 .filter(
                   (c) => c.target_kind === "documents" && c.target_id === r.id,
@@ -913,7 +894,7 @@ function DocumentDetail({ record: r, history }) {
               <CommentForm kind="documents" id={r.id} />
             </section>
             <details className="revisions">
-              <summary>修訂歷史 · {history.length}</summary>
+              <summary>{t("修訂歷史 · ")}{history.length}</summary>
               {history.map((h) => (
                 <details key={h.after_data.version}>
                   <summary>
@@ -932,8 +913,8 @@ function DocumentDetail({ record: r, history }) {
 function UploadForm({ kind, id }) {
   return (
     <FormShell
-      title="新增附件"
-      submit="加入附件"
+      title={t("新增附件")}
+      submit={t("加入附件")}
       onSubmit={async (fd) => {
         const owner = S.modal;
         const data = {
@@ -944,7 +925,7 @@ function UploadForm({ kind, id }) {
           file = fd.get("file");
         delete data.file;
         if (file?.size) {
-          if (file.size > 15 * 1024 * 1024) throw Error("附件不可超過 15 MB。");
+          if (file.size > 15 * 1024 * 1024) throw Error(t("附件不可超過 15 MB。"));
           data.name = data.name || file.name;
           data.mime = file.type;
           data.content_base64 = await new Promise((resolve, reject) => {
@@ -953,30 +934,30 @@ function UploadForm({ kind, id }) {
             reader.onerror = reject;
             reader.readAsDataURL(file);
           });
-        } else if (!data.external_url) throw Error("請選擇檔案或填寫連結。");
+        } else if (!data.external_url) throw Error(t("請選擇檔案或填寫連結。"));
         await api("attachments", data);
         await reopen(kind, id, { owner });
-        notify("附件已儲存");
+        notify(t("附件已儲存"));
       }}
     >
-      <Field label="選擇檔案（上限 15 MB）">
+      <Field label={t("選擇檔案（上限 15 MB）")}>
         <input type="file" name="file" />
       </Field>
-      <Field label="或使用外部連結">
+      <Field label={t("或使用外部連結")}>
         <Input name="external_url" type="url" placeholder="https://…" />
       </Field>
-      <Field label="名稱">
-        <Input name="name" placeholder="未填寫時使用檔名" />
+      <Field label={t("名稱")}>
+        <Input name="name" placeholder={t("未填寫時使用檔名")} />
       </Field>
       <div className="field-grid">
-        <Field label="畫面識別">
+        <Field label={t("畫面識別")}>
           <Input name="screen" />
         </Field>
-        <Field label="版本">
+        <Field label={t("版本")}>
           <Input name="visual_version" placeholder="v1" />
         </Field>
       </div>
-      <Field label="用途">
+      <Field label={t("用途")}>
         <Select name="approval" items={approvalOptions.filter((o) => ["draft", "evidence"].includes(o.id))} value="draft" />
       </Field>
     </FormShell>
@@ -985,7 +966,7 @@ function UploadForm({ kind, id }) {
 function RelationForm({ id }) {
   return (
     <FormShell
-      title="新增關聯"
+      title={t("新增關聯")}
       onSubmit={async (fd) => {
         const owner = S.modal;
         const data = Object.fromEntries(fd);
@@ -998,20 +979,20 @@ function RelationForm({ id }) {
         await reopen("issues", id, { owner });
       }}
     >
-      <Field label="關聯類型">
+      <Field label={t("關聯類型")}>
         <Select
           name="relation"
           items={[
-            { id: "related", name: "相關任務" },
-            { id: "blocks", name: "此任務阻擋對方" },
-            { id: "blocked_by", name: "此任務被對方阻擋" },
-            { id: "supersedes", name: "取代" },
-            { id: "duplicate", name: "重複任務" },
+            { id: "related", name: t("相關任務") },
+            { id: "blocks", name: t("此任務阻擋對方") },
+            { id: "blocked_by", name: t("此任務被對方阻擋") },
+            { id: "supersedes", name: t("取代") },
+            { id: "duplicate", name: t("重複任務") },
           ]}
           value="related"
         />
       </Field>
-      <Field label="目標任務">
+      <Field label={t("目標任務")}>
         <Select
           name="target_id"
           items={list("issues")
@@ -1069,9 +1050,9 @@ export function Dialog() {
       }
       aria-label={
         modal?.type === "issue"
-          ? "任務詳情"
+          ? t("任務詳情")
           : modal?.type === "document"
-            ? "專案文件"
+            ? t("專案文件")
             : undefined
       }
       aria-labelledby={

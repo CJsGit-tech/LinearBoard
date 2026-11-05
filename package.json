@@ -8,7 +8,8 @@
     "start": "python3 server.py",
     "test": "python3 -m unittest discover -s tests -v",
     "test:ui": "node tests/ui.cjs",
-    "test:selects": "node tests/selects.cjs"
+    "test:selects": "node tests/selects.cjs",
+    "test:i18n": "node tests/i18n.cjs"
   },
   "keywords": [],
   "author": "",

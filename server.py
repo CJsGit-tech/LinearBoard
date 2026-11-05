@@ -15,6 +15,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 from linearboard.store import Store, Invalid, Conflict, KINDS
 from linearboard.contracts import capabilities
+from linearboard.i18n import preferred_language, translate_error
 
 ROOT = Path(__file__).resolve().parent
 GUIDE_RUNTIME_TAG = '<script src="guide.js" data-guide-runtime defer></script>'
@@ -46,13 +47,19 @@ class Handler(BaseHTTPRequestHandler):
             super().log_message(fmt, *args)
 
     def send(self, status, content, mime='application/json', headers=None):
+        language = preferred_language(self.headers.get('Accept-Language', ''))
         if mime == 'application/json':
+            if status >= 400 and isinstance(content, dict) and isinstance(content.get('error'), str):
+                content = {**content, 'error': translate_error(content['error'], language)}
             content = json.dumps(content, ensure_ascii=False).encode()
         elif isinstance(content, str):
             content = content.encode()
         self.send_response(status)
         self.send_header('Content-Type', mime)
         self.send_header('Content-Length', str(len(content)))
+        if mime == 'application/json':
+            self.send_header('Content-Language', language)
+            self.send_header('Vary', 'Accept-Language')
         self.send_header('X-Content-Type-Options', 'nosniff')
         self.send_header('Referrer-Policy', 'same-origin')
         self.send_header('Cache-Control', 'no-store' if mime == 'application/json' else 'no-cache')
@@ -120,7 +127,7 @@ class Handler(BaseHTTPRequestHandler):
                         if artifact.is_file():
                             return self.send(200, artifact.read_bytes(), mimetypes.guess_type(artifact)[0] or 'application/octet-stream')
                     return self.send(404, {'error':'找不到視覺參考。'})
-                files = {'/': ROOT / 'web/index.html', '/app.js': ROOT / 'web/dist/app.js', '/style.css': ROOT / 'web/style.css', '/guide': ROOT / 'linearboard-guide.html', '/guide.js': ROOT / 'guide.js'}
+                files = {'/': ROOT / 'web/index.html', '/app.js': ROOT / 'web/dist/app.js', '/style.css': ROOT / 'web/style.css', '/guide': ROOT / 'linearboard-guide.html', '/guide/en': ROOT / 'web/guide.en.html', '/guide.js': ROOT / 'guide.js'}
                 file = files.get(parsed.path)
                 if file and file.is_file():
                     return self.send(200, file.read_bytes(), mimetypes.guess_type(file)[0] or 'application/octet-stream')

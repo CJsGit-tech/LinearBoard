@@ -14,7 +14,7 @@ const {selectTrigger,selectValue,optionValues,selectProject}=require('./controls
  const passed=[];let errors=[];
  try{
  await start();browser=await chromium.launch({channel:'chrome',headless:true});
- const context=await browser.newContext({viewport:{width:1440,height:960}});const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
+ const context=await browser.newContext({locale:"zh-TW",viewport:{width:1440,height:960}});const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
  page.setDefaultTimeout(10000); const waitRender=()=>page.waitForTimeout(180);
  const click=async(action,root=page)=>{const selector=action==='all-view'?'[data-action="nav"][data-page="issues"]':`[data-action="${action}"]`;const control=root.locator(selector).first();if(action==='preview'&&await root.locator('[name="body"]').first().evaluate(el=>el.hidden))return;await control.click();await waitRender();};
  const filters=async()=>{if(!await page.locator('#search').isVisible())await page.getByRole('button',{name:'篩選任務',exact:true}).click();await page.locator('#search').waitFor({state:'visible'});};

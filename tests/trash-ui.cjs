@@ -28,7 +28,7 @@ const assert = require('node:assert/strict');
     const parent = await request('issues', {project_id:project.id, title:'Parent QA', category:'FrontEnd'});
     const child = await request('issues', {project_id:project.id, title:'Child QA', category:'FrontEnd', parent_id:parent.id});
     browser = await chromium.launch({channel:'chrome', headless:true});
-    const page = await browser.newPage({viewport:{width:1440,height:960}});
+    const page = await browser.newPage({locale:"zh-TW",viewport:{width:1440,height:960}});
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(base);
     await page.getByRole('button', {name:'工作區設定', exact:true}).click();

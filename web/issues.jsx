@@ -1,3 +1,4 @@
+import { t } from "./i18n.js";
 import React, { useEffect, useRef, useState } from "react";
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -11,7 +12,7 @@ function StatusMenu({ parts: M, ids, busy, onStatus }) {
   return (
     <M.Sub>
       <M.SubTrigger className="menu-item" disabled={busy || !ids.length}>
-        <Icon name="circle-dot" />變更狀態<Icon name="chevron-right" />
+        <Icon name="circle-dot" />{t("變更狀態")}<Icon name="chevron-right" />
       </M.SubTrigger>
       <M.Portal>
         <M.SubContent className={menuClass + " status-submenu"} sideOffset={5} collisionPadding={10}>
@@ -31,16 +32,14 @@ function StatusMenu({ parts: M, ids, busy, onStatus }) {
 function GroupMenuItems({ parts: M, collapsed, allCollapsed, disabled, empty, onToggle, onAllToggle, onSelectAll, onHide }) {
   return <>
     <M.Item className="menu-item" onSelect={onToggle} disabled={disabled}>
-      {collapsed ? "展開群組" : "收合群組"}
+      {collapsed ? t("展開群組") : t("收合群組")}
     </M.Item>
     <M.Item className="menu-item" onSelect={onAllToggle} disabled={disabled}>
-      {allCollapsed ? "展開全部群組" : "收合全部群組"}
+      {allCollapsed ? t("展開全部群組") : t("收合全部群組")}
     </M.Item>
     <M.Separator className="menu-separator" />
-    <M.Item className="menu-item" onSelect={onSelectAll} disabled={disabled || empty}>
-      全選此群組
-    </M.Item>
-    <M.Item className="menu-item" onSelect={onHide} disabled={disabled}>隱藏群組</M.Item>
+    <M.Item className="menu-item" onSelect={onSelectAll} disabled={disabled || empty}>{t("全選此群組")}</M.Item>
+    <M.Item className="menu-item" onSelect={onHide} disabled={disabled}>{t("隱藏群組")}</M.Item>
   </>;
 }
 
@@ -59,7 +58,7 @@ function IssueRow({ record: r, selected, selectedIds, busy, onToggle, onSelectOn
           onContextMenu={() => { if (!selected) onSelectOnly(r.id); }}>
           <label className="issue-selection-area">
           <input type="checkbox" className="issue-checkbox"
-            aria-label={"選取 " + r.identifier} checked={selected} disabled={busy}
+            aria-label={t("選取 ") + r.identifier} checked={selected} disabled={busy}
             onChange={() => onToggle(r.id)} />
           </label>
           <Button action="open-issue" id={r.id} className="issue-row" disabled={busy}
@@ -79,31 +78,31 @@ function IssueRow({ record: r, selected, selectedIds, busy, onToggle, onSelectOn
             </span>
           </Button>
           {labels.length > 3 && <button type="button" className="quiet issue-label-toggle"
-            aria-label={(labelsExpanded ? '收合 ' : '展開 ') + r.identifier + ' 標籤'}
+            aria-label={(labelsExpanded ? t("收合 ") : t("展開 ")) + r.identifier + t(" 標籤")}
             aria-expanded={labelsExpanded} disabled={busy}
             onClick={event => { event.stopPropagation(); setLabelsExpanded(value => !value); }}>
-            {labelsExpanded ? '收合' : `+${labels.length - 3}`}
+            {labelsExpanded ? t("收合") : `+${labels.length - 3}`}
           </button>}
-          {labelsExpanded && labels.length > 3 && <div className="issue-labels-expanded" role="group" aria-label={r.identifier + ' 所有標籤'}>
+          {labelsExpanded && labels.length > 3 && <div className="issue-labels-expanded" role="group" aria-label={r.identifier + t(" 所有標籤")}>
             {labels.map(label => <span key={label.id} className="badge" title={label.name}>{label.name}</span>)}
           </div>}
         </div>
       </ContextMenu.Trigger>
       <ContextMenu.Portal>
         <ContextMenu.Content className={menuClass} collisionPadding={10}>
-          <ContextMenu.Label className="menu-label">{ids.length} 個任務</ContextMenu.Label>
+          <ContextMenu.Label className="menu-label">{ids.length}{t(" 個任務")}</ContextMenu.Label>
           <StatusMenu parts={ContextMenu} ids={ids} busy={busy} onStatus={onStatus} />
           <ContextMenu.Separator className="menu-separator" />
           <ContextMenu.Item className="menu-item" disabled={busy} onSelect={() => {
             setTimeout(() => action("open-issue", { id: r.id }).catch(error => notify(error.message, true)), 0);
-          }}><Icon name="arrow-up-right" />開啟任務</ContextMenu.Item>
+          }}><Icon name="arrow-up-right" />{t("開啟任務")}</ContextMenu.Item>
           <ContextMenu.Item className="menu-item" onSelect={() => {
             navigator.clipboard.writeText(new URL(r.url, location.origin).href)
-              .then(() => notify("已複製連結"), error => notify(error.message, true));
-          }}><Icon name="link-2" />複製任務連結</ContextMenu.Item>
+              .then(() => notify(t("已複製連結")), error => notify(error.message, true));
+          }}><Icon name="link-2" />{t("複製任務連結")}</ContextMenu.Item>
           <ContextMenu.Item className="menu-item" disabled={busy} onSelect={() => {
             setTimeout(() => action(ids.length > 1 ? 'trash-bulk-confirm' : 'trash-confirm', ids.length > 1 ? { ids } : { kind: 'issues', id: r.id }).catch(error => notify(error.message, true)), 0);
-          }}><Icon name="trash" />刪除</ContextMenu.Item>
+          }}><Icon name="trash" />{t("刪除")}</ContextMenu.Item>
         </ContextMenu.Content>
       </ContextMenu.Portal>
     </ContextMenu.Root>
@@ -186,7 +185,7 @@ export default function Issues() {
       const result = await api("issues/bulk-status", { issue_ids: ids, expected_versions, status });
       await refresh();
       render();
-      notify(result.updated ? `已更新 ${result.updated} 個任務的狀態。` : "選取的任務已是此狀態。");
+      notify(result.updated ? t("已更新 {0} 個任務的狀態。", result.updated) : t("選取的任務已是此狀態。"));
     } catch (error) {
       try { await refresh(); render(); } catch { /* The original error remains actionable. */ }
       notify(error.message, true);
@@ -203,13 +202,13 @@ export default function Issues() {
     <>
       <section className="issues-page">
         <h1 className="visually-hidden">
-          {v?.name || "所有任務"}
+          {v?.name || t("所有任務")}
         </h1>
-        {selectedIds.length > 0 && <div className="selection-bar" aria-label="已選取任務" aria-busy={busy}>
-          <strong aria-live="polite">已選取 {selectedIds.length} 個任務</strong>
+        {selectedIds.length > 0 && <div className="selection-bar" aria-label={t("已選取任務")} aria-busy={busy}>
+          <strong aria-live="polite">{t("已選取 {0} 個任務", selectedIds.length)}</strong>
           <DropdownMenu.Root>
             <DropdownMenu.Trigger className="quiet compact bulk-actions-trigger" disabled={busy}>
-              {busy ? "更新中…" : "動作"}<Icon name="chevron-down" />
+              {busy ? t("更新中…") : t("動作")}<Icon name="chevron-down" />
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
               <DropdownMenu.Content className={menuClass} sideOffset={5} collisionPadding={10}>
@@ -217,19 +216,19 @@ export default function Issues() {
                 <DropdownMenu.Separator className="menu-separator" />
                 <DropdownMenu.Item className="menu-item" disabled={busy} onSelect={() => {
                   setTimeout(() => action('trash-bulk-confirm', { ids: selectedIds }).catch(error => notify(error.message, true)), 0);
-                }}><Icon name="trash" />刪除</DropdownMenu.Item>
+                }}><Icon name="trash" />{t("刪除")}</DropdownMenu.Item>
               </DropdownMenu.Content>
             </DropdownMenu.Portal>
           </DropdownMenu.Root>
-          <button type="button" className="icon-button" aria-label="取消選取" disabled={busy} onClick={() => setSelected(new Set())}><Icon name="x" /></button>
+          <button type="button" className="icon-button" aria-label={t("取消選取")} disabled={busy} onClick={() => setSelected(new Set())}><Icon name="x" /></button>
         </div>}
         <div className="filters" hidden={!S.filtersOpen}>
           <label className="search-field">
             <Icon name="search" />
             <input
               id="search"
-              placeholder="搜尋任務…"
-              aria-label="搜尋任務"
+              placeholder={t("搜尋任務…")}
+              aria-label={t("搜尋任務")}
               value={S.q}
               onChange={(e) => setFilter("q", e.target.value)}
             />
@@ -237,51 +236,41 @@ export default function Issues() {
           </label>
           <Picker
             id="filter-category"
-              aria-label="篩選類別"
+              aria-label={t("篩選類別")}
             value={S.category}
             onValueChange={(value) => setFilter("category", value)}
               items={S.db.categories.map((c) => ({ id: c, name: cats[c] }))}
-              blank="所有類別"
+              blank={t("所有類別")}
           />
           <Picker
             id="filter-status"
-            aria-label="篩選狀態"
+            aria-label={t("篩選狀態")}
             value={S.status}
             onValueChange={(value) => setFilter("status", value)}
               items={teamStatuses().map((s) => ({
                 id: s,
                 name: statusLabel(s),
               }))}
-              blank="所有狀態"
+              blank={t("所有狀態")}
           />
           <Picker
             id="filter-milestone"
-            aria-label="篩選里程碑"
+            aria-label={t("篩選里程碑")}
             value={S.milestone}
             onValueChange={(value) => setFilter("milestone", value)}
-            items={list("milestones")} blank="所有里程碑"
+            items={list("milestones")} blank={t("所有里程碑")}
           />
           {(S.q || S.category || S.status || S.milestone) && (
-            <Button action="clear-filters" icon="x" className="quiet">
-              清除
-            </Button>
+            <Button action="clear-filters" icon="x" className="quiet">{t("清除")}</Button>
           )}
           <span className="filter-spacer" />
           <span className="small muted desktop-only">
-            <Icon name="sliders-horizontal" />依{" "}
-            {
-              {
-                status: "狀態",
-                category: "類別",
-                milestone_id: "里程碑",
-                priority: "優先級",
-              }[group]
-            }{" "}
-            分組
-          </span>
+            <Icon name="sliders-horizontal" />{t("依 {0} 分組", {
+              status: t("狀態"), category: t("類別"), milestone_id: t("里程碑"), priority: t("優先級"),
+            }[group])}</span>
         </div>
         <div className={"results " + (S.layout === "board" ? "board" : "list")}>
-          {rows.length > 0 && !shownGroups.length && <Empty title="所有群組皆已隱藏" />}
+          {rows.length > 0 && !shownGroups.length && <Empty title={t("所有群組皆已隱藏")} />}
           {rows.length ? (
             shownGroups.map((k) => (
                 <section
@@ -307,7 +296,7 @@ export default function Issues() {
                     <ContextMenu.Trigger asChild>
                       <div className="group-heading" data-group={k}>
                         <button type="button" className="quiet group-toggle" aria-expanded={!collapsed.has(k)}
-                          aria-label={(collapsed.has(k) ? "展開" : "收合") + groupName(k) + "群組"} onClick={() => toggleGroup(k)}>
+                          aria-label={t(collapsed.has(k) ? "展開{0}群組" : "收合{0}群組", groupName(k))} onClick={() => toggleGroup(k)}>
                           <Icon name="chevron-right" />
                           <span className={"status-symbol " + statusClass(k)}>
                             {group === "status" ? <StatusIcon status={k} /> : <Icon name="circle" />}
@@ -316,7 +305,7 @@ export default function Issues() {
                           <span className="count">{rows.filter(r => (r[group] || "") === k).length}</span>
                         </button>
                         <DropdownMenu.Root>
-                          <DropdownMenu.Trigger className="icon-button group-menu-trigger" aria-label={groupName(k) + "群組選單"}>
+                          <DropdownMenu.Trigger className="icon-button group-menu-trigger" aria-label={groupName(k) + t("群組選單")}>
                             <Icon name="more-horizontal" />
                           </DropdownMenu.Trigger>
                           <DropdownMenu.Portal>
@@ -329,7 +318,7 @@ export default function Issues() {
                           </DropdownMenu.Portal>
                         </DropdownMenu.Root>
                         <Button action="new-issue" icon="plus" status={group === "status" ? k : undefined}
-                          issueDefaults={{ [group]: k }} aria-label={"在" + groupName(k) + "新增任務"} className="icon-button" />
+                          issueDefaults={{ [group]: k }} aria-label={t("在{0}新增任務", groupName(k))} className="icon-button" />
                       </div>
                     </ContextMenu.Trigger>
                     <ContextMenu.Portal>
@@ -355,27 +344,25 @@ export default function Issues() {
                         issueDefaults={{ [group]: k }}
                         icon="plus"
                         className="board-add"
-                      >
-                        新增任務
-                      </Button>
+                      >{t("新增任務")}</Button>
                     )}
                   </div>
                 </section>
               ))
           ) : (
             <Empty
-              title="沒有符合的任務"
+              title={t("沒有符合的任務")}
               detail={
                 S.q || S.category || S.status || S.milestone
-                  ? "調整篩選條件，或清除搜尋。"
+                  ? t("調整篩選條件，或清除搜尋。")
                   : undefined
               }
             />
           )}
         </div>
         <footer className="results-footer">
-          <span>{rows.length} 個任務</span>
-          {hidden.size > 0 && <button type="button" className="quiet compact" onClick={() => setHidden(new Set())}>顯示隱藏的群組（{hidden.size}）</button>}
+          <span>{rows.length}{t(" 個任務")}</span>
+          {hidden.size > 0 && <button type="button" className="quiet compact" onClick={() => setHidden(new Set())}>{t("顯示隱藏的群組（{0}）", hidden.size)}</button>}
         </footer>
       </section>
     </>

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LinearBoard — User guide</title><link rel="stylesheet" href="/style.css"><style>body{max-width:920px;margin:auto;padding:40px 24px 80px;line-height:1.75}h1{font-size:2.4rem}h2{margin-top:2.5rem}table{border-collapse:collapse;width:100%}td,th{padding:10px;border-bottom:1px solid var(--line);text-align:left}code{overflow-wrap:anywhere}a{color:var(--text);text-underline-offset:4px}li{margin:.5rem 0}a:focus-visible{outline:2px solid var(--accent)}</style></head><body><main><h1>LinearBoard user guide</h1>
+<p><a href="/">Back to workspace</a> · <a href="https://github.com/CJsGit-tech/LinearBoard#readme">Repository and setup</a></p>
+<p>LinearBoard keeps product work in a local workspace. Use the sidebar&#39;s <strong>Language</strong> selector to choose English or Traditional Chinese. Your language choice stays in this browser. Changing it does not translate project content or change the database.</p>
+<h2>Start a project</h2>
+<ol>
+<li>Choose <strong>Create project</strong> in an empty workspace or the <strong>+</strong> beside Projects.</li>
+<li>Enter a project name, select a team, and add a description if needed.</li>
+<li>Save. Use the project tabs to open Overview, Issues, Documents, and Milestones.</li>
+<li>Add milestones with an expected outcome and an optional target date. Avoid inventing commitments that have not been agreed.</li>
+</ol>
+<p>In <strong>Workspace settings → Team</strong>, you can create teams and edit their workflow states, one per line. Referenced states cannot be removed. Existing custom state names stay exactly as entered.</p>
+<h2>Work with issues</h2>
+<p>Choose <strong>New issue</strong> or press <strong>C</strong> outside an editor. Enter a title, category, state, milestone, and optional labels. The categories are User stories, PRDs, Design, FrontEnd, and BackEnd. Category is a dedicated single-select group.</p>
+<p>Open an issue to read its body and edit its properties. <strong>More properties</strong> contains priority, assignee, and parent issue. Add source relations and blocking dependencies under <strong>Relations and dependencies</strong>. Parent and blocking relations cannot form cycles. Use <strong>Save changes</strong> to persist edits.</p>
+<p><strong>/</strong> opens issue search outside editable controls. The filter button exposes category, state, and milestone filters. Switch between List view and Board view using the controls above the results. In a board grouped by status, drag an issue to another status column to change its state.</p>
+<p>Select issue checkboxes for bulk actions. A bulk state update is atomic: if any selected issue has a stale version, no selected issues are changed. Reopen or reload the current data before retrying.</p>
+<h2>Save a View</h2>
+<p>Choose <strong>Add tab View</strong> in a project. Give it a name, choose filters and grouping, and place it in the issue tabs or shared sidebar. Filters combine with AND. Leaving the state selection empty includes all states. View membership reflects actual matching records.</p>
+<h2>Write documents and comments</h2>
+<p>Create documents from the Documents tab or the project overview. Choose a document type and optional milestone, then write rich text or Markdown. The toolbar supports headings, bold, italic, lists, tasks, code, links, undo, and redo.</p>
+<p>Content containing HTML stays in Markdown mode so its source is preserved. Use <strong>Save document</strong> explicitly. Comments have their own Post comment action. Revision history retains earlier versions. Use <strong>Back</strong> or <strong>Alt+←</strong> to return from a record; reopening and navigation read current data from the app.</p>
+<h2>Attach files and record evidence</h2>
+<p>Under an issue or document, choose <strong>Add attachment</strong>. Upload a file up to 15 MB or provide an HTTP(S) link. Add screen and version identifiers where applicable. Images recognized as PNG or JPEG can display inline; other files are offered as downloads.</p>
+<p>Review labels distinguish Draft, Approved, Superseded, and Verification evidence. Approval of a visual reference is a user action. An uploaded image alone does not establish design approval or prove that a product was implemented.</p>
+<p>Use <strong>Record verification</strong> to capture a criterion, environment, result, and observations. Keep failed or untested checks visible. <strong>In Review</strong> means ready for the user&#39;s review; <strong>Done</strong> is the user&#39;s acceptance decision.</p>
+<h2>Delivery batches and dispatch records</h2>
+<p>Open <strong>Delivery</strong> in the sidebar. Create batches from FrontEnd or BackEnd issues, recording the rationale, expected output, checks, and blockers. A dispatch owns one issue and records an execution target, scope, reviewed plan, worker report, and independent TPM verification.</p>
+<p>At most three dispatches may be active. The same issue cannot have duplicate active assignments. A reviewed plan is required before execution, and a completion report is required before marking a dispatch completed. These records do not run agents; execution and independent product inspection happen through external tools.</p>
+<h2>Trash and backups</h2>
+<p>Deletion first shows an impact preview. Moving an issue to trash includes its descendants; deleting a project includes its owned records. In <strong>Workspace settings → Trash</strong>, restore a deletion batch or permanently delete it. Restore required teams, projects, and parent records first. Permanent deletion cannot be undone; old backups may retain the data.</p>
+<p>Use <strong>Download database backup</strong> in Workspace settings. Compose returns a PostgreSQL custom-format dump. SQLite development mode returns a SQLite backup. Restore into a separate empty database and verify it before switching. Do not remove the Docker volume when stopping the app.</p>
+<h2>Use the management skill</h2>
+<p>The repository includes the English <a href="https://github.com/CJsGit-tech/LinearBoard/tree/main/skills/linearboard">LinearBoard skill</a>. It is an instruction set for Codex, separate from the app&#39;s storage and UI. Product records stay in LinearBoard; the repository holds code, tests, and reusable skill instructions.</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>help</code></td>
+<td>List available commands.</td>
+</tr>
+<tr>
+<td><code>planning</code></td>
+<td>Discuss an idea; save only when requested.</td>
+</tr>
+<tr>
+<td><code>create-vision-document</code></td>
+<td>Save the project vision.</td>
+</tr>
+<tr>
+<td><code>create-milestones</code></td>
+<td>Define milestones and grouped stories.</td>
+</tr>
+<tr>
+<td><code>create-PRDs</code></td>
+<td>Create linked requirement issues and their View.</td>
+</tr>
+<tr>
+<td><code>prd-demystify</code></td>
+<td>Clarify consequential requirement decisions.</td>
+</tr>
+<tr>
+<td><code>create-designs</code></td>
+<td>Write the design overview and interaction specification.</td>
+</tr>
+<tr>
+<td><code>create-visuals</code></td>
+<td>Produce and inspect visual studies, then follow the approval gates.</td>
+</tr>
+<tr>
+<td><code>create-issues-FE</code> / <code>create-issues-BE</code></td>
+<td>Create the authorized delivery issues and Views.</td>
+</tr>
+<tr>
+<td><code>organize-task-batch</code></td>
+<td>Propose dependency-aware checkpoints without writing records.</td>
+</tr>
+<tr>
+<td><code>dispatch</code></td>
+<td>Execute the selected ready issues and independently verify them.</td>
+</tr>
+<tr>
+<td><code>debug</code></td>
+<td>Log user reports, create linked fixes, and verify the selected scope.</td>
+</tr>
+<tr>
+<td><code>sync</code></td>
+<td>Reconcile confirmed records and current UI evidence.</td>
+</tr>
+</tbody></table>
+<p>Use the installed skill&#39;s instructions as the workflow authority. The API&#39;s capability catalog may include legacy commands; a listed capability does not prove that the corresponding external workflow has been verified. Missing requirements, references, or approvals remain unresolved until supported by evidence.</p>
+<h2>MCP and API</h2>
+<p>Start the app, then configure <code>python3 /absolute/path/to/LinearBoard/mcp_server.py --url http://127.0.0.1:8765</code> as a stdio server in your MCP client. Use <strong>Integration and commands</strong> to inspect tools and contracts.</p>
+<p>List operations are paginated. Updates require the current <code>expected_version</code>. Reuse the same idempotency key and identical payload for a retry. API clients can request English validation errors with <code>Accept-Language: en</code>; record content remains unchanged.</p>
+<p>This is a local application for its owner. Keep the service on loopback, retain the database password privately, and keep workspace databases and backups out of Git.</p>
+</main></body></html>

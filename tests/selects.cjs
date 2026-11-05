@@ -36,7 +36,7 @@ const { openSelect, selectValue, selectProject } = require('./controls.cjs');
     for (let n = 0; n < 18; n++) await http('issues', { project_id: project.id, title: '長名稱任務 '.repeat(12) + n, category: 'BackEnd', status: 'Backlog' });
     const attachment = await http('attachments', { target_kind: 'issues', target_id: issue.id, name: '參考連結', external_url: 'https://example.invalid/reference', approval: 'draft' });
     browser = await chromium.launch({ channel: 'chrome', headless: true });
-    const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+    const page = await browser.newPage({locale:"zh-TW", viewport: { width: 1440, height: 960 } });
     page.on('pageerror', error => errors.push(error.message));
     page.setDefaultTimeout(10000);
     await page.goto(base);

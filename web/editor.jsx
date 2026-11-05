@@ -1,3 +1,4 @@
+import { t } from "./i18n.js";
 import React, { useMemo, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -17,7 +18,7 @@ function RichText({ value, onChange, label }) {
         link: { openOnClick: true, HTMLAttributes: { target: "_self", rel: "noopener noreferrer" } },
       }),
       TaskList, TaskItem.configure({ nested: true, a11y: {
-        checkboxLabel: (node, checked) => `${checked ? "取消勾選" : "勾選"} ${node.textContent || "待辦事項"}`,
+        checkboxLabel: (node, checked) => `${checked ? t("取消勾選") : t("勾選")} ${node.textContent || t("待辦事項")}`,
       } }), TableKit, Image,
       MarkdownExtension,
     ],
@@ -29,38 +30,38 @@ function RichText({ value, onChange, label }) {
   });
   if (!editor) return null;
   const controls = [
-    ["標題", Heading2, () => editor.chain().focus().toggleHeading({ level: 2 }).run(), editor.isActive("heading", { level: 2 })],
-    ["粗體", Bold, () => editor.chain().focus().toggleBold().run(), editor.isActive("bold")],
-    ["斜體", Italic, () => editor.chain().focus().toggleItalic().run(), editor.isActive("italic")],
-    ["項目清單", List, () => editor.chain().focus().toggleBulletList().run(), editor.isActive("bulletList")],
-    ["編號清單", ListOrdered, () => editor.chain().focus().toggleOrderedList().run(), editor.isActive("orderedList")],
-    ["待辦清單", ListTodo, () => editor.chain().focus().toggleTaskList().run(), editor.isActive("taskList")],
-    ["程式碼", Code, () => editor.chain().focus().toggleCode().run(), editor.isActive("code")],
-    ["連結", Link2, () => { setUrl(editor.getAttributes("link").href || ""); setError(""); setLinkOpen(v => !v); }, editor.isActive("link")],
-    ["復原", Undo2, () => editor.chain().focus().undo().run(), false, !editor.can().undo()],
-    ["重做", Redo2, () => editor.chain().focus().redo().run(), false, !editor.can().redo()],
+    [t("標題"), Heading2, () => editor.chain().focus().toggleHeading({ level: 2 }).run(), editor.isActive("heading", { level: 2 })],
+    [t("粗體"), Bold, () => editor.chain().focus().toggleBold().run(), editor.isActive("bold")],
+    [t("斜體"), Italic, () => editor.chain().focus().toggleItalic().run(), editor.isActive("italic")],
+    [t("項目清單"), List, () => editor.chain().focus().toggleBulletList().run(), editor.isActive("bulletList")],
+    [t("編號清單"), ListOrdered, () => editor.chain().focus().toggleOrderedList().run(), editor.isActive("orderedList")],
+    [t("待辦清單"), ListTodo, () => editor.chain().focus().toggleTaskList().run(), editor.isActive("taskList")],
+    [t("程式碼"), Code, () => editor.chain().focus().toggleCode().run(), editor.isActive("code")],
+    [t("連結"), Link2, () => { setUrl(editor.getAttributes("link").href || ""); setError(""); setLinkOpen(v => !v); }, editor.isActive("link")],
+    [t("復原"), Undo2, () => editor.chain().focus().undo().run(), false, !editor.can().undo()],
+    [t("重做"), Redo2, () => editor.chain().focus().redo().run(), false, !editor.can().redo()],
   ];
   const applyLink = () => {
     try {
       const href = url.trim();
       if (!href || !["http:", "https:", "mailto:"].includes(new URL(href, location.origin).protocol))
-        throw Error("請輸入有效的網址或紀錄連結。");
+        throw Error(t("請輸入有效的網址或紀錄連結。"));
       editor.chain().focus().extendMarkRange("link").setLink({ href }).run();
       setLinkOpen(false);
-    } catch { setError("請輸入有效的網址或紀錄連結。"); }
+    } catch { setError(t("請輸入有效的網址或紀錄連結。")); }
   };
   return <div className="rich-text-editor">
-    <div role="toolbar" aria-label="文字格式" className="rich-text-toolbar">
+    <div role="toolbar" aria-label={t("文字格式")} className="rich-text-toolbar">
       {controls.map(([name, Icon, run, active, disabled]) => <button key={name} type="button"
         className="icon-button" aria-label={name} title={name} aria-pressed={active} disabled={disabled}
         onMouseDown={event => event.preventDefault()} onClick={run}><Icon aria-hidden="true" /></button>)}
     </div>
     {linkOpen && <div className="rich-link-editor">
-      <input aria-label="連結網址" value={url} autoFocus onChange={event => setUrl(event.target.value)}
+      <input aria-label={t("連結網址")} value={url} autoFocus onChange={event => setUrl(event.target.value)}
         onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); applyLink(); } }} />
-      <button type="button" onClick={applyLink}>套用</button>
-      <button type="button" className="quiet" onClick={() => { editor.chain().focus().extendMarkRange("link").unsetLink().run(); setLinkOpen(false); }}>移除連結</button>
-      <button type="button" className="quiet" onClick={() => setLinkOpen(false)}>取消</button>
+      <button type="button" onClick={applyLink}>{t("套用")}</button>
+      <button type="button" className="quiet" onClick={() => { editor.chain().focus().extendMarkRange("link").unsetLink().run(); setLinkOpen(false); }}>{t("移除連結")}</button>
+      <button type="button" className="quiet" onClick={() => setLinkOpen(false)}>{t("取消")}</button>
       {error && <span role="alert">{error}</span>}
     </div>}
     <EditorContent editor={editor} id="body-preview" />
@@ -77,14 +78,14 @@ export function BodyEditor({ value = "", document = false, initialPreview = true
   const [rich, setRich] = useState(initialPreview && !hasHtml);
   return <>
     <div className="editor-label">
-      <h3>內容</h3>
+      <h3>{t("內容")}</h3>
       <button type="button" data-action="preview" className="quiet" aria-pressed={!rich}
         disabled={!rich && hasHtml} onClick={() => setRich(v => !v)}>{rich ? "Markdown" : "Rich text"}</button>
     </div>
-    {hasHtml && !rich && <p className="muted small">此內容含 HTML，請使用 Markdown 編輯以保留原文。</p>}
+    {hasHtml && !rich && <p className="muted small">{t("此內容含 HTML，請使用 Markdown 編輯以保留原文。")}</p>}
     <textarea name="body" className={"body-editor" + (document ? " document-editor" : "")}
-      rows={document ? 18 : 10} aria-label={document ? "文件 Markdown" : "任務 Markdown"}
+      rows={document ? 18 : 10} aria-label={document ? t("文件 Markdown") : t("任務 Markdown")}
       value={body} onChange={event => setBody(event.target.value)} hidden={rich} />
-    {rich && <RichText value={body} onChange={setBody} label={document ? "文件內容" : "任務內容"} />}
+    {rich && <RichText value={body} onChange={setBody} label={document ? t("文件內容") : t("任務內容")} />}
   </>;
 }

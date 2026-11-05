@@ -1,3 +1,4 @@
+import { t, getLanguage } from "./i18n.js";
 import { defaultStatuses } from "./labels.js";
 // The existing API and navigation state stay separate from React presentation.
 let revision = 0;
@@ -210,13 +211,14 @@ async function api(path, body, method = "POST") {
       method: body === undefined ? "GET" : method,
       headers: {
         "Content-Type": "application/json",
+        "Accept-Language": getLanguage(),
         "X-LinearBoard-Actor": "user",
         "Idempotency-Key": crypto.randomUUID(),
       },
       body: body === undefined ? undefined : JSON.stringify(body),
     });
     const result = await response.json();
-    if (!response.ok) throw new Error(result.error || "操作失敗");
+    if (!response.ok) throw new Error(result.error || t("操作失敗"));
     return result;
   })();
   if (fingerprint) inFlightWrites.set(fingerprint, operation);
@@ -254,7 +256,7 @@ async function refreshNavigation(pending) {
 }
 function navigationFailure(error, retry) {
   retryNavigation = retry;
-  notify("無法取得最新資料；目前畫面尚未更新。" + error.message, true);
+  notify(t("無法取得最新資料；目前畫面尚未更新。") + error.message, true);
   clearTimeout(notify.timer);
   S.toast.retry = true;
   render();
@@ -273,7 +275,7 @@ function applyProjectSelection() {
   if (requestedProject === null) return;
   const id = requestedProject,
     target = get("projects", id);
-  if (id && (!target || target.archived)) throw new Error("找不到此專案。");
+  if (id && (!target || target.archived)) throw new Error(t("找不到此專案。"));
   S.project = id;
   S.view = "all";
   S.q = S.category = S.status = S.milestone = "";
@@ -314,7 +316,7 @@ function defaultStatus(category, requested) {
       : statuses[0];
 }
 const labelName = (id) => get("labels", id)?.name || id;
-const milestoneName = (id) => get("milestones", id)?.name || "無里程碑";
+const milestoneName = (id) => get("milestones", id)?.name || t("無里程碑");
 export function filteredIssues() {
   let rows = list("issues");
   const v = get("views", S.view);
@@ -340,11 +342,11 @@ export function filteredIssues() {
 
 export function editRecord(kind, record = {}, defaults = {}) {
   if (!S.project && !["teams", "projects"].includes(kind))
-    return notify("請先建立專案。", true);
+    return notify(t("請先建立專案。"), true);
   show({ type: "record", kind, record: { ...defaults, ...record } });
 }
 export function newIssue(defaults = {}) {
-  if (!S.project) return notify("請先建立專案。", true);
+  if (!S.project) return notify(t("請先建立專案。"), true);
   const view = get("views", S.view);
   show({ type: "new-issue", record: {
     category: S.category || view?.category || "FrontEnd",
@@ -359,7 +361,7 @@ export async function openIssue(id, { fresh = true } = {}) {
   try {
     if (fresh && !(await refreshNavigation(pending))) return;
     const record = get("issues", id);
-    if (!record) throw Error("找不到此任務。");
+    if (!record) throw Error(t("找不到此任務。"));
     S.project = record.project_id;
     const history = await api("history/" + id);
     if (!isCurrentNavigation(pending)) return;
@@ -381,9 +383,9 @@ export async function openDocument(id, { fresh = true } = {}) {
     const record = id
       ? get("documents", id)
       : { doc_type: "Vision", title: "", body: "" };
-    if (!record) throw Error("找不到此文件。");
+    if (!record) throw Error(t("找不到此文件。"));
     if (id) S.project = record.project_id;
-    if (!S.project) return notify("請先建立專案。", true);
+    if (!S.project) return notify(t("請先建立專案。"), true);
     const history = id ? await api("history/" + id) : [];
     if (!isCurrentNavigation(pending)) return;
     S.selected = null;
@@ -407,7 +409,7 @@ export async function moveToTrash(kind, id, fingerprint) {
   if (parent?.record.id && parent.record.id !== id) {
     const parentKind = parent.type === 'issue' ? 'issues' : 'documents';
     await reopen(parentKind, parent.record.id, { owner: S.modal });
-    notify('已移至垃圾桶');
+    notify(t("已移至垃圾桶"));
     return;
   }
   const wasDetail = isRecordRoute();
@@ -417,7 +419,7 @@ export async function moveToTrash(kind, id, fingerprint) {
   if (wasDetail) restoreWorkspace(workspaceContext || fallbackWorkspace(kind === 'documents' ? 'documents' : 'issues'));
   rememberWorkspace();
   render();
-  notify('已移至垃圾桶');
+  notify(t("已移至垃圾桶"));
 }
 export async function reopen(kind, id, { saved = false, commentSent = false, owner = S.modal } = {}) {
   if (S.modal !== owner) return;
@@ -430,7 +432,7 @@ export async function reopen(kind, id, { saved = false, commentSent = false, own
     returnedDrafts.delete(`${kind === "issues" ? "issue" : "document"}:${id}`);
     if (kind === "documents") returnedDrafts.delete(`document:new:${S.project}`);
     const record = get(kind, id);
-    if (!record) throw Error("找不到已儲存的紀錄。");
+    if (!record) throw Error(t("找不到已儲存的紀錄。"));
     const history = await api("history/" + id);
     if (!isCurrentNavigation(pending)) return;
     nestedParent = null;
@@ -521,7 +523,7 @@ export async function action(a, { id, ids, kind, page, layout, status, issueDefa
   if (a === "view" || a === "all-view")
     return navigateWorkspace(() => {
       const view = id ? get("views", id) : null;
-      if (id && (!view || view.archived)) throw Error("找不到此 View。");
+      if (id && (!view || view.archived)) throw Error(t("找不到此 View。"));
       if (view) S.project = view.project_id;
       S.view = id || "all";
       S.page = "issues";
@@ -549,7 +551,7 @@ export async function action(a, { id, ids, kind, page, layout, status, issueDefa
   if (a === "new-document") return openDocument();
   if (a === "copy-link") {
     await navigator.clipboard.writeText(location.href);
-    notify("已複製連結");
+    notify(t("已複製連結"));
     return;
   }
   if (a === "upload") return show({ type: "upload", kind, id });
@@ -558,7 +560,7 @@ export async function action(a, { id, ids, kind, page, layout, status, issueDefa
   if (a === "edit-record")
     return withLatestSnapshot(() => {
       const record = get(kind, id);
-      if (!record) throw Error("找不到此紀錄。");
+      if (!record) throw Error(t("找不到此紀錄。"));
       editRecord(kind, record);
     });
   if (a === "edit-project")
@@ -591,7 +593,7 @@ export async function moveIssue(id, status) {
     await persist("issues", get("issues", id), { status });
     await refresh();
     render();
-    notify("狀態已更新");
+    notify(t("狀態已更新"));
   } catch (error) {
     notify(error.message, true);
   }
@@ -622,7 +624,7 @@ async function routeHash({ fresh = true } = {}) {
       dismissDialog();
       const view = get("views", id);
       if (!view) {
-        notify("找不到此 View。", true);
+        notify(t("找不到此 View。"), true);
         return;
       }
       if (saved?.route === location.hash && saved.project === view.project_id)
@@ -640,7 +642,7 @@ async function routeHash({ fresh = true } = {}) {
       const record = S.db[type] ? get(type, id) : null;
       if (!record) {
         dismissDialog();
-        notify("紀錄已刪除或不存在。", true);
+        notify(t("紀錄已刪除或不存在。"), true);
         return;
       }
       const page =

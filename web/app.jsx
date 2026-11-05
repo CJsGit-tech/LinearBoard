@@ -1,3 +1,4 @@
+import { t, getLanguage, subscribeLanguage } from "./i18n.js";
 import React, { useEffect, useSyncExternalStore } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -18,6 +19,7 @@ import { Dialog } from "./forms.jsx";
 import { Button } from "./ui.jsx";
 function App() {
   useSyncExternalStore(subscribe, snapshot);
+  useSyncExternalStore(subscribeLanguage, getLanguage);
   useEffect(() => {
     const stop = startNavigation();
     boot();
@@ -57,12 +59,12 @@ function App() {
   if (S.bootError)
     return (
       <section className="welcome">
-        <h1>無法開啟工作區</h1>
+        <h1>{t("無法開啟工作區")}</h1>
         <p>{S.bootError}</p>
-        <Button action="reload">重新載入</Button>
+        <Button action="reload">{t("重新載入")}</Button>
       </section>
     );
-  if (!S.db) return <p className="boot">正在開啟工作區…</p>;
+  if (!S.db) return <p className="boot">{t("正在開啟工作區…")}</p>;
   return (
     <>
       <Shell>
@@ -80,7 +82,7 @@ function App() {
         {S.toast?.retry && (
           <>
             {" "}
-            <Button action="retry-navigation">重試</Button>
+            <Button action="retry-navigation">{t("重試")}</Button>
           </>
         )}
       </div>
