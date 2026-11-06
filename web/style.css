@@ -3409,6 +3409,7 @@ body {
 .rich-text-toolbar .icon-button { width: 28px; height: 28px; min-height: 28px; padding: 6px; color: var(--muted); }
 .rich-text-toolbar .icon-button[aria-pressed="true"] { color: var(--text); background: var(--hover); }
 .rich-text-content { min-height: 180px; outline: none; }
+.rich-text-content [data-story-anchor] { height: 0; margin: 0 !important; padding: 0; overflow: hidden; }
 .rich-text-content:focus { outline: none; }
 .rich-text-content > :first-child { margin-top: 0; }
 .rich-text-content ul[data-type="taskList"] { list-style: none; padding-left: 0; }
