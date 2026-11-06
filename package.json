@@ -11,7 +11,8 @@
     "test:selects": "node tests/selects.cjs",
     "test:i18n": "node tests/i18n.cjs",
     "test:guide": "node tests/guide.cjs",
-    "test:links": "node tests/document-links.cjs"
+    "test:links": "node tests/document-links.cjs",
+    "test:attachments": "node tests/attachments-ui.cjs"
   },
   "keywords": [],
   "author": "",

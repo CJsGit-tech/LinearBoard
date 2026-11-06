@@ -34,7 +34,7 @@ import {
   MilestoneField,
   LabelsSelect,
   IssueChip,
-  Attachment,
+  AttachmentSections,
   AutoTitle,
   BodyEditor,
   revealAnchor,
@@ -720,23 +720,7 @@ function IssueDetail({ record: r, history }) {
           </aside>
         </form>
 
-        <section className="detail-section">
-          <div className="section-title">
-            <h3>{t("視覺參考與附件")}</h3>
-            <Button
-              action="upload"
-              kind="issues"
-              id={r.id}
-              icon="paperclip"
-              className="quiet"
-            >{t("新增附件")}</Button>
-          </div>
-          <div className="attachments">
-            {attachments.map((a) => (
-              <Attachment key={a.id} record={a} />
-            ))}
-          </div>
-        </section>
+        <AttachmentSections records={attachments} kind="issues" id={r.id} />
         <section className="detail-section">
           <div className="section-title">
             <h3>{t("驗證證據")}</h3>
@@ -866,23 +850,7 @@ function DocumentDetail({ record: r, history }) {
         </form>
         {r.id && (
           <>
-            <section className="detail-section">
-              <div className="section-title">
-                <h3>{t("附件")}</h3>
-                <Button
-                  action="upload"
-                  kind="documents"
-                  id={r.id}
-                  icon="paperclip"
-                  className="quiet"
-                >{t("新增附件")}</Button>
-              </div>
-              {list("attachments")
-                .filter((a) => a.target_id === r.id)
-                .map((a) => (
-                  <Attachment key={a.id} record={a} />
-                ))}
-            </section>
+            <AttachmentSections records={list("attachments").filter(a => a.target_id === r.id)} kind="documents" id={r.id} />
             <section className="detail-section">
               <h3>{t("文件留言")}</h3>
               {list("comments")
