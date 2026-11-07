@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Pro"
+  short_description: "Source-backed Mobile and Web UI design guidance"
+  default_prompt: "Use $design-pro to refine the interface with cited design guidance."

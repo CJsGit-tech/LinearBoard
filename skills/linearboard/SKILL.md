@@ -115,7 +115,7 @@ Every actual issue-creation command also creates or reuses its project/category 
 
 Apply the [shared change review](references/change-review.md) when creating or clarifying PRDs, handling a user change or worker conflict in any command, reconciling affected records, and at dispatch readiness and final handoff.
 
-Both design commands apply [shared design integration](references/design-direction.md): Use design-pro within the current command for creative judgment and focused critique, and the Uiverse MCP for suitable component references when needed. LinearBoard controls deliverables, board writes, user selection and complete-set approval.
+Both design commands apply [shared design integration](references/design-direction.md). Use the bundled [design-pro skill](../design-pro/SKILL.md) within the current command for creative judgment and focused critique, and the Uiverse MCP for suitable component references when needed. LinearBoard controls deliverables, board writes, user selection and complete-set approval.
 
 For all UI design, build, dispatch and review, resolve the requested target platform/stack using [platform scope](references/design-direction.md#target-platform). Never add paired Web/Mobile layout checks or screenshots by default; their separate application stacks require separate authorized scopes.
 

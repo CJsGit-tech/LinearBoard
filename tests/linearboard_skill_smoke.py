@@ -12,8 +12,10 @@ assert '`create-issues-BE`' in section, 'Backend delivery command missing'
 commands.add('create-issues-BE')
 help_commands=[match.split()[0] for match in re.findall(r'^- `([^`]+)`',(skill/'references/help.md').read_text(),re.M)]
 assert len(help_commands)==len(commands) and set(help_commands)==commands, 'Offline help and skill router disagree'
-external_skill_links={'../../design-pro/SKILL.md','../../file-change-summary/SKILL.md'}
-for file in skill.rglob('*.md'):
+design_skill=skill.parent/'design-pro'
+assert (design_skill/'SKILL.md').is_file(), 'Missing bundled design-pro sibling'
+external_skill_links={'../../file-change-summary/SKILL.md'}
+for file in [*skill.rglob('*.md'), *design_skill.rglob('*.md')]:
  for target in re.findall(r'\]\(([^)]+)\)',file.read_text()):
   if ':' in target or target.startswith(('#','{{')) or '<' in target or ' ' in target or target in external_skill_links: continue
   path=target.split('#')[0]

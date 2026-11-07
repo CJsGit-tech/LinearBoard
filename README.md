@@ -171,7 +171,7 @@ LinearBoard persists records and exposes the 15 canonical commands and their ali
 
 The complete bundle is in [`skills/linearboard/`](skills/linearboard/): `SKILL.md`, references, reusable authoring templates, agent metadata, and Python tools. These are workflow instructions, not a copy of a project's requirements or delivery records.
 
-Copy the folder to `~/.codex/skills/linearboard/` to install it for Codex, preserving any existing installation first, or point Codex directly at its `SKILL.md`. The design and sync workflows also reference the separately installed `design-pro` and `file-change-summary` skills. For a checkout at a different path, set:
+Point Codex at the repository's LinearBoard `SKILL.md`, or install both [`skills/linearboard/`](skills/linearboard/) and [`skills/design-pro/`](skills/design-pro/) as sibling folders under `~/.codex/skills/`. Preserve any existing installations first. Both design commands use the bundled sibling `design-pro`. The sync workflow references the separately installed `file-change-summary` skill. For a checkout at a different path, set:
 
 ```sh
 export LINEARBOARD_PROJECT_DIR="/absolute/path/to/LinearBoard"

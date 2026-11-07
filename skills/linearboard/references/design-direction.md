@@ -20,7 +20,7 @@ Inspect existing product screens and supplied references first. If a visual deci
 
 ## Apply design-pro within the current stage
 
-Read the installed [design-pro skill](../../design-pro/SKILL.md) and the guidance for the requested platform and design task. Reuse the brief, requirements, design system and applicable Technical Baseline. Apply its methods within the isolated draft and current LinearBoard stage. If the skill is unavailable, disclose that limitation and continue with the shared design method here.
+Read the bundled sibling [design-pro skill](../../design-pro/SKILL.md) and the guidance for the requested platform and design task. Resolve the link relative to this file so both commands use the version shipped alongside LinearBoard. Reuse the brief, requirements, design system and applicable Technical Baseline. Apply its methods within the isolated draft and current LinearBoard stage. If the bundled skill is missing, report the missing dependency and continue with the shared design method here.
 
 For an open direction, use identity and composition to turn the product’s subject and primary task into different ideas about what readers or users notice, compare or do first. Compare the rendered options against the same brief and recommend one with a specific reason and tradeoff. The user selects. For an established direction, choose the lens that addresses the observed problem, such as craft for an unclear control, recover for an interrupted task, or reconcile for inconsistent screens. Revise and recheck the affected journey.
 
