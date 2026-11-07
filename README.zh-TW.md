@@ -2,13 +2,55 @@
 
 [English](README.md) · [繁體中文](README.zh-TW.md)
 
-**Hands-on 操作指南:** [English](docs/linearboard-guides/hands-on.en.html) · [繁體中文](docs/linearboard-guides/hands-on.zh-Hant.html)
+在本機管理專案、任務、文件與交付審閱。可直接使用 App，或透過隨附的 LinearBoard skill 與 Codex 協作，不需要 Linear 帳號。
 
-## 靈感來自 Linear
+[啟動方式](#啟動) · [介面導覽](#介面導覽) · [操作指南](docs/linearboard-guides/index.html) · [Docker Compose](#docker-compose-與-postgresql)
 
-本應用程式與隨附的管理 skill，靈感來自 [Linear](https://linear.app) 組織產品工作的方式。LinearBoard 是獨立開發的本機工作區。
+![LinearBoard 任務清單：依狀態分組，顯示類別、里程碑標籤與專案資訊](docs/images/issue-list.jpg)
 
-獨立的個人產品交付工作區。React UI、Compose 管理的 PostgreSQL 資料庫、REST API 和 MCP stdio adapter；運作不需要 Linear 帳號。
+*截圖為目前英文介面與虛構示範資料；新工作區不會預填專案任務。介面可切換繁體中文。*
+
+## 建立第一個專案
+
+1. 在側欄「專案」旁選擇「建立專案」。
+2. 新增里程碑，再建立任務，設定類別、狀態與里程碑。
+3. 開啟任務，直接撰寫內容與驗收清單，再按頂部「儲存變更」。
+4. 切換看板，或建立常用分類的 saved View。
+
+逐步操作與 Codex 指令請見 [English hands-on guide](docs/linearboard-guides/hands-on.en.html)／[繁體中文操作指南](docs/linearboard-guides/hands-on.zh-Hant.html)。送出前先替換 `<Project>` 等佔位符；下載或在本機開啟 HTML 才能使用互動功能，程式碼託管平台的檔案頁只會顯示原始碼。
+
+## 介面導覽
+
+### 依狀態整理任務
+
+清單方便掃描任務，看板方便掌握各狀態並拖曳移動。右鍵開啟任務或群組選單；點擊任務列最左側可勾選，也可使用「全選此群組」後透過「動作」批次變更狀態。
+
+![LinearBoard 看板：進行中、待審閱、待開始與待安排的示範任務](docs/images/issue-board.jpg)
+
+*看板可橫向捲動；不需要顯示的群組可從群組選單隱藏。*
+
+### 在任務中直接編輯
+
+Rich-text editor 支援標題、清單、連結與驗收勾選框，也可切換 Markdown。右側保留狀態、類別與里程碑；頂部工具列提供儲存、返回與刪除。留言、附件、驗證證據與修訂歷史位於下方。
+
+![LinearBoard 任務詳情：rich text、驗收清單、任務屬性與頂部儲存按鈕](docs/images/issue-detail.jpg)
+
+| 位置 | 用途 |
+| --- | --- |
+| 側欄專案清單 | 點選切換專案。 |
+| 總覽與里程碑 | 查看專案脈絡與里程碑成果。 |
+| 任務與分類 Views | 處理任務、保存常用篩選與分組。 |
+| 文件 | 保存願景、分組故事與設計規格。 |
+| 目前專案下方的交付 | 查看已保存批次、派工計畫與回報。 |
+| 工作區設定 | 管理團隊、標籤、垃圾桶與資料庫備份。 |
+
+介面採暖色調深色背景、緊湊任務列與一致選單。側欄選專案，上方分頁切換內容，右側可收合的資訊面板顯示專案屬性。
+
+## 直接操作，或搭配 Codex
+
+App 不需要 AI model 或 API key。若要由 Codex 引導規劃、需求、設計、派工與審閱，請安裝 [LinearBoard skill](skills/linearboard/SKILL.md)，從 `$linearboard help` 與操作指南開始。App 保存紀錄；Codex 與外部工具執行授權工作，新增派工紀錄本身不會啟動 agent。
+
+`In Review` 代表可以交給你審閱。`Done` 由使用者決定。Design 票中與使用者完整設計核准相符的確切 JPG 會繼承 Approved。
 
 ## 介面語言
 
@@ -49,7 +91,7 @@ python3 server.py
 
 ## REST 契約
 
-`GET /api/capabilities` 是可讀取的資源欄位、16 個主要指令與別名契約。這是應用程式介面說明，不是開發 backlog 或驗證報告。
+`GET /api/capabilities` 列出資源欄位、15 個正式指令與相容別名。
 
 | 操作 | 路徑 |
 | --- | --- |
@@ -68,9 +110,9 @@ python3 server.py
 
 各紀錄包含 `url`（相對於目前服務的穩定 UI 連結），例如 `/#/issues/{id}`、`/#/documents/{id}` 和 `/#/views/{id}`。重新開啟 View 會恢復其專案、儲存的 AND 條件與分組。
 
-類別是唯一 Category 子標籤；一般 M／US／Coder labels 與原生 milestone 分開。PRD-to-US 與 delivery-to-source 使用 `relations`，文件來源使用 Markdown record links。`blocks` 禁止循環與跨專案關係。派工只接受 FE／BE、每筆一張任務、最多三筆 active，並拒絕重複 active assignment。計畫和完成回報有必填檢查，但真實 readiness、產品驗證和授權仍由執行端負責；資料存在不代表驗收。
+類別是唯一 Category 子標籤；一般 M／US／Coder labels 與原生 milestone 分開。PRD 以 Markdown 連結至里程碑文件中的故事段落。議題之間的來源關聯與相依使用 `relations`。`blocks` 禁止循環與跨專案關係。派工只接受 FE／BE、每筆一張任務、最多三筆 active，並拒絕重複 active assignment。計畫和完成回報有必填檢查，但真實 readiness、產品驗證和授權仍由執行端負責；資料存在不代表驗收。
 
-Automation 可建立 draft／evidence 附件，不能核准視覺或把 issue 轉為 Done；這兩項由使用者在 UI 操作。一般 metadata 修訂會保留 Done。附件上傳以 `content_base64` 提供，或使用 `external_url`，上限 15 MB。Markdown 經 DOMPurify 清理；只有辨識為 PNG/JPEG 的 bytes 會 inline，其餘以下載提供。
+Automation 可建立 draft／evidence 附件。Design 票上的確切 JPG 若已登記並對應完整核准紀錄，會繼承 Approved。其餘附件核准與議題轉為 Done 由使用者操作。附件上傳以 `content_base64` 提供，或使用 `external_url`，上限 15 MB。Markdown 經 DOMPurify 清理。可辨識的 PNG／JPEG 顯示預覽，其餘以下載提供。
 
 ## MCP 與 LinearBoard skill
 
@@ -107,7 +149,7 @@ Automation 可建立 draft／evidence 附件，不能核准視覺或把 issue �
 2. **Codex／外部工具** 解讀 `planning`、產出產品文字、訪談、生成視覺與 gallery、選擇批次、執行 coding agents、實際操作待測產品並做獨立驗證。
 3. **LinearBoard skill** 定義本應用程式的規劃、需求、設計、交付、除錯與同步流程，透過原生 REST API 或 MCP 工具讀寫紀錄。以隨附的 `skills/linearboard/SKILL.md` 為流程依據。
 
-沒有內建 AI、API key、遠端同步、imagegen 或 agent runner。`dispatches` 是真實的派工紀錄，不是假裝已執行的 worker。`create-visuals` 的圖片生成與 HTML gallery 由現有外部工具完成，核准後才能保存正式 reference。不能將這些外部工作標成 App 已執行。
+App 保存派工與驗證紀錄，Codex 和外部工具負責執行與檢查。`create-designs` 和 `create-visuals` 的可操作 HTML 留在工作區並在對話中分享。LinearBoard 紀錄連結至 Design 票或原生 Approved JPG。
 
 ## 開發與可重現檢查
 
@@ -184,7 +226,7 @@ PostgreSQL 交易目前使用應用程式層級的 advisory lock，保留原 SQL
 
 完整管理 skill 位於 [`skills/linearboard/SKILL.md`](skills/linearboard/SKILL.md)，包含 references、工作流範本、agents metadata 與 Python 操作工具。這些是可重用的 authoring instructions，不是任何專案的 PRD、backlog 或驗收資料。此 bundle 是發布時的副本，更新個人安裝版本不會自動同步到 repository。
 
-在 Codex 中可將 `skills/linearboard/` 複製到 `~/.codex/skills/linearboard/`（先保留既有版本）；或直接指定此 repository 內的 `SKILL.md`。圖片生成命令另需執行環境提供 `imagegen` skill 與圖片工具；本 bundle 不包含 imagegen。skill 的相對 imagegen 連結預期採用 Codex skill 安裝目錄結構。
+在 Codex 中可將 `skills/linearboard/` 複製到 `~/.codex/skills/linearboard/`（先保留既有版本），或直接指定此 repository 內的 `SKILL.md`。設計與同步流程另參照已安裝的 `design-pro` 與 `file-change-summary` skills。
 
 若 checkout 不在原始作者的路徑，請在使用 skill 自動啟動服務前設定：
 
@@ -195,3 +237,8 @@ export LINEARBOARD_PROJECT_DIR="/absolute/path/to/LinearBoard"
 首次安裝請先依上方 Compose 指令建立本機 secret、build 並啟動服務；skill 的 preflight 只重用或啟動既有部署，不負責初次建立資料卷、遷移或重設密碼。使用 `--url` 或 `LINEARBOARD_URL` 可指定服務位址，另行管理的開發服務可使用 `--no-autostart`。
 
 公開 repository 僅包含應用程式、測試與可重用 skill；`data/`、`output/`、資料庫備份、Compose 密碼、環境變數檔與相依套件均由 `.gitignore` 排除。產品管理紀錄持續保存在各使用者的 LinearBoard 資料庫中。
+
+
+## 靈感來自 Linear
+
+本應用程式與管理 skill 靈感來自 [Linear](https://linear.app) 組織產品工作的方式。LinearBoard 為獨立開發的本機工作區。

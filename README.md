@@ -2,23 +2,19 @@
 
 [English](README.md) · [繁體中文](README.zh-TW.md)
 
-**Hands-on guides:** [English](docs/linearboard-guides/hands-on.en.html) · [繁體中文](docs/linearboard-guides/hands-on.zh-Hant.html)
+A local workspace for projects, tasks, documents, and delivery reviews. Use the app on its own, or connect Codex through the included LinearBoard skill. No Linear account is required.
 
-## Inspired by Linear
+[Quick start](#quick-start) · [Interface tour](#interface-tour) · [Hands-on guides](docs/linearboard-guides/index.html) · [Codex integration](#mcp-integration)
 
-This application and its companion management skill are inspired by [Linear](https://linear.app) and its approach to organizing product work. LinearBoard is developed independently as a standalone local workspace.
+![LinearBoard issue list with grouped workflow states, category and milestone labels, and project details](docs/images/issue-list.jpg)
 
-A standalone, local product-delivery workspace with a React interface, PostgreSQL storage, a REST API, and an MCP stdio adapter. A Linear account is not required.
+*Current English interface with fictional demo data. Your workspace starts without prefilled project tasks.*
 
-Manage projects, milestones, issues, documents, saved Views, attachments, delivery batches, dispatch records, and verification evidence in one local application. The included [LinearBoard skill](skills/linearboard/SKILL.md) gives Codex a workflow for managing those records.
+- **Plan:** keep the vision, grouped stories, requirements, and milestones connected.
+- **Organize:** switch between a compact list, a status board, and saved category Views.
+- **Review:** keep descriptions, design references, comments, and verification evidence with the work.
 
-## Language
-
-The interface supports **English** and **Traditional Chinese**. On first use, Chinese browser locales select Traditional Chinese; other browser locales select English. Use **Language** in the sidebar to switch at any time. The choice is saved in that browser, and changing it preserves the current screen and unsaved form contents.
-
-Navigation, forms, editor controls, accessibility labels, notifications, dates, and API validation messages follow the selected language. Project names, issue titles, documents, comments, labels, custom workflow states, and other user-authored content are preserved as entered. The skill is written in English. The app links English users to an English user guide.
-
-## Run with Docker Compose
+## Quick start
 
 Requires Docker with Compose. The image build installs its Node and Python dependencies.
 
@@ -42,6 +38,58 @@ The app is published only on the host's loopback address. PostgreSQL has no publ
 
 `docker compose down` retains the database volume. **Do not use `docker compose down -v` to stop the app:** it removes the database volume.
 
+## Create your first project
+
+1. Open the app and choose **Create project** beside **Project** in the sidebar.
+2. Add a milestone, then choose **New issue**. Set its category, status, and milestone.
+3. Open the issue to write a description or acceptance checklist. Choose **Save changes** in the top toolbar.
+4. Switch to **Board view**, or create a saved View for the category you use most.
+
+For guided product planning, start with the [English hands-on guide](docs/linearboard-guides/hands-on.en.html) or [繁體中文操作指南](docs/linearboard-guides/hands-on.zh-Hant.html). Both include copyable prompts, expected outputs, and checks to perform afterward. Replace `<Project>` and other placeholders before sending a prompt to Codex. Download or open the HTML files locally to use the interactive guides; a repository file viewer shows their source.
+
+## Interface tour
+
+### See work by status
+
+Choose **List view** for scanning many tasks, or **Board view** to see work in columns and drag tasks between states. Right-click an issue or group for actions. To update several tasks, select them using the left edge of each row, or choose **Select all in group**, then use **Actions**.
+
+![LinearBoard board view showing demo tasks in In Progress, In Review, Todo, and Backlog columns](docs/images/issue-board.jpg)
+
+*The board supports horizontal scrolling. Unused groups can be hidden from their group menu.*
+
+### Edit the task where you read it
+
+Write headings, lists, links, and acceptance checklists in the rich-text editor, or switch to Markdown. Status, category, and milestone stay alongside the description. Use the top toolbar to save, go back, or delete; comments, attachments, evidence, and revision history continue below the editor.
+
+![LinearBoard task detail with rich-text formatting, acceptance checkboxes, task properties, and a top-toolbar Save changes button](docs/images/issue-detail.jpg)
+
+### Know where things live
+
+| Area | What you do there |
+| --- | --- |
+| Project list in the sidebar | Click a project to switch its workspace. |
+| Overview and Milestone | Read the project context and milestone outcomes. |
+| Issues and saved Views | Work with tasks and reusable category/filter combinations. |
+| Documents | Keep the vision, grouped stories, PRD-related notes, and design specifications. |
+| Delivery beneath the selected project | Inspect saved batches, dispatch plans, and reports. |
+| Workspace settings | Manage teams, labels, trash, and database backups. |
+
+The interface uses a dark, warm-neutral palette, compact task rows, and consistent menus. The sidebar selects the project; top tabs organize its content; the optional right panel shows project details. This keeps navigation and task editing in the same workspace.
+
+## Work manually or with Codex
+
+**In the app:** create projects, write documents, organize tasks, and review changes directly. The app works without an AI model or API key.
+
+**With Codex:** install the [included LinearBoard skill](skills/linearboard/SKILL.md) to guide planning, requirements, design, scoped implementation, and review. Start with `$linearboard help`; use the hands-on guide to choose the next command. The app stores records; Codex and external tools perform the requested work. A dispatch record alone does not start an agent.
+
+**Final acceptance stays with you:** `In Review` means work is ready for your review. Only the user decides `Done`. Exact JPGs registered against the user's complete-set approval inherit Approved on their Design tickets.
+
+## Language
+
+The interface supports **English** and **Traditional Chinese**. On first use, Chinese browser locales select Traditional Chinese; other browser locales select English. Use **Language** in the sidebar to switch at any time. The choice is saved in that browser, and changing it preserves the current screen and unsaved form contents.
+
+Navigation, forms, editor controls, accessibility labels, notifications, dates, and API validation messages follow the selected language. Project names, issue titles, documents, comments, labels, custom workflow states, and other user-authored content are preserved as entered. The skill is written in English. The app links English users to an English user guide.
+
 ## Optional SQLite development mode
 
 Requires Python 3.12+ and Node.js 20+.
@@ -60,7 +108,7 @@ python3 server.py --port 9000 --db /absolute/path/to/development.sqlite3
 
 Without `DATABASE_URL`, the server uses SQLite (by default `data/linearboard.sqlite3`). Compose configures PostgreSQL using `DATABASE_URL` and `DATABASE_PASSWORD_FILE`.
 
-## Using the app
+## Features and shortcuts
 
 - **Projects and milestones:** describe outcomes and group work under native milestones.
 - **Issues:** use list or board layouts, filters, search, categories, priorities, assignees, parent issues, and relations. Drag issues between status columns or edit their status in the form.
@@ -117,13 +165,13 @@ Start the HTTP app first, then configure a stdio server in your MCP client:
 
 Available tools include `linearboard_capabilities`, `linearboard_list`, `linearboard_get`, `linearboard_create`, `linearboard_update`, `linearboard_update_issue_statuses`, and the `linearboard_trash_*` operations. Inspect `/api/capabilities` for exact fields and contracts. List calls are paginated; follow every `next_cursor`. The supplied `linearboard.client.Client` supports MCP connections, readback, reuse, and exact retries.
 
-LinearBoard persists records. Codex and external tools interpret the skill, generate visuals, run agents, and inspect the actual target product. The app does not contain an AI model, API key, remote sync service, image generator, or agent runner. Capability metadata is an API description, not evidence that a complete external workflow has been verified.
+LinearBoard persists records and exposes the 15 canonical commands and their aliases in the capability catalog. Codex and external tools interpret the skill, build and review local HTML prototypes, run agents, and inspect the actual target product. Share runnable prototype links in chat and link the owning Design tickets or their native Approved JPGs from LinearBoard records.
 
 ### Included management skill
 
 The complete bundle is in [`skills/linearboard/`](skills/linearboard/): `SKILL.md`, references, reusable authoring templates, agent metadata, and Python tools. These are workflow instructions, not a copy of a project's requirements or delivery records.
 
-Copy the folder to `~/.codex/skills/linearboard/` to install it for Codex, preserving any existing installation first, or point Codex directly at its `SKILL.md`. For a checkout at a different path, set:
+Copy the folder to `~/.codex/skills/linearboard/` to install it for Codex, preserving any existing installation first, or point Codex directly at its `SKILL.md`. The design and sync workflows also reference the separately installed `design-pro` and `file-change-summary` skills. For a checkout at a different path, set:
 
 ```sh
 export LINEARBOARD_PROJECT_DIR="/absolute/path/to/LinearBoard"
@@ -171,3 +219,8 @@ Main source areas: `web/` (React UI and message catalog), `linearboard/store.py`
 The app uses React, Radix Primitives, Tiptap, Lucide, Marked, DOMPurify, esbuild, and Playwright. Exact dependency versions are locked in `package-lock.json`. The built app has no CDN, remote font, or image dependency. The optional local `/visuals/` review gallery is not included in Git or the Docker image.
 
 Workspace databases, credentials, backups, generated review assets, dependencies, and build output are excluded by `.gitignore`.
+
+
+## Inspired by Linear
+
+This application and its companion management skill are inspired by [Linear](https://linear.app) and its approach to organizing product work. LinearBoard is developed independently as a standalone local workspace.
