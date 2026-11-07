@@ -1,21 +1,20 @@
 """Machine-readable adapter contracts, shipped as application capability metadata."""
 CONTRACTS = [
-    ('help', 'Installed command definitions', [], 'Capabilities and boundaries', 'Read /api/capabilities; no mutation'),
-    ('planning', 'Idea and confirmed answers', [], 'Conversation; optional explicitly saved project document', 'No writes unless saving is requested'),
+    ('init', 'Project and optional repository path', [], 'Local AGENTS.md and project Codex agents', 'Inspect roles, commands and preserved custom instructions'),
+    ('help', 'Installed command definitions', [], 'Offline command syntax and purposes', 'No application access required'),
+    ('planning', 'Idea, target users and constraints', [], '4W1H discussion and a check of any user-chosen stack', 'Save only when explicitly requested'),
     ('create-vision-document', 'Resolved team/project and planning context', ['projects', 'documents'], 'Vision Project Document', 'Read back document and project_id'),
-    ('create-milestones', 'Vision and outcome boundaries', ['milestones', 'documents'], 'Native milestones and overview document', 'Read milestone IDs, project ownership and overview'),
-    ('create-userstories', 'Milestones and user outcomes', ['issues', 'labels', 'views'], 'Story issues, Category and saved View', 'Verify body, milestone, labels and View membership'),
-    ('create-PRDs', 'Source story IDs and current decisions', ['issues', 'relations', 'labels', 'views'], 'PRD issues related to every source story', 'Verify native relations, M/US labels and View membership'),
-    ('prd-demystify', 'Current PRDs and explicit user answers', ['issues', 'documents', 'comments'], 'Current PRD rules and preserved QA history', 'Re-read PRD revisions and QA original answers; unanswered stays unresolved'),
-    ('create-designs', 'US/PRDs and confirmed decisions', ['documents', 'issues', 'relations', 'views'], 'Design overview, interaction specification, Design issues', 'Verify two linked documents, category, milestone and source links'),
-    ('create-visuals', 'Design issues, direction and explicit image approvals', ['attachments', 'comments'], 'Versioned drafts and user-approved references', 'Open attachment, inspect approval/version; image generation and gallery are external'),
-    ('create-issues-FE', 'Requirements, design and approved visual IDs', ['issues', 'relations', 'labels', 'views'], 'FrontEnd issues, Coder label and saved View', 'Verify Backlog, milestone, source links, all US labels and View membership'),
+    ('create-technical-baseline', 'Project, vision and shared technical constraints', ['documents'], 'Optional project Technical Baseline', 'Verify project ownership, sources, limitations and open decisions'),
+    ('create-milestones', 'Vision and outcome boundaries', ['milestones', 'documents'], 'Native milestones and overview with grouped user stories', 'Read milestone IDs, project ownership and stable story sections'),
+    ('create-PRDs', 'Source story IDs and current decisions', ['issues', 'relations', 'labels', 'views', 'comments'], 'Linked PRDs and saved View, followed by live clarification', 'Verify milestone, M/US labels, source links and View membership, then verify confirmed answers in the PRD body and comment'),
+    ('create-designs', 'Design documents or brief, scoped requirements and target platform', ['documents'], 'Three local HTML proposals, followed by two linked design documents after explicit style selection', 'Operate all three proposals and verify the selected version in both documents'),
+    ('create-visuals', 'Recorded style/version and scoped screens and states', ['documents', 'comments', 'issues', 'labels', 'views', 'attachments'], 'Complete local HTML review set, followed by Design tickets, Approved JPGs and saved View after complete-set approval', 'Verify exact screen/version, JPG preview and Design View membership'),
+    ('create-issues-FE', 'Requirements, design and accessible approved screen versions', ['issues', 'relations', 'labels', 'views'], 'FrontEnd issues, Coder label and saved View', 'Verify Backlog for new issues, milestone, source links, Approved JPGs where applicable and View membership'),
     ('create-issues-BE', 'Confirmed data/service scope and shared contracts', ['issues', 'relations', 'labels', 'views'], 'BackEnd issues and dependency ownership', 'Verify Backlog, contract owner, blockers and saved View'),
-    ('organize-task-batch', 'Exact FE/BE IDs and dependencies', [], 'Read-only proposal in conversation', 'No mutation; optional explicitly saved batches preserve exact IDs/checkpoints'),
-    ('dispatch', 'Exact authorized issue IDs, target and reviewed plan', ['dispatches', 'comments', 'issues', 'evidence'], 'Assignment, plan, report and independent verification', 'Record state, one issue per assignment, <=3 active, no duplicate assignment; agent execution external'),
-    ('debug', 'Selected report batch and reproduction', ['documents', 'issues', 'comments', 'relations', 'views', 'evidence'], 'Bugs log, FIX issues and document result comments', 'Verify report text/history, FIX-to-report links, evidence and result comments; implementation external'),
-    ('sync', 'Bounded scope and confirmed owner records', ['issues', 'documents', 'relations', 'views', 'labels'], 'Minimal reconciled records with history', 'Read versions, preserve Done/progress/history; reject stale writes and retry keys'),
-    ('frd', 'Current stories and product rules', ['documents'], 'Linked FRD Project Document', 'Read document and its source issue links'),
+    ('organize-task-batch', 'Exact FE/BE IDs and dependencies', ['issues', 'labels'], 'Ordered checkpoints and filterable Batch N issue labels', 'Verify exact FE/BE membership by project, milestone and batch label; no dispatch'),
+    ('dispatch', 'Verified milestone batch or exact authorized issue IDs and accessible target', ['dispatches', 'comments', 'issues', 'evidence'], 'Reviewed plans, worker reports and independent verification', 'Freeze exact issue membership, verify readiness and review plans before implementation'),
+    ('debug', 'Observed defect, expectation and reproduction context', ['issues', 'comments', 'relations', 'labels', 'views', 'evidence'], 'BUG ticket and coding-agent result comment on the same ticket', 'Verify report, source links and category View. For fixes, verify the result independently'),
+    ('sync', 'Bounded scope and affected records', ['documents', 'milestones', 'issues', 'relations', 'views', 'labels', 'comments', 'attachments'], 'From/to proposal, then only explicitly approved edits', 'Read back approved edits and any approved UI evidence updates'),
 ]
 
 def capabilities():
@@ -27,9 +26,9 @@ def capabilities():
         'adapter': 'Native REST API + MCP stdio',
         'bulk_status': {'endpoint':'POST /api/issues/bulk-status', 'tool':'linearboard_update_issue_statuses', 'inputs':['issue_ids','expected_versions','status'], 'semantics':'Atomic; same project; all versions checked; unchanged status preserves history; Done requires user action'},
         'trash': {'preview':'linearboard_trash_impact', 'list':'linearboard_trash_list', 'move':'linearboard_trash_move', 'restore':'linearboard_trash_restore', 'purge':'Manual user action via UI', 'semantics':'Atomic impact-checked batches; descendant issues included; no automatic expiry'},
-        'external': ['Codex command interpretation', 'Coding-agent execution', 'Image generation and review gallery', 'Independent product verification'],
+        'external': ['Codex command interpretation', 'Coding-agent execution', 'Interactive HTML mockups and review', 'Independent product verification'],
         'commands': [dict(zip(['command', 'inputs', 'resources', 'outputs', 'verification'], item)) for item in CONTRACTS],
-        'aliases': {'stories':'create-userstories', 'user-stories':'create-userstories', 'prd':'create-PRDs', 'create-prds':'create-PRDs', 'Prototype UI':'create-designs', 'Prototype UI Issues':'create-designs', 'Build UI':'create-issues-FE', 'Build UI Issues':'create-issues-FE', 'prototype-ui':'create-designs', 'prototype-ui-issues':'create-designs', 'build-ui':'create-issues-FE', 'build-ui-issues':'create-issues-FE', 'create-issues-fe':'create-issues-FE', 'create-issues-be':'create-issues-BE'},
+        'aliases': {'create-userstories':'create-milestones', 'stories':'create-milestones', 'user-stories':'create-milestones', 'prd':'create-PRDs', 'create-prds':'create-PRDs', 'Prototype UI':'create-designs', 'Prototype UI Issues':'create-designs', 'Build UI':'create-issues-FE', 'Build UI Issues':'create-issues-FE', 'prototype-ui':'create-designs', 'prototype-ui-issues':'create-designs', 'build-ui':'create-issues-FE', 'build-ui-issues':'create-issues-FE', 'create-issues-fe':'create-issues-FE', 'create-issues-be':'create-issues-BE'},
         'verification': 'Capability contracts describe operations, not a claim that external orchestration has been tested.'
     }
 

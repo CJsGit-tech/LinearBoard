@@ -2,7 +2,7 @@
 
 Authoring guidance for a native LinearBoard PRD issue, not a local product deliverable. Title `[Stable PRD ID] — [User task or capability]`; preserve established IDs when revising.
 
-Link source story entries in the milestone document and include the source index defined by create-PRDs. Set the matching native milestone; preserve optional legacy labels. Native Related links apply only to actual legacy issue sources. New PRDs start in Backlog. Metadata belongs in native fields; readable source links may be a short opening line. For an explicitly selected legacy PRD Project Document, preserve that representation and skip issue-only metadata.
+Begin the purpose section with one visible **Source stories:** line. Link each exact stable story ID to its milestone-document URL and explicit anchor, for example `**Source stories:** [US-01](<document-url>#us-01)`. Put only declared source stories on that line. Keep machine schemas out of issue descriptions. Apply the native milestone, its stable M-number tag and each mapped source-story tag. Reuse active team labels (for example, M1 and US1 for US-01); resolve ambiguous mappings before writing. Preserve unrelated labels. Native Related links apply only to actual legacy issue sources. New PRDs start in Backlog. Metadata belongs in native fields; readable source links may be a short opening line. For an explicitly selected legacy PRD Project Document, preserve that representation and skip issue-only metadata.
 
 Keep the body to the five sections below by default; adapt when an actual product need justifies it. Do not add placeholders, forced length quotas or duplicated shared policy. Necessary evidence, goals and success context belong in purpose/scope or acceptance; useful decision history belongs in native PRD comments/revisions.
 
@@ -26,4 +26,4 @@ Unchecked observable outcomes tied to the current requirements and applicable st
 
 Links to source stories when not already listed, owning PRDs for shared rules, the milestone document, and any relevant historical decision source. Keep consequential unresolved product decisions visible, separately from design and engineering work or unverified capabilities. Include concrete evidence links when available; do not invent owners, dates, estimates or test completion.
 
-A settled PRD contains the final behavior and short relevant boundaries. Keep useful decision provenance in native PRD comments/revisions; do not create a separate QA report. Preserve existing historical QA documents when present.
+A settled PRD contains the final behavior and short relevant boundaries. Record each confirmed answer as a native comment on its owning PRD issue and verify it by reading the comment back; do not create a separate QA report. Preserve existing historical QA documents when present.

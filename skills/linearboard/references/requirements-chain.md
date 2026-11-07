@@ -5,9 +5,9 @@ The canonical building flow is Planning discussion → 4W1H vision Project Docum
 ## Ownership and identity
 
 - Vision: What, Why, Who, Where, How based on Planning. Business products express pain and intended solution; games express intended player experience.
-- Milestones: native records with outcomes; the milestone overview Project Document owns grouped story entries, stable story IDs, explicit anchors, core observable acceptance and the machine-readable story index.
-- PRDs: native ProductRequirement issues with source document/story IDs and one matching native milestone. Related story issues are only required when those sources actually exist as legacy issues. M/US labels are optional query aids.
-- Decisions: current scope/rules/acceptance in owning PRDs; concise native PRD comments/revisions can preserve useful decision history. Existing QA documents are historical sources, not a new mandatory artifact.
+- Milestones: native records with outcomes; the milestone overview Project Document owns grouped story entries, stable story IDs, explicit anchors and core observable acceptance under numbered milestone headings.
+- PRDs: native ProductRequirement issues with source document/story IDs and one matching native milestone. Related story issues are only required when those sources actually exist as legacy issues. Apply the native milestone, its stable M-number tag and each mapped source-story tag. Reuse active team labels (for example, M1 and US1 for US-01); resolve ambiguous mappings before writing. Preserve unrelated labels.
+- Decisions: current scope/rules/acceptance in owning PRDs; each confirmed answer is recorded and verified as a native comment on its owning PRD issue. Existing QA documents are historical sources, not a new mandatory artifact.
 - Design and delivery: link to the actual story document entry (or existing legacy issue), owning PRD and applicable acceptance; never create story issues merely to satisfy downstream relations.
 
 A task-specific rule has one PRD owner. The milestone document owns milestone-wide scope, outcomes and story grouping. Consumers link shared owners instead of copying rules. Preserve stable requirement/story IDs and history; restructuring or moving sources needs authorized scope.
@@ -18,10 +18,8 @@ Read [traceability](traceability.md) when auditing or repairing PRD source/miles
 
 ## Drafts and readiness
 
-Draft PRDs may preserve open boundary/scope questions. `prd-demystify` asks only decisions that matter and updates PRDs directly; it creates no QA document or delivery tickets. Unresolved material behavior blocks affected dispatch, not draft creation. Record creation and decision completion prove neither implementation nor acceptance.
+Draft PRDs may preserve open boundary/scope questions. `create-PRDs` asks about consequential open decisions in the same conversation and updates PRDs directly; it creates no QA document or delivery tickets. Unresolved material behavior blocks affected dispatch, not draft creation. Record creation and decision completion prove neither implementation nor acceptance.
 
-## Technical Baseline reference
+## Technical decisions in delivery tickets
 
-Technology selection remains internal to FE/BE issue creation. An existing Technical Baseline is optional, not a prerequisite. Choices and shared-contract ownership belong in responsible delivery tickets.
-
-If baseline maintenance is explicitly in scope, reuse `Technical Baseline — [Product] [Stage]`, its existing identity and [template](../assets/templates/techstack-template.md). Record facts from actual configuration and official sources, preserve review history and read back placement/content. Do not invent versions or duplicate requirements and status.
+Select technologies during frontend and backend issue creation. Record verified choices and shared interface ownership in the responsible delivery tickets, with evidence from actual configuration or official sources. Link dependent tickets to the decision.

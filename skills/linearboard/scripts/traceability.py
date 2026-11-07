@@ -59,6 +59,59 @@ def readable_markdown(body):
     return ''.join(parts)
 
 
+def prd_sources(body, base_url):
+    """Read the declared source line, or a historical fenced record."""
+    lines = re.findall(r'^\*\*Source stories:\*\*[^\n]*$', readable_markdown(body), re.M)
+    if not lines:
+        return block(body, PRD_SCHEMA)
+    if len(lines) != 1 or PRD_SCHEMA in body:
+        raise ValueError('Ambiguous PRD source declarations')
+    links = re.findall(r'\[([\w-]+)\]\(([^\s)]+)\)', lines[0])
+    residue = re.sub(r'\[([\w-]+)\]\(([^\s)]+)\)', '', lines[0].split('**', 2)[2])
+    if not links or residue.strip(' ,·\t'):
+        raise ValueError('Expected only source story links on the declared line')
+    documents = set()
+    anchors = {}
+    for sid, target in links:
+        absolute = urljoin(base_url, target)
+        route = re.fullmatch(re.escape(base_url.rstrip('/')) + r'/#/documents/([\w-]+)#([\w-]+)', absolute)
+        if not route or sid in anchors:
+            raise ValueError('Invalid or duplicate source story link')
+        documents.add(route[1])
+        anchors[sid] = route[2]
+    if len(documents) != 1:
+        raise ValueError('Sources must share one milestone document')
+    return {'document_id': documents.pop(), 'story_ids': list(anchors), 'anchors': anchors}
+
+
+def grouped_stories(body):
+    """Read story ownership from the human-readable numbered milestone sections."""
+    readable = readable_markdown(body)
+    sections = re.split(r'(?m)(?=^## )', readable)
+    entries = []
+    for section in sections:
+        if not re.match(r'^## M[1-9]\d* — ', section):
+            if re.search(r'^#### ', section, re.M):
+                raise ValueError('Story outside a numbered milestone')
+            continue
+        links = re.findall(r'^\[Native milestone\]\([^\n)]*#/milestones/([\w-]+)\)', section, re.M)
+        if len(links) != 1:
+            raise ValueError('Expected one native milestone link in numbered section')
+        parts = re.split(r'(?m)(?=^<a id=)', section)
+        for part in parts[1:]:
+            match = re.match(r'^<a id="([\w-]+)"></a>\s*\n#### ([\w-]+) — ', part)
+            if not match:
+                raise ValueError('Expected anchored story heading in numbered section')
+            entry = dict(id=match[2], anchor=match[1], milestone_id=links[0])
+            legacy = re.search(r'^- \*\*Legacy source:\*\* .*?#/issues/([\w-]+)\)', part, re.M)
+            if legacy:
+                entry['legacy_issue_id'] = legacy[1]
+            entries.append(entry)
+        if len(parts)-1 != len(re.findall(r'^#### ', section, re.M)):
+            raise ValueError('Missing story anchor')
+    return entries
+
+
 def nonempty(value, name):
     if not isinstance(value, str) or not value.strip():
         raise ValueError('Missing or invalid ' + name)
@@ -99,7 +152,7 @@ class Traceability:
         issue = self.get('issues', issue_id)
         if issue.get('project_id') != project_id or issue.get('category') != 'ProductRequirement':
             raise ValueError('Selection is not a PRD in the selected project')
-        source = block(issue.get('body', ''), PRD_SCHEMA)
+        source = prd_sources(issue.get('body', ''), self.base_url)
         doc_id = nonempty(source.get('document_id'), 'document_id')
         ids = source.get('story_ids')
         if not isinstance(ids, list) or not ids or any(not isinstance(x, str) or not x for x in ids) or len(set(ids)) != len(ids):
@@ -107,7 +160,9 @@ class Traceability:
         doc = self.get('documents', doc_id)
         if doc.get('project_id') != project_id:
             raise ValueError('Source document belongs to another project')
-        entries = block(doc.get('body', ''), STORY_SCHEMA).get('stories')
+        body = doc.get('body', '')
+        # Historical documents may still carry the earlier source format.
+        entries = block(body, STORY_SCHEMA).get('stories') if STORY_SCHEMA in body else grouped_stories(body)
         if not isinstance(entries, list) or not entries:
             raise ValueError('Story index must be a nonempty array')
         indexed, anchors = {}, set()
@@ -130,6 +185,8 @@ class Traceability:
         if any(sid not in indexed for sid in ids):
             raise ValueError('Unknown source story id')
         selected = [indexed[sid] for sid in ids]
+        if 'anchors' in source and any(source['anchors'][s['id']] != s['anchor'] for s in selected):
+            raise ValueError('Source link does not match its story anchor')
         mids = {s['milestone_id'] for s in selected}
         if len(mids) != 1:
             raise ValueError('Cross-milestone PRD: split or explicitly revise source grouping')
@@ -162,6 +219,22 @@ class Traceability:
         actions.extend({'kind': 'related', 'value': lid} for lid in missing)
         # Link text remains human-owned; automation reports missing links without rewriting body.
         warnings = []
+        if 'anchors' in source:
+            stage = re.match(r'^(M[1-9]\d*)\b', milestone.get('name', ''))
+            if not stage:
+                raise ValueError('Missing stable M-number in milestone name')
+            team_labels = self.listing('labels', {'team_id': issue['team_id']})
+            expected_tags = [stage[1]]
+            for sid in ids:
+                numeric = re.fullmatch(r'US-(\d+)', sid)
+                if numeric:
+                    expected_tags.append('US' + str(int(numeric[1])))
+                else:
+                    warnings.append('Verify custom story tag mapping for ' + sid)
+            for tag in expected_tags:
+                matches = [x for x in team_labels if x['name'] == tag and not x.get('archived') and not x.get('is_group')]
+                if len(matches) != 1 or matches[0]['id'] not in issue.get('label_ids', []):
+                    warnings.append('Missing or ambiguous tracking tag ' + tag)
         readable_issue = readable_markdown(issue.get('body', ''))
         links = re.findall(r'\[[^\]]+\]\(([^\s)]+)\)', readable_issue)
         doc_url = doc.get('url')

@@ -100,6 +100,21 @@ class TraceTests(unittest.TestCase):
     def result(self, apply=False):
         return self.audit.run('p', ['prd'], apply)['issues'][0]
 
+    def test_visible_sources_verify_tags_and_anchor_identity(self):
+        issue = self.fake.data['issues']['prd']
+        issue.update(team_id='team', milestone_id='m', label_ids=['stage', 'story'],
+                     body='**Source stories:** [US-01](/#/documents/doc#us-01)')
+        self.fake.data['documents']['doc']['url'] = '/#/documents/doc'
+        self.fake.data['milestones']['m']['name'] = 'M1 — Booking'
+        self.fake.data['labels'] = {}
+        self.fake.add('labels', 'stage', name='M1', team_id='team')
+        self.fake.add('labels', 'story', name='US1', team_id='team')
+        self.assertEqual(self.result()['warnings'], [])
+        issue['label_ids'].remove('stage')
+        self.assertIn('Missing or ambiguous tracking tag M1', self.result()['warnings'])
+        issue['body'] = issue['body'].replace('#us-01', '#us-02')
+        self.assertEqual(self.result()['status'], 'blocked')
+
     def test_inline_code_anchor_cannot_authorize_repair(self):
         doc = self.fake.data['documents']['doc']
         doc['body'] = doc['body'].replace('<a id="us-01"></a>', '`<a id="us-01"></a>`')

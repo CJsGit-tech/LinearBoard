@@ -19,7 +19,7 @@ Populate this Markdown template in the dispatch prompt. Omit inapplicable fields
 - **Checks and evidence:** [required verification and evidence]
 - **Report to:** [TPM agent or chat]
 
-The current issue and canonical references define scope; conversation history does not expand it. Follow `AGENTS.md`, preserve others' changes and do not update LinearBoard.
+The current issue and canonical references define scope; conversation history does not expand it. Follow `AGENTS.md`, preserve others' changes. For ordinary dispatch, report to the TPM. For a debug assignment, record and comment directly on the assigned BUG ticket as specified in the debug workflow.
 
 ### 1. Review
 
@@ -50,7 +50,7 @@ Wait for explicit TPM validation before implementing. This is an internal checkp
 
 ### 3. Execute
 
-Research and implement the validated plan within your ownership. Report technical findings, supporting evidence, chosen contract and consumer impact to the TPM before dependent integration. Escalate any choice that changes confirmed product behavior; do not invent it. Approved images can be sufficient design input; no separate clickable prototype or Technical Baseline is required. Report material scope or plan changes before proceeding with dependent work.
+Research and implement the validated plan within your ownership. Report technical findings, supporting evidence, chosen contract and consumer impact to the TPM before dependent integration. Escalate any choice that changes confirmed product behavior; do not invent it. Approved images can be sufficient design input; a separate clickable prototype is optional. Report technical decisions to the TPM for recording in the owning frontend or backend ticket. Report material scope or plan changes before proceeding with dependent work.
 
 Follow any project-specific delivery reference supplied by the TPM. Coordinate shared-target writes, wait for terminal deployment status when applicable, and inspect the actual QA/runtime result.
 

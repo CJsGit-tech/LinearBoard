@@ -1,6 +1,6 @@
 # Organize task batches
 
-Use for `organize-task-batch <Project> <Milestone> [issue IDs]`. Review existing FE/BE delivery issues and propose batches that each lead to a reviewable delivery checkpoint. This command is read-only and returns a proposal in chat. It does not create or edit issues, relations, labels, statuses, milestones, Views, assignments or dates; save a canonical plan in LinearBoard only when explicitly requested. Do not implement or dispatch agents.
+Use for `organize-task-batch <Project> <Milestone> [issue IDs]`. Review existing FE/BE delivery issues and propose batches that each lead to a reviewable delivery checkpoint. The invocation authorizes applying native batch labels to selected delivery issues and reporting the ordered checkpoints. An explicit preview-only request skips all writes. Save a separate batch record only when explicitly requested. Do not implement or dispatch agents.
 
 ## Review the requested scope
 
@@ -18,6 +18,16 @@ Order batches by real prerequisites. Identify shared contract owners, integratio
 A delivery batch is not a concurrent worker allocation. Do not impose the dispatch workflow's three-worker limit on batch size or imply that all issues in one batch can execute simultaneously. Keep existing issue boundaries; propose a split only as an unresolved recommendation when an issue prevents an independently reviewable checkpoint.
 
 Define expected checkpoint outcomes as observable behavior or concrete service/data results grounded in the existing acceptance criteria. State the relevant verification scenario and any prerequisite that prevents it. These are future completion criteria, not claims that implementation or tests have passed. Do not invent estimates, dates, approvals or new product scope.
+
+## Tag and verify the checkpoints
+
+Use reusable, active team labels named exactly `Batch 1`, `Batch 2`, etc. Resolve a batch with the exact project AND native milestone AND that label, across both FrontEnd and BackEnd. A label by itself is team-wide. Keep the native milestone, M-number, US, Coder, Category and unrelated labels.
+
+Before writing, page through existing labels, tagged FE/BE issues and saved batches. Reuse matching assignments on reruns. For partial selections, preserve existing checkpoint numbers and members outside the selection. Do not merge new work into an unrelated numbered batch. Surface conflicts with saved membership or ambiguous label definitions before modifying affected issues.
+
+Create missing batch labels once. For each selected eligible ticket, read its current version and replace only conflicting numbered batch labels with its intended label. Skip already-correct tickets. Use the ordinary versioned issue update and stable retry keys. Re-read on conflicts. Do not change status, assignee or dependency relations.
+
+For each checkpoint, query both categories by project, milestone and label with pagination. Compare IDs against the intended full membership (including retained members for partial selections). Check each changed issue has exactly one numbered batch label and preserves all other labels. Report verified counts or exact outstanding mismatches. If a write fails partway, report the verified subset and resume idempotently before dispatch. A verified label selects the full batch in `dispatch <Project> <Milestone> Batch <n>`. Use that form in the final recommendation for the first actionable checkpoint. Explain the order of ready prerequisites and dependent issues above the line. Dispatch applies its own readiness checks.
 
 ## Required output
 

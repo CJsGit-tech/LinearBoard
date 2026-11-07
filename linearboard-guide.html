@@ -332,31 +332,33 @@
     </header>
 
     <div class="meta">
-      <span><i class="status-dot"></i>14 個主要指令</span>
+      <span><i class="status-dot"></i>15 個主要指令</span>
       <span>預設服務：http://127.0.0.1:8765</span>
-      <span>更新：2026-11-05</span>
+      <span>更新：2026-11-07</span>
       <span>可離線閱讀</span>
     </div>
 
     <section id="builder">
       <span class="eyebrow">Command composer</span>
       <h2>設定範圍，複製指令。</h2>
-      <p>這只是文字產生器，不會直接呼叫 Codex、LinearBoard 或 imagegen。檢查目的地與授權範圍後，再把結果貼到 Codex。</p>
+      <p>這只是文字產生器，不會直接呼叫 Codex 或 LinearBoard。檢查目的地與授權範圍後，再把結果貼到 Codex。</p>
       <div class="build-panel">
         <div>
           <div class="fields">
             <label>指令<select id="action"></select></label>
-            <label>專案<input id="project" value="PocketScheduler" maxlength="100" autocomplete="off"></label>
-            <label>Milestone<input id="milestone" value="M1" maxlength="40" autocomplete="off"></label>
+            <label id="project-field">專案<input id="project" placeholder="Project" maxlength="100" autocomplete="off"></label>
+            <label id="milestone-field">Milestone<input id="milestone" placeholder="Milestone" maxlength="40" autocomplete="off"></label>
             <label id="dispatch-scope-field" hidden>派工範圍
               <select id="dispatchscope">
                 <option value="issues">指定 issue IDs</option>
-                <option value="batch">既有 Batch</option>
+                <option value="batch">已核對的 Batch N</option>
               </select>
             </label>
             <label id="batch-field" hidden>Batch 編號<input id="batch" type="number" min="1" step="1" value="1"></label>
             <label id="issue-field" class="wide" hidden><span id="issue-label">Issue IDs</span><input id="issueids" placeholder="例如 LB-78 LB-81" maxlength="300" autocomplete="off"></label>
-            <label id="debug-field" class="wide" hidden>問題來源<input id="debugsource" placeholder="Bugs 文件、回報文件 URL 或 issue IDs" maxlength="1000" autocomplete="off"></label>
+            <label id="repo-field" class="wide" hidden>儲存庫路徑（選填）<input id="repo" placeholder="/path/to/repository" autocomplete="off"></label>
+            <label id="sync-field" class="wide" hidden>同步範圍（選填）<input id="scope" placeholder="紀錄 IDs、主題或新需求" autocomplete="off"></label>
+            <label id="debug-field" class="wide" hidden>問題來源<input id="debugsource" placeholder="問題回報、來源文件 URL 或 issue IDs" maxlength="1000" autocomplete="off"></label>
             <label class="wide">補充要求（選填）<input id="additional" placeholder="例如：重用既有票；不要變更狀態" maxlength="1000" autocomplete="off"></label>
           </div>
           <p class="builder-help" id="builder-help" aria-live="polite"></p>
@@ -386,7 +388,7 @@
       <label class="sr-only" for="search">搜尋指令</label>
       <input id="search" type="search" placeholder="搜尋 FE、PRD、設計、派工、debug…" autocomplete="off">
       <button type="button" id="clear-search">清除搜尋與階段篩選</button>
-      <p class="table-count" id="result-count">14 / 14 個指令</p>
+      <p class="table-count" id="result-count">15 / 15 個指令</p>
       <div class="table-scroll">
         <table>
           <thead><tr><th>指令</th><th>用途</th><th>效果</th><th>Saved View</th><th><span class="sr-only">組合</span></th></tr></thead>
@@ -430,10 +432,10 @@
       <h2>不用每次從第一步重跑。</h2>
       <p>從第一個尚未完成的產出接續。已確認的回答、既有 issues、核准視覺與目前程式狀態應被重用。</p>
       <div class="flow">
-        <a href="#planning">願景／Milestones</a><b>→</b>
+        <a href="#planning">願景／技術基線／Milestones</a><b>→</b>
         <a href="#requirements">Stories／PRDs</a><b>→</b>
-        <a href="#design">Design documents</a><b>→</b>
-        <a href="#cmd-create-visuals">版型研究／全套視覺／核准</a><b>→</b>
+        <a href="#design">三個 HTML 方案／選風格</a><b>→</b>
+        <a href="#cmd-create-visuals">全套視覺／核准</a><b>→</b>
         <a href="#delivery">Design／FE／BE issues</a><b>→</b>
         <a href="#cmd-organize-task-batch">Checkpoints</a><b>→</b>
         <a href="#execution">Dispatch／Review</a>
@@ -442,16 +444,17 @@
         <article class="route">
           <span class="eyebrow">從零開始</span>
           <h3>只有產品構想</h3>
-          <p class="path">planning → create-vision-document → create-milestones → create-PRDs</p>
-          <p>先建立可追溯需求，再進入設計。產品決策仍未確定時，用 <code>prd-demystify</code> 一次處理一題。</p>
+          <p class="path">planning → create-vision-document → 選用 create-technical-baseline → create-milestones → create-PRDs</p>
+          <p><code>create-PRDs</code> 保存議題與 View 後會逐題釐清重要決策。在原對話回覆；確認的答案會寫入對應 PRD 內文與原生留言。</p>
         </article>
         <article class="route">
           <span class="eyebrow">延續現有專案</span>
           <h3>需求、設計或開發票已存在</h3>
-          <p class="path">sync（有差異才用） → 下一個缺少的產出 → organize-task-batch → dispatch</p>
+          <p class="path">接續第一個尚未完成的產出；必要時用 sync 審閱差異。</p>
           <p>不要為了遵守指令順序而重做已完成文件，也不要把 read-only 規劃誤當成實作授權。</p>
         </article>
       </div>
+      <p>最後一行 <strong>Recommended next step:</strong> 優先指出接續目前指令所需的回覆；否則提供確切的下一個指令或立即可做的事。推薦不會授權執行。</p>
       <div class="note warm"><strong>先建票，後派工。</strong> <code>create-issues-FE</code>／<code>create-issues-BE</code> 只建立 Backlog issues 與 saved Views；<code>dispatch</code> 才讓 agents 實作。</div>
       <label class="done-row"><input type="checkbox" data-progress="workflow">我能從現有產出選擇下一步，不會儀式性重跑整條流程。</label>
     </section>
@@ -474,7 +477,7 @@
       <div class="three">
         <article class="mini-card"><span class="eyebrow">Database</span><h3>PostgreSQL-backed</h3><p>應透過 App／tools 操作；不可直接改 database 或 legacy SQLite backup。</p></article>
         <article class="mini-card"><span class="eyebrow">Deletion</span><h3>Recoverable trash</h3><p>先做 impact preview；record deletion 進入可復原垃圾桶，永久刪除留給使用者 UI。</p></article>
-        <article class="mini-card"><span class="eyebrow">Visual exception</span><h3>Read-only gallery</h3><p><code>create-visuals</code> 的 HTML gallery 可留在本機供審閱，但不能成為 approval 或 PM mirror。</p></article>
+        <article class="mini-card"><span class="eyebrow">Visual exception</span><h3>Read-only gallery</h3><p>兩個設計指令的版本化 HTML 審閱包可留在本機；核准仍記在 LinearBoard。</p></article>
       </div>
       <div class="note">如果 LinearBoard、workspace、team、project 或必要權限不可用，停止受影響操作並回報 blocker；不要改存本機文件或切換到 Linear SaaS。</div>
       <label class="done-row"><input type="checkbox" data-progress="storage">我能分辨 LinearBoard canonical records、repository 工程檔案與視覺 gallery 例外。</label>
@@ -482,8 +485,8 @@
 
     <section id="planning">
       <span class="eyebrow">04 / Intent → Stories</span>
-      <h2>願景、里程碑與 User Stories</h2>
-      <p>願景說明為誰解決什麼問題；Milestone 定義一階段的可觀察成果；User Stories 保存在按 milestone 分組的 Project Document，包含穩定 ID 與核心 acceptance criteria。</p>
+      <h2>願景、技術基線、里程碑與 User Stories</h2>
+      <p>願景說明為誰解決什麼問題；選用的 Technical Baseline 記錄共用技術限制；Milestone 定義一階段的可觀察成果；User Stories 保存在按 milestone 分組的 Project Document，包含穩定 ID 與核心 acceptance criteria。</p>
       <div id="commands-planning"></div>
       <label class="done-row"><input type="checkbox" data-progress="planning">我能分辨 vision、milestone 與 User Story 的責任。</label>
     </section>
@@ -491,18 +494,18 @@
     <section id="requirements">
       <span class="eyebrow">05 / Product rules</span>
       <h2>PRDs 與逐題釐清</h2>
-      <p>PRD 可以涵蓋多個 User Stories，但每條規則要有唯一主要負責位置。未回答的選項是 unresolved，不是默認同意。</p>
+      <p>PRD 可以涵蓋多個 User Stories，但每條規則要有唯一主要負責位置。一次問一個關鍵問題，優先使用可選答案卡片。若無法使用卡片，依序列出 Question、Example、Options，並列明各選項的優缺點。沒有回答的決策仍是未定。</p>
       <div id="commands-requirements"></div>
       <label class="done-row"><input type="checkbox" data-progress="requirements">我能維持故事文件、US ID、PRD、原生關聯與確認決策的追溯鏈。</label>
     </section>
 
     <section id="design">
       <span class="eyebrow">06 / Design → Approval</span>
-      <h2>設計文件、版型研究與完整視覺審閱</h2>
-      <p><code>create-designs</code> 與 <code>create-visuals</code> 是兩個不同階段。前者只建立設計文件；後者先選本次 layout，再完成全套 screens／components 與 key states。</p>
+      <h2>品牌提案、風格選擇與完整視覺審閱</h2>
+      <p><code>create-designs</code> 與 <code>create-visuals</code> 是兩個不同階段。前者比較三個可操作方案；選定前不寫入 LinearBoard，選定後將確切版本記入兩份設計文件。後者沿用該風格完成指定畫面、元件與狀態。</p>
       <div id="commands-design"></div>
-      <div class="note warm"><strong>核准順序：</strong>適量版型研究或 bounded edit → 確認本次 layout → 產生完整範圍與關鍵狀態 → 選定 final images 並授權 upload → 使用者核准完整設計範圍 → 建立或重用 Design tickets 與 Design View。</div>
-      <label class="done-row"><input type="checkbox" data-progress="design">我不會把 theme、layout、final image upload 與完整設計 approval 混成同一個 gate。</label>
+      <div class="note warm"><strong>核准順序：</strong>確認風格 → 審閱完整可操作 HTML → 明確核准全套設計 → 建立或重用 Design 票與 View，並上傳各票必要的 JPG。原型連結留在對話中。核准前僅在另行要求時截圖；確切的設計 JPG 會繼承該範圍的 Approved，其餘附件由使用者核准。</div>
+      <label class="done-row"><input type="checkbox" data-progress="design">我能分辨風格選擇、完整設計核准、必要 JPG 上傳與原生附件核准。</label>
     </section>
 
     <section id="delivery">
@@ -527,31 +530,31 @@
         <article class="mini-card"><span class="eyebrow">In Review</span><h3>可供使用者審閱</h3><p>Implementation complete，TPM 已做獨立檢查並記錄證據；不等於 production ready。</p></article>
         <article class="mini-card"><span class="eyebrow">Done</span><h3>只由 final user 決定</h3><p>TPM 與 coding agents 都不能代替使用者接受交付。</p></article>
       </div>
-      <div class="note"><strong>Agent lifecycle：</strong>worker 先讀來源並回報 <code>acknowledged</code>／<code>blocked</code>；TPM 驗證 plan 後才放行 implementation。Worker report 是 claim，TPM 仍需檢查 source／deployment、執行適當 checks，且只有 TPM 能寫 LinearBoard。</div>
+      <div class="note"><strong>Agent lifecycle：</strong>worker 先讀來源並回報 <code>acknowledged</code>／<code>blocked</code>；TPM 驗證 plan 後才放行 implementation。Worker report 是 claim，TPM 仍需檢查 source／deployment、執行適當 checks，一般派工的 LinearBoard 寫入由 TPM 負責。Debug 的 BUG 票與結果留言則由負責修復的 coding agent 寫入。</div>
       <label class="done-row"><input type="checkbox" data-progress="execution">我能區分 worker report、TPM verification、In Review 與 user acceptance。</label>
     </section>
 
     <section id="maintenance">
       <span class="eyebrow">09 / Maintenance</span>
       <h2>Debug 與授權範圍內的同步</h2>
-      <p>Debug 要保留原始使用者回報、修復票與獨立驗證；sync 只修正有確認證據的差異，不會啟動實作。</p>
+      <p>Debug 在同一張 BUG 票保存原始回報、預期行為與結果留言。Sync 先展示每筆紀錄的 from/to 提案，明確核准後才可寫入，不啟動實作。</p>
       <div id="commands-maintenance"></div>
-      <label class="done-row"><input type="checkbox" data-progress="maintenance">我能保留 Bugs 文件、FIX issues、結果留言與 sync 差異的完整鏈結。</label>
+      <label class="done-row"><input type="checkbox" data-progress="maintenance">我能從 BUG 票讀回回報、來源與結果，也知道 sync 的核准界線。</label>
     </section>
 
     <section id="troubleshoot">
       <span class="eyebrow">10 / Practice</span>
       <h2>常見問題</h2>
       <details><summary>本機服務沒啟動，可以直接改資料庫嗎？</summary><p>不可以。使用 connected tools 或 <code>scripts/operate.py</code> 的 preflight；不可直接修改 PostgreSQL、legacy SQLite 或另建 PM database。</p></details>
-      <details><summary>create-designs 為什麼沒有 Design issues？</summary><p>目前規則是 document-only：只建立 design overview 與 screen／interaction specification。Design tickets 要等 <code>create-visuals</code> 的完整設計範圍明確核准後才建立。</p></details>
-      <details><summary>每次都需要比較三個 layouts 嗎？</summary><p>新構圖依範圍比較適量版型（通常 2–3 版）；已選版型的小修直接編輯。選定或委託選擇後，仍須完成原定畫面、元件與關鍵狀態。</p></details>
+      <details><summary>create-designs 為什麼沒有 Design issues？</summary><p>本指令比較三個可操作方案，選定後記錄至設計總覽與畫面互動規格。Design tickets 要等 <code>create-visuals</code> 的完整設計範圍明確核准後才建立。</p></details>
+      <details><summary>什麼時候需要比較三個品牌方案？</summary><p>新的風格方向比較正好三個方案。同一範圍及版本已有明確選擇時，可重用選擇並接續剩餘畫面與狀態。</p></details>
       <details><summary>View 看不到正確 issues，應該改 issue 狀態嗎？</summary><p>先修 View filters 與 membership。Saved View 應依 project 與精確 Category 組合；不要為了配合錯誤 View 改 issue 狀態或 labels。</p></details>
       <details><summary>Worker 說 completed，可以直接移到 Done 嗎？</summary><p>不行。TPM 必須獨立驗證後才能交到 In Review；Done 永遠由 final user 決定。</p></details>
       <details><summary>測試環境限制是否一定卡在 In Progress？</summary><p>只有狹窄、已明確 attribution 的 environment-only limitation，可以在主要 target 與流程已檢查、其他證據支持 review readiness 時保留於 In Review；該檢查必須標示 Not tested 或 Environment-blocked，不能寫 Pass。</p></details>
       <h3>最後檢查</h3>
       <ul class="checklist">
         <li><label><input type="checkbox">我指定了正確 team、project、milestone 與本次產出。</label></li>
-        <li><label><input type="checkbox">我知道這次是 read-only、LinearBoard write、視覺生成，還是真的 dispatch。</label></li>
+        <li><label><input type="checkbox">我知道這次是 read-only、LinearBoard write、本機 HTML 審閱，還是 dispatch。</label></li>
         <li><label><input type="checkbox">我檢查實際 document／issue／View links 與 readback，不只相信完成宣告。</label></li>
         <li><label><input type="checkbox">我沒有把 PM records 另存到 repository 或第二個 database。</label></li>
         <li><label><input type="checkbox">我保留 unresolved、environment limits 與 user acceptance 的真實狀態。</label></li>
@@ -564,199 +567,227 @@
 
     <footer>
       <h3>教學依據與版本</h3>
-      <p>依 2026-11-03 本機安裝的 <code>/Users/chuang/.codex/skills/linearboard/SKILL.md</code> 整理，並以 <code>references/linearboard-operations.md</code>、<code>issue-governance.md</code>、<code>create-designs.md</code>、<code>create-visuals.md</code>、<code>create-design-tickets.md</code>、<code>issue-views.md</code>、<code>coding-dispatch.md</code>、<code>debug.md</code> 與 <code>sync.md</code> 的責任邊界呈現。這份 HTML 是操作指南，不是另一份 backlog、PRD 或 LinearBoard 即時鏡像；skill 更新後，以當時安裝版本與 LinearBoard canonical records 為準。</p>
-      <p>示例使用 PocketScheduler M1。替換專案時，應使用真實 team／project／milestone、issue IDs、approved visuals 與 target application。</p>
+      <p>依 2026-11-07 本機安裝的 <code>/Users/chuang/.codex/skills/linearboard/SKILL.md</code> 整理，並以 <code>references/linearboard-operations.md</code>、<code>issue-governance.md</code>、<code>create-designs.md</code>、<code>create-visuals.md</code>、<code>create-design-tickets.md</code>、<code>issue-views.md</code>、<code>coding-dispatch.md</code>、<code>debug.md</code> 與 <code>sync.md</code> 的責任邊界呈現。這份 HTML 是操作指南，不是另一份 backlog、PRD 或 LinearBoard 即時鏡像；skill 更新後，以當時安裝版本與 LinearBoard canonical records 為準。</p>
+      <p>範例中的佔位符應換成實際 team／project／milestone、issue IDs、已核准視覺及執行目標。</p>
     </footer>
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script id="command-data" type="application/json">
-  [
+[
+  {
+    "name": "init",
+    "syntax": "init \u003cProject> [repository path]",
+    "title": "設定儲存庫指引與代理",
+    "phase": "起步",
+    "effect": "本機工程檔案",
+    "view": "—",
+    "when": "需要設定或更新 Codex 專案工作指引時。",
+    "input": "確切專案及其程式碼儲存庫，必要時提供路徑。",
+    "output": "建立或安全更新 AGENTS.md 與專案 Codex 代理。",
+    "check": "檢查本機差異及代理清單、角色和支援指令，確認保留自訂指引。",
+    "example": "$linearboard init \u003cProject>",
+    "limit": "不改產品紀錄、不推進交付階段，也不安裝 hooks。"
+  },
   {
     "name": "help",
-    "title": "查看指令與邊界",
+    "syntax": "help",
+    "title": "查看可用指令",
     "phase": "起步",
     "effect": "唯讀",
-    "view": "無",
+    "view": "—",
     "when": "先理解目前 skill 支援的 commands、gates 與 authorization。",
-    "input": "目前安裝的 linearboard skill。",
-    "output": "指令、必要來源、輸出與限制；不寫入 LinearBoard。",
-    "check": "確認目的地是 standalone LinearBoard，不是 Linear SaaS。",
+    "input": "已安裝的 skill；不需要啟動 App 或選擇專案。",
+    "output": "只有指令及用途清單。",
+    "check": "核對回傳語法與指令索引。故事指令是相容別名。",
     "example": "$linearboard help",
-    "limit": "不建立任何 record、View 或 agent dispatch。"
+    "limit": "不寫入應用程式，也不執行後續步驟。"
   },
   {
     "name": "planning",
+    "syntax": "planning",
     "title": "整理產品構想",
     "phase": "規劃",
     "effect": "討論",
-    "view": "無",
+    "view": "—",
     "when": "把模糊想法整理成使用者問題、價值與範圍。",
-    "input": "想法、既有對話、限制與研究問題。",
-    "output": "聊天中的規劃；只有明確要求保存才寫入 canonical record。",
-    "check": "目標使用者、問題、價值與不做事項清楚。",
-    "example": "$linearboard planning PocketScheduler：先整理產品範圍，不保存紀錄。",
-    "limit": "不把討論自動轉成文件、issues 或 implementation。"
+    "input": "\u003cProduct idea>、\u003cTarget user>、\u003cConstraints>。",
+    "output": "聊天中的產品問題、價值、範圍與待驗證假設。若已選技術，會依官方來源初步確認能否支援核心流程。",
+    "check": "你能指出產品服務誰、解決什麼問題，以及這輪不做什麼。",
+    "example": "$linearboard planning\n專案背景：\u003cProject>。\n產品構想：\u003cProduct idea>\n目標使用者／玩家：\u003cTarget user>\n限制：\u003cConstraints>\n先討論方向，不保存紀錄。",
+    "limit": "只有明確要求保存，才會寫入 LinearBoard。"
   },
   {
     "name": "create-vision-document",
-    "title": "建立產品願景",
+    "syntax": "create-vision-document",
+    "title": "保存產品願景",
     "phase": "規劃",
-    "effect": "寫入 Project Document",
-    "view": "無",
+    "effect": "寫入文件",
+    "view": "—",
     "when": "將已確認方向保存為產品定位與邊界。",
-    "input": "已整理構想、證據、假設與限制。",
-    "output": "LinearBoard native vision Project Document。",
-    "check": "文件屬於正確 project；事實、假設與 unknowns 分開。",
-    "example": "$linearboard create-vision-document PocketScheduler",
-    "limit": "不建立 milestones、issues、design 或 dispatch。"
+    "input": "已確認的 planning 結論與目的地 \u003cTeam>／\u003cProject>。",
+    "output": "依已確認的 4W1H 建立原生 \u003cProject> — Product Vision 文件。",
+    "check": "在「文件」開啟願景，確認專案、內容與可存取的文件連結。",
+    "example": "$linearboard create-vision-document\n專案背景：\u003cProject>。\n團隊：\u003cTeam>\n依據以上已確認的 planning 結論建立或重用願景文件。保留尚未確認的假設。",
+    "limit": "不建立里程碑、故事票或開發票。"
+  },
+  {
+    "name": "create-technical-baseline",
+    "syntax": "create-technical-baseline \u003cProject>",
+    "title": "記錄共用技術限制",
+    "phase": "規劃",
+    "effect": "寫入一份專案文件",
+    "view": "—",
+    "when": "已保存願景，且需要記錄共用技術限制時。",
+    "input": "已保存的願景、已選技術或共用限制，以及相關官方來源。",
+    "output": "專案層級的 \u003cProject> — Technical Baseline，記錄可行性、限制、建議檢查與未決事項。",
+    "check": "確認原生專案歸屬，並區分文件查核與實際測試。",
+    "example": "$linearboard create-technical-baseline \u003cProject>",
+    "limit": "有共用限制需要保存時才使用。功能專屬的技術決策記在對應 FE 或 BE 票。"
   },
   {
     "name": "create-milestones",
-    "title": "建立成果型里程碑",
+    "syntax": "create-milestones",
+    "title": "從故事分組成里程碑",
     "phase": "規劃",
-    "effect": "寫入 milestones／document",
-    "view": "無",
+    "effect": "寫入里程碑與文件",
+    "view": "—",
     "when": "把願景拆成可觀察的交付階段。",
-    "input": "Vision、優先順序與已知 dependency。",
-    "output": "Native milestones 與按里程碑分組的 User Stories overview Project Document；每則故事保留穩定 US ID、anchor 與核心驗收。",
-    "check": "原生 milestone、文件歸屬、故事 ID 與索引一致；既有故事票作歷史來源保留。",
-    "example": "$linearboard create-milestones PocketScheduler",
-    "limit": "不建立 UserStory issues 或 View；create-userstories／user-stories／stories 是本指令的相容別名。"
+    "input": "願景、已確認範圍與既有里程碑／故事。",
+    "output": "原生 milestones ＋一份按里程碑分組的故事總覽文件；故事有穩定 US ID、anchor 與結構索引。",
+    "check": "「里程碑」可見原生紀錄；「文件」中每則故事有核心驗收且只歸屬一個原生 milestone。索引與可讀段落一致。",
+    "example": "$linearboard create-milestones\n專案背景：\u003cProject>。\n依據既有願景產生故事並按可觀察成果分組。重用既有里程碑與故事 ID，不虛構日期。",
+    "limit": "不建立 UserStory issues 或 View；已有舊故事票保留。"
   },
   {
     "name": "create-PRDs",
-    "title": "建立 PRD issues",
+    "syntax": "create-PRDs \u003cProject> \u003cMilestone>",
+    "title": "保存關聯 PRDs 並逐題釐清",
     "phase": "需求",
-    "effect": "寫入 issues／relations",
-    "view": "{Project}-PRDs",
-    "when": "把 User Stories 轉成產品規則與行為。",
-    "input": "指定 milestone 的故事文件、穩定 US IDs、vision 與 shared constraints。",
-    "output": "ProductRequirement issues、來源文件與故事連結、原生 milestone 與 saved PRDs View；M／US labels 選用。",
-    "check": "每個 PRD 聚焦一致 task；讀回來源索引、故事連結、milestone、Category 與 View membership。",
-    "example": "$linearboard create-PRDs PocketScheduler M1",
-    "limit": "新票 Backlog；不實作、不 dispatch，unresolved 不視為 approved。"
-  },
-  {
-    "name": "prd-demystify",
-    "title": "逐題釐清 PRD 決策",
-    "phase": "需求",
-    "effect": "更新原 PRDs",
-    "view": "無",
-    "when": "存在會影響 product behavior、scope 或 data result 的 unresolved decisions。",
-    "input": "Milestone PRDs、來源故事、既有回答與未決範圍。",
-    "output": "確認後直接修訂擁有規則的 PRD，必要時保留原生留言；不新增 QA 文件。",
-    "check": "一次一題；已確認答案反映於規則與驗收，未回答仍標未決；保留既有 QA history。",
-    "example": "$linearboard prd-demystify PocketScheduler M1",
-    "limit": "一次一題；可 defer 或 pause；技術實作問題留在 engineering issue。"
+    "effect": "寫入 PRDs 與 View；開始即時問答",
+    "view": "PRDs",
+    "when": "已有分組故事，要定義產品規則或釐清關鍵決策時。",
+    "input": "原生里程碑、有穩定 ID 的分組故事，以及已確認的產品規則。",
+    "output": "具來源連結的 ProductRequirement issues 與已保存的 PRDs View。接著一次問一個關鍵問題，優先使用可選答案卡片，否則使用 Markdown 問答格式。",
+    "check": "核對里程碑、M／US 標籤、故事連結與 View 成員。每次回答後，核對原 PRD 內文的規則及驗收條件，以及原生留言中的答案。",
+    "example": "$linearboard create-PRDs \u003cProject> \u003cMilestone>\n使用此里程碑的分組故事，核對保存的 PRDs 與 View，再詢問第一個會影響行為或驗收的未決問題。",
+    "limit": "新票從 Backlog 開始。在同一段對話回覆即可接續。未回答的決策維持未定，不另建 QA 文件。"
   },
   {
     "name": "create-designs",
-    "title": "建立設計文件",
+    "syntax": "create-designs \u003cProject> \u003cMilestone>",
+    "title": "比較三種品牌方向並記錄選擇",
     "phase": "設計",
-    "effect": "寫入 2 份 documents",
-    "view": "無",
-    "when": "把需求轉成 screen、flow、interaction 與 state specification。",
-    "input": "故事文件、PRDs、已確認決策與可用技術背景。",
-    "output": "Design overview 與 screen／interaction specification Project Documents。",
-    "check": "入口、出口、actions、normal／loading／empty／error states 可追到來源規則。",
-    "example": "$linearboard create-designs PocketScheduler M1",
-    "limit": "Document-only；不建立 Design issues／View，也不執行 create-visuals。"
+    "effect": "本機提案；選定後寫入文件",
+    "view": "—",
+    "when": "有使用者可見的範圍，尚未確認風格方向時。",
+    "input": "既有設計文件或 brief、適用故事與 PRDs、目標平台及主要使用流程。",
+    "output": "正好三個可操作的 HTML／Tailwind／JS 方案與離線索引。明確選定風格後，於互相連結的 Design Overview 與 Screen and Interaction Specification 記錄確切版本。",
+    "check": "從索引開啟三版，以相同範例資料與目標寬度操作主要流程及返回路徑。選定後讀回兩份文件及風格規則。",
+    "example": "$linearboard create-designs \u003cProject> \u003cMilestone>\n使用既有設計背景或提供的 brief，展示同一操作流程的三個可操作方向，等我選擇。",
+    "limit": "選定版本前 LinearBoard 維持唯讀。同範圍及版本可重用已確認方向。不建 Design 票、不建 View、不改正式程式。"
   },
   {
     "name": "create-visuals",
-    "title": "產生與核准完整視覺",
+    "syntax": "create-visuals \u003cProject> \u003cMilestone>",
+    "title": "完成並審閱選定的設計",
     "phase": "設計",
-    "effect": "生成 gallery／授權後 upload",
-    "view": "核准後 {Project}-Designs",
-    "when": "先選擇本次 layout，再完成全部 screens／components 與 key states。",
-    "input": "Design documents、requirements、established theme 與 references。",
-    "output": "適量 representative layouts 或選定版型的 bounded edit，接續完成原定 gallery；完整設計核准後建立 Design tickets 與 View。",
-    "check": "版型選擇、完整覆蓋、上傳與完整設計核准分開；確切版本、gallery、Design tickets 與 View 皆讀回。",
-    "example": "$linearboard create-visuals PocketScheduler M1",
-    "limit": "新構圖通常比較 2–3 版；小修直接編輯已選版型。只上傳明確授權版本；不改既有狀態，upload 不等於 native attachment approval。"
+    "effect": "本機 HTML；核准後建立 Design 票",
+    "view": "Designs（完整核准後）",
+    "when": "兩份設計文件已記錄相符的確切風格版本時。",
+    "input": "create-designs 已記錄的確切風格及版本，以及範圍內畫面、元件及狀態清單。",
+    "output": "有版本的可操作 HTML 與離線索引。明確核准全套設計後，建立含原生 Approved JPG 的 Design 票與 Designs View。",
+    "check": "由索引操作指定目標上的各畫面及關鍵狀態。核准後核對畫面及版本、繼承的核准、各票 JPG 預覽及 View 成員。",
+    "example": "$linearboard create-visuals \u003cProject> \u003cMilestone>\n將已記錄的風格延伸到所有指定畫面與狀態，提供互動索引及確切版本清單供完整核准。",
+    "limit": "原型連結留在對話中。完整設計核准前，截圖須另行要求。對應核准範圍的確切 JPG 會繼承 Approved，其餘附件核准由使用者操作。"
   },
   {
     "name": "create-issues-FE",
-    "title": "建立 FrontEnd delivery issues",
+    "syntax": "create-issues-FE \u003cProject> \u003cMilestone>",
+    "title": "拆出前端交付責任",
     "phase": "交付",
-    "effect": "寫入 issues",
-    "view": "{Project}-FE",
+    "effect": "寫入 FE issues 與 View",
+    "view": "FE",
     "when": "把需求與 approved visuals 拆成 independently reviewable UI work。",
-    "input": "Stories、PRDs、design documents、exact approved visuals 與 repository context。",
-    "output": "FrontEnd issues、native milestone、Category 與來源連結；保留既有 labels 與 saved FE View；新票 Backlog。",
-    "check": "Routes、states、data effects、errors、accessibility、responsive scope、evidence requirements 與 exact visual version 完整。",
-    "example": "$linearboard create-issues-FE PocketScheduler M1",
-    "limit": "只建 FE 不授權 BE 或 dispatch；technical lookup 是內部流程。"
+    "input": "來源故事、PRDs、設計規格、確切核准的視覺版本與 \u003cRepo path>。",
+    "output": "FrontEnd delivery issues、驗收、來源、阻擋相依與 \u003cProject>-FE View。",
+    "check": "任務可獨立審閱；路由、狀態、資料效果與 UI 驗證目標清楚。確切視覺參照能從 issue 開啟。",
+    "example": "$linearboard create-issues-FE \u003cProject> \u003cMilestone>\n工程目錄：\u003cRepo path>\n根據既有來源與核准視覺建立或重用 FE issues、相依與 FE View。缺少必要來源就回報，不派工。",
+    "limit": "新票 Backlog；保留既有狀態。不自動建立 BE 或派工。技術查核在此指令內進行。"
   },
   {
     "name": "create-issues-BE",
-    "title": "建立 BackEnd delivery issues",
+    "syntax": "create-issues-BE \u003cProject> \u003cMilestone>",
+    "title": "拆出資料與服務責任",
     "phase": "交付",
-    "effect": "寫入 issues",
-    "view": "{Project}-BE",
+    "effect": "寫入 BE issues 與 View",
+    "view": "BE",
     "when": "把 confirmed data／service scope 拆成明確 ownership。",
-    "input": "Stories、PRDs、data boundaries、existing services 與 repository context。",
-    "output": "BackEnd issues、native milestone、Category 與來源連結；保留既有 labels 與 saved BE View；新票 Backlog。",
-    "check": "Shared contracts 有單一 owner；authorization、consistency、failure／retry／recovery 與 compatibility 有驗收。",
-    "example": "$linearboard create-issues-BE PocketScheduler M1",
-    "limit": "BackEnd 不自動代表 server／cloud；technical lookup 是內部流程。"
+    "input": "來源故事、PRDs、資料／服務邊界與既有工程實作。",
+    "output": "BackEnd delivery issues、共用契約 owner、相依與 \u003cProject>-BE View。",
+    "check": "檢查資料一致性、錯誤／重試／復原、權限與可觀察驗收；共用規則有單一負責票。",
+    "example": "$linearboard create-issues-BE \u003cProject> \u003cMilestone>\n工程目錄：\u003cRepo path>\n資料／服務邊界：\u003cConfirmed data and service scope>\n先查核現有實作與官方文件，建立或重用 BE issues 與 BE View，不派工。",
+    "limit": "BE 可能是 App 內資料／服務，不預設新增雲端或伺服器。新票 Backlog，不派工。"
   },
   {
     "name": "organize-task-batch",
-    "title": "整理 checkpoint batches",
+    "syntax": "organize-task-batch \u003cProject> \u003cMilestone> [issue IDs]",
+    "title": "依相依關係分批並加上標籤",
     "phase": "交付",
-    "effect": "唯讀",
-    "view": "無",
-    "when": "依 observable outcome 與 dependencies 組織既有 FE／BE issues。",
-    "input": "Project、milestone 或 issue IDs，以及完整 issue／dependency evidence。",
-    "output": "聊天中的 ordered batches：Batch Name、FE Issues、BE Issues、grouping reason、expected outcomes。",
-    "check": "每張 selected issue 恰好出現一次或有排除理由；links、prerequisites、blockers 與 verification scenario 清楚。",
-    "example": "$linearboard organize-task-batch PocketScheduler M1",
-    "limit": "不寫 LinearBoard、不排日期、不 dispatch；batch 不是 concurrent worker allocation。"
+    "effect": "寫入 Batch N 議題標籤",
+    "view": "—",
+    "when": "數張既有交付票需要依相依性排序時。",
+    "input": "此里程碑的既有 FE／BE 票，可選填確切 IDs。",
+    "output": "有順序的交付檢查點，包含議題連結、分組理由、阻礙及可觀察成果。每張符合條件的選定議題加上一個原生 Batch N 標籤。",
+    "check": "依團隊、專案、原生里程碑及 Batch N 篩選兩個分類，核對確切 IDs，確認保留其他標籤及狀態。",
+    "example": "$linearboard organize-task-batch \u003cProject> \u003cMilestone> \u003cIssue IDs>\n依可審閱成果將選定的交付票分批，套用 Batch N 標籤並核對成員。不派工。",
+    "limit": "說明「只預覽」即不寫入。獨立的交付批次紀錄須明確要求。分批不會派工。"
   },
   {
     "name": "dispatch",
-    "title": "派工指定 delivery issues",
+    "syntax": "dispatch \u003cProject> \u003cMilestone> [Batch \u003cn> | issue IDs]",
+    "title": "實作指定的交付範圍",
     "phase": "交付",
-    "effect": "派工／實作／驗證",
-    "view": "無",
-    "when": "使用者已授權 exact issue IDs 或既有 Batch，且 readiness preflight 通過。",
-    "input": "Ready FE／BE issues、canonical requirements、approved design、repository、target app 與 checks。",
-    "output": "最多三個 concurrent workers；validated plans、implementation reports、TPM independent evidence 與 review-ready In Review handoff。",
-    "check": "Worker scope 不重疊；先 acknowledged 再 release；actual target UI／service 驗證；Done 留給 user。",
-    "example": "$linearboard dispatch PocketScheduler M1 Batch 1",
-    "limit": "不擴張 issue selection；workers 不寫 LinearBoard；worker report 不是 acceptance evidence。"
+    "effect": "派工、實作與獨立驗證",
+    "view": "—",
+    "when": "已指定交付票或可解析的 Batch N，且可檢查執行目標時。",
+    "input": "已就緒的 FE／BE IDs，或能在專案與里程碑內解析成確切 IDs 的 Batch N；另需適用的已核准視覺及可操作的執行目標。",
+    "output": "派工紀錄、通過檢查的 worker 計畫、實作回報、TPM 獨立證據；可供審閱的工作到 In Review。",
+    "check": "從實際 App 正常入口驗證主要流程；報告結果、環境限制與 remaining checks，並讀回 issue 與派工紀錄。",
+    "example": "$linearboard dispatch \u003cProject> \u003cMilestone> \u003cIssue IDs>\n先檢查是否可派工，僅派送指定範圍。使用指定儲存庫及實際執行目標，獨立驗證後才交審。",
+    "limit": "未就緒時只做唯讀檢查。最多三位 worker，各負責一張範圍明確的票。一般派工由 TPM 寫入並獨立審查，Done 由使用者決定。"
   },
   {
     "name": "debug",
-    "title": "從回報到修復與驗證",
+    "syntax": "debug [Project] [Milestone] [report or issue IDs]",
+    "title": "在 BUG 票記錄並驗證修復",
     "phase": "維護",
-    "effect": "記錄／建票／實作／驗證",
-    "view": "{Project}-FE／BE",
-    "when": "處理使用者選定的 bug reports 或 FIX issues。",
-    "input": "Project／milestone、Bugs document 或 issue IDs、reproduction、expected behavior 與 target environment。",
-    "output": "Bugs Project Document 的 Datetime／User Report、bounded FIX issues、saved View、independent evidence 與文件原生結果留言。",
-    "check": "每張 FIX 指回正確 report batch／bullet；result comment 回連 FIX；readback 與 target verification 完成。 Bugs 文件先保存原始回報；在 Bugs 文件回寫結果，不以 issue 留言替代文件結果。",
-    "example": "$linearboard debug PocketScheduler M1 〈Bugs 文件或 issue IDs〉",
-    "limit": "Triage-only 要明說；Bugs document 不可用就停止，不另存本機或以 issue-only 取代。"
+    "effect": "寫入 BUG 票；只分流時不修復",
+    "view": "對應 FE 或 BE View",
+    "when": "有可辨識的問題回報或重現路徑時。",
+    "input": "問題觀察、預期行為及重現背景，或既有 issue IDs。",
+    "output": "coding agent 先建立或重用對應 BUG 票並記錄回報，再調查。修復後在同一張票留言：Status、Why、Action、Check。",
+    "check": "讀回回報、預期、來源連結與 FE／BE View。交審前確認代理的結果留言及 TPM 獨立驗證證據。",
+    "example": "$linearboard debug \u003cProject> \u003cMilestone> \u003cReport or issue IDs>",
+    "limit": "只分流時，核對 BUG 票及對應 FE 或 BE View 後停止。若 View 缺少則建立。行為有爭議或新增需求時，走 sync 審閱。"
   },
   {
     "name": "sync",
-    "title": "同步已確認 records",
+    "syntax": "sync \u003cProject> \u003cMilestone> [scope or new request]",
+    "title": "先提議紀錄變更，再依核准套用",
     "phase": "維護",
-    "effect": "更新授權範圍",
-    "view": "依範圍",
-    "when": "Canonical records 之間存在有證據的缺漏或 drift。",
-    "input": "Project、milestone、scope 與 confirmed owner records。",
-    "output": "差異報告與 verified updates，涵蓋 content、milestone、labels、relations、status 與 Views。",
-    "check": "Updated、already aligned、conflict、unverified 分開回報；每次 write 後 readback。",
-    "example": "$linearboard sync PocketScheduler M1",
-    "limit": "不靠較新 timestamp 自動勝出；不補造 history、不重設 progress、不實作。"
+    "effect": "明確核准前維持唯讀",
+    "view": "—",
+    "when": "新需求或已確認變更可能影響既有紀錄時。",
+    "input": "指定里程碑，可選填範圍、紀錄 IDs 或新需求。",
+    "output": "每筆受影響紀錄一組 from/to 提案。明確核准後，只套用已核准的變更並讀回。",
+    "check": "檢查範圍、關聯及驗收條件。若已核准更新 UI 證據，從實際 App 擷取缺漏或過時狀態，並在對應紀錄驗證圖片。",
+    "example": "$linearboard sync \u003cProject> \u003cMilestone> \u003cScope>\n每筆受影響紀錄列出一組 from/to 提案，等我核准。",
+    "limit": "執行指令只啟動審閱。任何寫入（含留言、上傳）都須先核准。不實作。"
   }
 ]
-  </script>
+</script>
 
   <script src="guide.js" data-guide-runtime defer></script>
 </body>

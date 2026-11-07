@@ -1,24 +1,14 @@
 # Story → PRD traceability
 
-Use this operation during `create-PRDs` verification and authorized metadata reconciliation. The canonical chain is **milestone document story entry → PRD issue → that story group's native milestone**. Source IDs are opaque stable strings, not numbers inferred from issue keys or list position. Native relations apply only to real legacy story issues; document entries are linked by their document URL and stable section ID. New M/US labels are unnecessary. Preserve existing labels and legacy links.
+Use this operation during `create-PRDs` verification and authorized metadata reconciliation. The canonical chain is **milestone document story entry → PRD issue → that story group's native milestone**. Source IDs are opaque stable strings, not numbers inferred from issue keys or list position. Native relations apply only to real legacy story issues; document entries are linked by their document URL and stable section ID. Apply the native milestone, its stable M-number tag and each mapped source-story tag. Reuse active team labels (for example, M1 and US1 for US-01); resolve ambiguous mappings before writing. Preserve unrelated labels. Preserve existing labels and legacy links.
 
-## Canonical indexes
+## Story groups and PRD sources
 
-`create-milestones` places one JSON block in its native milestone overview Project Document. It is a compact identity/grouping index alongside the readable grouped stories, not a separate database or local artifact:
+Read each story from its M-numbered section, the section’s native milestone link, and the explicit anchor immediately before its story heading. Preserve the story IDs across edits. Include a verified legacy issue link directly in the story when applicable. Older documents may retain their historical index. New documents require no index.
 
-```json
-{"schema":"linearboard-story-index-v1","stories":[{"id":"US-01","milestone_id":"<native milestone ID>","anchor":"us-01"}]}
-```
+Begin the purpose section with one visible **Source stories:** line. Link each exact stable story ID to its milestone-document URL and explicit anchor, for example `**Source stories:** [US-01](<document-url>#us-01)`. Put only declared source stories on that line. Keep machine schemas out of issue descriptions. Historical PRDs with the older fenced source record remain readable.
 
-Each anchor has an explicit `<a id="us-01"></a>` beside its readable story heading. Include `legacy_issue_id` only for a verified existing UserStory issue in the same project/milestone. Preserve established story prefixes and IDs on reruns. Renderer fragment navigation must be checked in the actual UI; if unsupported, the source link still names the stable story ID and owning document, and no working deep-link claim is made.
-
-Each new PRD contains one provenance block, plus readable links to all its source story entries:
-
-```json
-{"schema":"linearboard-prd-sources-v1","document_id":"<native milestone document ID>","story_ids":["US-01"]}
-```
-
-All source stories in one PRD belong to the same native milestone. If a proposed PRD crosses milestones, split it into milestone-scoped PRDs or resolve the grouping explicitly before creation. Do not choose a primary milestone arbitrarily. Existing cross-milestone/legacy PRDs without this index are reported for an authorized migration; never guess provenance from titles or labels.
+All source stories in one PRD belong to the same native milestone. If a proposed PRD crosses milestones, split it into milestone-scoped PRDs or resolve the grouping explicitly before creation. Do not choose a primary milestone arbitrarily. Existing cross-milestone/legacy PRDs without verifiable source links or historical metadata are reported for an authorized migration; never guess provenance from titles or labels.
 
 ## Audit and bounded repair
 

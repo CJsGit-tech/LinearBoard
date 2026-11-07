@@ -34,7 +34,7 @@ function initializeLinearBoardGuide() {
     const row = document.createElement('tr');
     row.dataset.phase = command.phase;
     row.dataset.search = Object.values(command).join(' ').toLowerCase();
-    row.innerHTML = `<td><a href="#cmd-${escapeHTML(command.name)}"><code>${escapeHTML(command.name)}</code></a></td><td>${escapeHTML(command.title)}</td><td>${escapeHTML(command.effect)}</td><td>${escapeHTML(command.view)}</td><td><button type="button" class="use-command" data-command="${escapeHTML(command.name)}">組合 ↗</button></td>`;
+    row.innerHTML = `<td><a href="#cmd-${escapeHTML(command.name)}"><code>${escapeHTML(command.syntax)}</code></a></td><td>${escapeHTML(command.title)}</td><td>${escapeHTML(command.effect)}</td><td>${escapeHTML(command.view)}</td><td><button type="button" class="use-command" data-command="${escapeHTML(command.name)}">組合 ↗</button></td>`;
     $('catalog').append(row);
 
     const card = document.createElement('article');
@@ -59,26 +59,36 @@ function initializeLinearBoardGuide() {
     const ids = $('issueids').value.trim();
     const batch = $('batch').value.trim();
     const validBatch = /^[1-9]\d*$/.test(batch);
+    const projectIsContext = ['planning', 'create-vision-document', 'create-milestones'].includes(command.name);
+    $('project-field').hidden = command.name === 'help';
+    $('milestone-field').hidden = !command.syntax.includes('<Milestone>');
+    $('repo-field').hidden = command.name !== 'init';
+    $('sync-field').hidden = command.name !== 'sync';
     $('dispatch-scope-field').hidden = command.name !== 'dispatch';
     $('batch-field').hidden = command.name !== 'dispatch' || scope !== 'batch';
     $('issue-field').hidden = !(command.name === 'organize-task-batch' || (command.name === 'dispatch' && scope === 'issues'));
     $('issue-label').textContent = command.name === 'organize-task-batch' ? 'Issue IDs（選填）' : 'Issue IDs（必填）';
     $('debug-field').hidden = command.name !== 'debug';
 
-    let args = command.name === 'help' ? '' : ` ${project}`;
-    if (!['help', 'planning', 'create-vision-document', 'create-milestones'].includes(command.name)) args += ` ${milestone}`;
+    let args = command.name === 'help' || projectIsContext ? '' : ` ${project}`;
+    if (command.syntax.includes('<Milestone>')) args += ` ${milestone}`;
+    const repo = $('repo').value.trim();
+    if (command.name === 'init' && repo) args += ` ${repo}`;
     if (command.name === 'organize-task-batch' && ids) args += ` ${ids}`;
     if (command.name === 'dispatch' && scope === 'batch') args += ` Batch ${validBatch ? batch : '〈批次編號〉'}`;
     if (command.name === 'dispatch' && scope === 'issues') args += ` ${ids || '〈issue IDs〉'}`;
-    if (command.name === 'debug') args += ` ${$('debugsource').value.trim() || '〈Bugs 文件或 issue IDs〉'}`;
+    if (command.name === 'debug') args += ` ${$('debugsource').value.trim() || '〈問題回報或 issue IDs〉'}`;
+    const syncScope = $('scope').value.trim();
+    if (command.name === 'sync' && syncScope) args += ` ${syncScope}`;
     let prompt = `$linearboard ${command.name}${args}`;
+    if (projectIsContext && $('project').value.trim()) prompt += `\n專案背景：${project}`;
     const extra = $('additional').value.trim();
     if (extra) prompt += `\n${extra}`;
     $('built').textContent = prompt;
     $('builder-help').textContent = `${command.effect} · ${command.when} ${command.limit}`;
   }
 
-  ['action','project','milestone','dispatchscope','batch','issueids','debugsource','additional'].forEach(id => $(id).addEventListener('input', build));
+  ['action','project','milestone','dispatchscope','batch','issueids','repo','scope','debugsource','additional'].forEach(id => $(id).addEventListener('input', build));
   build();
 
   document.addEventListener('click', async event => {

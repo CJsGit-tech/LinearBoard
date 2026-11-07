@@ -5,15 +5,16 @@ Read this reference before spawning any coding agent. `dispatch` is an implement
 ## Invocation and bounded selection
 
 - Parse a command only when the user asks to run dispatch. Editing or explaining the skill, or quoting an example, does not start implementation.
-- A dispatch request authorizes readiness preflight for its bounded selection, not creation of missing upstream artifacts. Product-decision completion alone is never dispatch readiness. If design records, approved UI references, FE/BE issues, execution access or another material input is missing, leave the affected issues unchanged, report the exact missing gate and recommend the first incomplete applicable command using [the skill router](../SKILL.md#next-command-selection-and-recommendation). Do not run that upstream command automatically, and do not keep recommending dispatch as the immediate next action until the gate is satisfied.
+- A dispatch request authorizes readiness preflight for its bounded selection, not creation of missing upstream artifacts. Product-decision completion alone is never dispatch readiness. If design records, approved UI references, FE/BE issues, execution access or another material input is missing, leave the affected issues unchanged, report the exact missing gate and recommend the first incomplete applicable command using [the skill router](../SKILL.md#next-command-selection-and-recommendation). If a supported upstream command can resolve the blocker, recommend that command. If user action or access is needed, name the exact prerequisite. When resuming is possible, keep the original batch or issue selection in any conditional dispatch recommendation.
 - `dispatch <Project> <Milestone> [Batch <n> | issue IDs]`: the explicit arguments control the scope. Resolve the exact LinearBoard project/team and native milestone, including milestone aliases such as `M1`. Do not substitute the current browser View, latest milestone, previous batch, working-directory name or remembered project.
 - With no batch or issue IDs, inventory all existing FrontEnd/BackEnd implementation issues in that project’s native milestone, with pagination. Apply status eligibility and readiness separately; include both FE and BE rather than only the visible View. Report excluded and unready issues with reasons. If none are eligible and ready, report no dispatchable work without reopening review/completed tickets or creating replacement work.
-- With `Batch <n>`, resolve only that batch’s exact issue IDs from the previously established task-batch proposal in the conversation or an explicitly saved LinearBoard record. Verify each issue’s project and native milestone. A batch number is not permission to select the entire milestone or regroup it silently. If its definition is unavailable or conflicting, ask for the missing batch boundary.
+- With `Batch <n>`, resolve the exact active team label `Batch <n>`, then query both FE and BE issues by the resolved project, native milestone and label ID with full pagination. Freeze the resulting IDs before readiness checks. Reject multiple batch tags on a member. When a saved batch exists, compare its IDs to tagged membership and pause on disagreement or partial tagging. For historical untagged batches only, use an unambiguous saved or previously agreed exact selection after checking scope. Never expand an empty or ambiguous batch to the whole milestone.
 - With issue IDs, include only those IDs and verify their project/milestone membership. Existing `dispatch <issue IDs>` and other explicitly bounded selections remain supported; resolve omitted project/milestone from current records. Ask only when a material boundary is ambiguous.
 - Before spawning, state the resolved project/team, native milestone, optional batch, exact issue-ID snapshot and execution target. This is a scope statement, not a repeated approval request.
 - Work only within the resolved snapshot. Do not enroll newly created tickets or out-of-scope prerequisites automatically. Report outside-scope blockers and continue independent ready work.
+- A batch invocation authorizes the full frozen membership as the work scope. Start ready prerequisites first and keep internally dependent issues in that same invocation. Recheck and start a dependent issue when its prerequisite contract has been verified and its own readiness gates pass. No second dispatch request is needed for that issue. Report any issue that remains unready and the prerequisite that still prevents it from starting.
 - Inspect current assignment comments and live agent/thread/worktree evidence before spawning. Reuse or wait for an authorized live assignment with the same scope; never spawn a second worker for the same ticket or steal ownership. A stale comment alone does not prove a worker is running. If activity cannot be determined, report that ticket as unresolved rather than duplicate it.
-- Approved images, design documents/screen specifications, PRDs and US are sufficient product inputs when they cover the assigned scope. A Design issue, clickable prototype or separate Technical Baseline is not mandatory. Use [the visual approval gates](create-visuals.md#design-approval-and-native-attachment-state): exact-scope recorded design approval plus accessible exact images is sufficient; the native attachment field remains separately user-controlled. Read existing applicable technical documents; do not require new ones as a ritual.
+- Approved images, design documents/screen specifications, PRDs and US are sufficient product inputs when they cover the assigned scope. A Design issue or clickable prototype is optional. Use [the visual approval gates](create-visuals.md#design-approval-and-native-attachment-state): exact-scope recorded design approval plus accessible exact images is sufficient; the native attachment field remains separately user-controlled. Read applicable technical decisions in the owning frontend or backend tickets.
 
 ## Product integration and execution target
 
@@ -31,9 +32,11 @@ Give each shared contract (data model, stable identity, file format or service i
 
 ## Status eligibility
 
-Dispatch is prohibited only for issues whose current status is `Canceled`, `In Review`, or `Done`. Every other team status is status-eligible; do not exclude an issue based on another status name alone. Status eligibility does not waive the readiness gate: unresolved material blockers, dependencies, missing scope, or missing required inputs still make an issue unready.
+Dispatch is prohibited only for issues whose current status is `Canceled`, `Duplicate`, `In Review`, or `Done`. Every other team status is status-eligible; do not exclude an issue based on another status name alone. Status eligibility does not waive the readiness gate: unresolved material blockers, dependencies, missing scope, or missing required inputs still make an issue unready.
 
 ## Dispatch readiness gate
+
+Use [shared change review](change-review.md) to baseline source versions, respond immediately to mid-build changes, and compare the latest criteria and references immediately before In Review.
 
 Retrieve each target issue and its canonical LinearBoard sources. Dispatch only when material product inputs and execution access are available; explicitly owned engineering research may remain as planned work:
 
@@ -80,7 +83,7 @@ Preserve applicable repository and conditionally loaded project-specific deliver
 
 Use [review handoff and final acceptance](../SKILL.md#review-handoff-and-final-acceptance) to distinguish review readiness from final acceptance. A narrow evidenced environment limitation can accompany `In Review`; unresolved product defects or essential verification gaps cannot.
 
-Coding agents never write to LinearBoard. They report only to the TPM. The TPM is the sole LinearBoard writer for dispatched work.
+For ordinary dispatch the TPM writes to LinearBoard. Under `debug`, the assigned coding agent creates or reuses its BUG ticket, records the report and expectation, and posts its own result comment directly on that ticket. The TPM retains independent verification and review transitions.
 
 ```text
 LinearBoard issue ready

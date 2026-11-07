@@ -22,10 +22,10 @@
 <p>Content containing HTML stays in Markdown mode so its source is preserved. Use <strong>Save document</strong> explicitly. Comments have their own Post comment action. Revision history retains earlier versions. Use <strong>Back</strong> or <strong>Alt+←</strong> to return from a record; reopening and navigation read current data from the app.</p>
 <h2>Attach files and record evidence</h2>
 <p>Under an issue or document, choose <strong>Add attachment</strong>. Upload a file up to 15 MB or provide an HTTP(S) link. Add screen and version identifiers where applicable. Images recognized as PNG or JPEG can display inline; other files are offered as downloads.</p>
-<p>Review labels distinguish Draft, Approved, Superseded, and Verification evidence. Approval of a visual reference is a user action. An uploaded image alone does not establish design approval or prove that a product was implemented.</p>
+<p>Review labels distinguish Draft, Approved, Superseded, and Verification evidence. For skill-driven design, exact JPGs registered against the user’s complete-set approval inherit Approved on their owning Design tickets. The user controls approval of other attachments. Keep prototype links in chat and link to the Approved JPGs from LinearBoard records. An uploaded image alone does not establish design approval or prove that a product was implemented.</p>
 <p>Use <strong>Record verification</strong> to capture a criterion, environment, result, and observations. Keep failed or untested checks visible. <strong>In Review</strong> means ready for the user&#39;s review; <strong>Done</strong> is the user&#39;s acceptance decision.</p>
 <h2>Delivery batches and dispatch records</h2>
-<p>Open <strong>Delivery</strong> in the sidebar. Create batches from FrontEnd or BackEnd issues, recording the rationale, expected output, checks, and blockers. A dispatch owns one issue and records an execution target, scope, reviewed plan, worker report, and independent TPM verification.</p>
+<p>Open <strong>Delivery</strong> under the selected project in the sidebar. For the app’s separate saved batch records, create batches from FrontEnd or BackEnd issues, recording the rationale, expected output, checks, and blockers. A dispatch owns one issue and records an execution target, scope, reviewed plan, worker report, and independent TPM verification.</p>
 <p>At most three dispatches may be active. The same issue cannot have duplicate active assignments. A reviewed plan is required before execution, and a completion report is required before marking a dispatch completed. These records do not run agents; execution and independent product inspection happen through external tools.</p>
 <h2>Trash and backups</h2>
 <p>Deletion first shows an impact preview. Moving an issue to trash includes its descendants; deleting a project includes its owned records. In <strong>Workspace settings → Trash</strong>, restore a deletion batch or permanently delete it. Restore required teams, projects, and parent records first. Permanent deletion cannot be undone; old backups may retain the data.</p>
@@ -39,60 +39,25 @@
 <th>Purpose</th>
 </tr>
 </thead>
-<tbody><tr>
-<td><code>help</code></td>
-<td>List available commands.</td>
-</tr>
-<tr>
-<td><code>planning</code></td>
-<td>Discuss an idea; save only when requested.</td>
-</tr>
-<tr>
-<td><code>create-vision-document</code></td>
-<td>Save the project vision.</td>
-</tr>
-<tr>
-<td><code>create-milestones</code></td>
-<td>Define milestones and grouped stories.</td>
-</tr>
-<tr>
-<td><code>create-PRDs</code></td>
-<td>Create linked requirement issues and their View.</td>
-</tr>
-<tr>
-<td><code>prd-demystify</code></td>
-<td>Clarify consequential requirement decisions.</td>
-</tr>
-<tr>
-<td><code>create-designs</code></td>
-<td>Write the design overview and interaction specification.</td>
-</tr>
-<tr>
-<td><code>create-visuals</code></td>
-<td>Produce and inspect visual studies, then follow the approval gates.</td>
-</tr>
-<tr>
-<td><code>create-issues-FE</code> / <code>create-issues-BE</code></td>
-<td>Create the authorized delivery issues and Views.</td>
-</tr>
-<tr>
-<td><code>organize-task-batch</code></td>
-<td>Propose dependency-aware checkpoints without writing records.</td>
-</tr>
-<tr>
-<td><code>dispatch</code></td>
-<td>Execute the selected ready issues and independently verify them.</td>
-</tr>
-<tr>
-<td><code>debug</code></td>
-<td>Log user reports, create linked fixes, and verify the selected scope.</td>
-</tr>
-<tr>
-<td><code>sync</code></td>
-<td>Reconcile confirmed records and current UI evidence.</td>
-</tr>
+<tbody>
+<tr><td><code>init &lt;Project&gt; [repository path]</code></td><td>Safely set up repository AGENTS.md and project agents. It does not write product records or install hooks.</td></tr>
+<tr><td><code>help</code></td><td>List commands and purposes offline.</td></tr>
+<tr><td><code>planning</code></td><td>Discuss the product and briefly check a chosen stack against official sources. Save only when requested.</td></tr>
+<tr><td><code>create-vision-document</code></td><td>Save the 4W1H vision in a native Project Document.</td></tr>
+<tr><td><code>create-technical-baseline &lt;Project&gt;</code></td><td>Record shared technical requirements, feasibility, limits, and open decisions when needed.</td></tr>
+<tr><td><code>create-milestones</code></td><td>Create native milestones and a document with grouped user stories.</td></tr>
+<tr><td><code>create-PRDs &lt;Project&gt; &lt;Milestone&gt;</code></td><td>Save linked requirement issues and their View. Then clarify one decision at a time using a selectable question card when available. Verify the answer in the owning PRD body and comment.</td></tr>
+<tr><td><code>create-designs &lt;Project&gt; &lt;Milestone&gt;</code></td><td>Compare three runnable proposals. After explicit style selection, record the chosen version in both design documents.</td></tr>
+<tr><td><code>create-visuals &lt;Project&gt; &lt;Milestone&gt;</code></td><td>Extend the recorded style to the full scoped HTML set. After complete-set approval, verify Design tickets, their native Approved JPGs, and the Designs View.</td></tr>
+<tr><td><code>create-issues-FE &lt;Project&gt; &lt;Milestone&gt;</code></td><td>Create or revise frontend issues and their View. New issues start in Backlog.</td></tr>
+<tr><td><code>create-issues-BE &lt;Project&gt; &lt;Milestone&gt;</code></td><td>Create or revise backend issues and their View. New issues start in Backlog.</td></tr>
+<tr><td><code>organize-task-batch &lt;Project&gt; &lt;Milestone&gt; [issue IDs]</code></td><td>Order checkpoints, apply Batch N labels, and verify exact issue membership. Ask for preview-only to skip writes.</td></tr>
+<tr><td><code>dispatch &lt;Project&gt; &lt;Milestone&gt; [Batch &lt;n&gt; | issue IDs]</code></td><td>Check readiness, implement only the selected FE/BE issues, and independently verify the result.</td></tr>
+<tr><td><code>debug [Project] [Milestone] [report or issue IDs]</code></td><td>Have the coding agent record and investigate a defect on its BUG ticket and post the result there. Triage-only stops after verifying the ticket and its matching FE or BE View. Create the View if missing.</td></tr>
+<tr><td><code>sync &lt;Project&gt; &lt;Milestone&gt; [scope or new request]</code></td><td>Show one from/to proposal per affected record and wait for explicit approval before applying any changes.</td></tr>
 </tbody></table>
-<p>Use the installed skill&#39;s instructions as the workflow authority. The API&#39;s capability catalog may include legacy commands; a listed capability does not prove that the corresponding external workflow has been verified. Missing requirements, references, or approvals remain unresolved until supported by evidence.</p>
+<p>Start at the first unfinished applicable step and reuse existing verified records. The final <strong>Recommended next step:</strong> line identifies the reply needed to resume a pending command, the exact next command, or the immediate action when no command applies. A recommendation does not authorize work.</p>
+<p>Use the installed skill&#39;s instructions as the workflow authority. The API&#39;s capability catalog lists the supported commands and their data contracts. Codex runs the workflow and verifies each result. When you choose approved static visuals, proceed to delivery issues once accessible JPGs and recorded approval cover the exact scope and version.</p>
 <h2>MCP and API</h2>
 <p>Start the app, then configure <code>python3 /absolute/path/to/LinearBoard/mcp_server.py --url http://127.0.0.1:8765</code> as a stdio server in your MCP client. Use <strong>Integration and commands</strong> to inspect tools and contracts.</p>
 <p>List operations are paginated. Updates require the current <code>expected_version</code>. Reuse the same idempotency key and identical payload for a retry. API clients can request English validation errors with <code>Accept-Language: en</code>; record content remains unchanged.</p>

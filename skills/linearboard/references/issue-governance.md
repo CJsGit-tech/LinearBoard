@@ -16,7 +16,7 @@ Every new issue, and every reused or restored issue within an authorized creatio
 
 Category describes responsibility; Status describes progress. Project Documents have no issue category. Do not invent another category or create workflow states for categories.
 
-Read the team's accessible labels and groups. Reuse the active `Category` group and exact child; create a missing team-scoped group or child only within an authorized issue-creation scope. Never apply the group container, reuse an unrelated same-named label, reparent a shared label or create a duplicate group. Include the category on creation with applicable role labels and any explicitly requested legacy M/US labels, then retrieve the issue and verify exactly one Category child. Add a missing category to a reused issue only when the command authorizes that metadata repair; preserve unrelated fields and labels.
+Read the team's accessible labels and groups. Reuse the active `Category` group and exact child; create a missing team-scoped group or child only within an authorized issue-creation scope. Never apply the group container, reuse an unrelated same-named label, reparent a shared label or create a duplicate group. Include the category on creation with applicable role labels and the milestone and mapped source-story tags, then retrieve the issue and verify exactly one Category child. Add a missing category to a reused issue only when the command authorizes that metadata repair; preserve unrelated fields and labels.
 
 `create-designs` creates documents only. `create-visuals` creates or reuses Design issues only after explicit approval of its complete requested design set; follow [post-approval Design tickets](create-design-tickets.md). Earlier exploration and generation never create Design issues. Preserve existing legacy records unless their reuse is authorized by that stage.
 
@@ -28,7 +28,7 @@ Place a tangible **Expected output** section near the top. Use unchecked task-li
 
 User stories use `{stable story ID} — {user outcome}`. PRDs use `{stable PRD ID} — {capability or outcome}`. They do not use delivery prefixes.
 
-Debug issues use `FIX {feature} — {specific outcome}`. Other new or explicitly renamed delivery issues use:
+Debug issues use `BUG {feature} — {observed problem}`. Other new or explicitly renamed delivery issues use:
 
 ```text
 {Prefix} — {Screen or capability} [v#] — {shared outcome}
@@ -65,7 +65,7 @@ Retrieve every affected record and verify only the fields applicable to the comm
 
 - exact team, project, milestone and canonical identity;
 - rendered content and accessible attachments;
-- required Category/role labels and preserved optional M/US labels and exactly one Category child;
+- required Category/role labels and verified milestone and mapped source-story tags and exactly one Category child;
 - source-story, PRD, dependency and supersession relations;
 - preserved lifecycle state and unrelated labels/relations;
 - saved View placement, filters and complete expected membership for issue-creation commands;

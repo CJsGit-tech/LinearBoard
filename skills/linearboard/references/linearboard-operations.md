@@ -6,7 +6,7 @@ Use this reference for issue CRUD, document creation or revision, synchronizatio
 
 LinearBoard is the authoritative location for all product-management items. Never create a local mirror, backlog, project plan, requirements document, ticket export, status ledger, traceability matrix, or agent-report archive. If LinearBoard cannot be reached or written, stop and report the blocker.
 
-The repository may contain application source code, application-required artifacts, and engineering instructions such as `AGENTS.md`. Product-management records belong in LinearBoard. A local task-owned upload intermediate is allowed only when direct LinearBoard entry is impossible; delete it after retrieving LinearBoard and verifying the uploaded canonical copy.
+The repository may contain application source code, application-required artifacts, and engineering instructions such as `AGENTS.md`. Both design commands keep versioned runnable drafts, assets, fixtures and an offline index in isolated local bundles. Keep screenshots and capture metadata there when capture was explicitly requested. Share local gallery and prototype links in chat. Keep local filesystem paths, file URLs and copyable prototype addresses out of LinearBoard documents, issues and comments. Product-management records belong in LinearBoard. Other task-owned upload intermediates are allowed only when direct entry is impossible; delete them after verifying the canonical copy.
 
 For `sync`, also apply the bounded difference classification and reconciliation contract in [sync](sync.md). Dispatch records its own validated plans, research decisions and evidence automatically; cross-record repairs follow the authorized sync scope.
 
@@ -25,19 +25,19 @@ Before a write:
 
 | Item | LinearBoard destination |
 | --- | --- |
-| PRD | Native requirement issue; source milestone document/story IDs and readable links, matching native milestone; Related links only to actual legacy issue sources; M/US labels optional |
-| Technical Baseline | Canonical project document titled `Technical Baseline — [Product] [Stage]` |
+| PRD | Native requirement issue; source milestone document/story IDs and readable links, matching native milestone; Related links only to actual legacy issue sources; required milestone and mapped source-story tags |
 | Vision and selling points | Native Project Document linked to its project |
-| Milestone overview | Native Project Document based on the vision, owning grouped story entries and the structural story index |
+| Technical baseline | One native Project Document per project, reused by identity, with shared technical decisions and evidence |
+| Milestone overview | Native Project Document based on the vision, owning story entries grouped under numbered milestone headings |
 | Milestone | Native project milestone; a heading or label alone is insufficient |
 | User story | Stable entry with explicit anchor and core acceptance in the milestone Project Document, indexed by native milestone ID; existing UserStory issues remain legacy |
 | User expectation test | Story-entry core acceptance and detailed PRD acceptance; existing legacy `TC-xx` cases may also apply |
-| Design overview and screen/interaction specification | Two native Project Documents maintained by document-only `create-designs`, linked to each other and source US/PRDs through stable screen/flow entries; no Design issue or View |
-| Design reference | Canonical specification entry with screen/version, accessible exact image and recorded design approval; report the separate native attachment field accurately; no intermediate work ticket |
-| Final prototype visual | Image attachment on the owning screen/interaction specification document, with screen/version metadata and source US/PRD links; attach only explicitly selected, upload-authorized finals; recorded exact-scope design approval follows create-visuals, while native attachment approval requires user action and readback |
+| Design overview and screen/interaction specification | Two native Project Documents updated by `create-designs` only after the user selects a locally reviewed proposal, linked to each other and source US/PRDs through stable screen/flow entries; no Design issue or View |
+| Design reference | Canonical specification entry with screen/version, links to the owning Design issue or its native Approved JPGs, and recorded design approval; report the separate native attachment field accurately; no intermediate work ticket |
+| Final mockup visual | Keep the versioned runnable original. After complete-set approval, upload confirmed JPG images directly to each owning Design issue and verify the rendered previews under [Design tickets](create-design-tickets.md). Link the issue gallery from the specification. Confirmed Design JPGs inherit the recorded visual-set approval as described in the Design-ticket workflow. Other manual approvals belong to the user. |
 | Screen-specific DESIGN.md handoff | Explicitly requested rendered LinearBoard handoff linked from the owning screen specification entry and final visual; include source story/cases, visual-critical details, and missing asset/icon guidance when requested |
-| Bug report (`debug`) | Native project Bugs Project Document; find/reuse or create if absent, append Datetime / User Report bullets in the existing style before FIX work; analysis and acceptance remain in FIX issues |
-| Debug result feedback | Native comment on that Bugs document after independent verification, grouped by report batch with FIX links and concise results; detailed evidence remains on the owning FIX issue |
+| Bug report (`debug`) | Coding agent creates or reuses the owning BUG ticket and records the user report, expectation and affected source links. |
+| Debug result feedback | Coding agent comments directly on that BUG ticket with status, cause, action and verification, then reads back the comment. |
 | Implementation report | Comment on the corresponding delivery issue |
 | Verification evidence | Comment or attachment on the corresponding issue |
 | Current UI screenshots during sync | Verified evidence attachments with a current screenshot section on affected issues and a linked owning screen-specification index; preserve earlier images as history |
@@ -63,18 +63,18 @@ Read capability `resources` for exact fields and `statuses_by_team` from `/api/s
 - `linearboard_create`: `{kind,data,idempotency_key}`. Search before create; use a stable key for the same logical attempt. The server does not deduplicate identical titles automatically.
 - `linearboard_update`: `{kind,id,data,idempotency_key}` with `data.expected_version` from the latest read. On conflict, re-read and reconcile; never force-write a stale draft. Retrying a lost response reuses the original payload/version/key, not a new version with an old key. After a write independently read back identity, fields and relationships.
 - Project Documents use `documents` with `project_id`, optional `milestone_id`, `doc_type`, `title`, `body` (Markdown rendered by the UI). Comments target `documents`, `issues`, or `projects` through `target_kind` and `target_id`.
-- Native milestone association is `milestone_id`; category is the exact enum UserStory / ProductRequirement / Design / FrontEnd / BackEnd. Creation automatically adds its Category child; preserve existing M/US/Coder label IDs; new M/US labels are optional and verify exactly one Category child.
+- Native milestone association is `milestone_id`; category is the exact enum UserStory / ProductRequirement / Design / FrontEnd / BackEnd. Creation automatically adds its Category child; preserve existing M/US/Coder label IDs; apply the milestone and mapped source-story tags and verify exactly one Category child.
 - Relations use `{source_id,target_id,relation}` with related / blocks / supersedes / duplicate. A related relation is reciprocal in the UI; do not create an extra reverse duplicate. Blocks direction is blocker to blocked issue. Document links remain Markdown record links.
 - Batches optionally persist explicitly authorized checkpoint proposals via `batches`; dispatches are separate `dispatches`, each with exactly one FE/BE issue and a maximum of three active assignments. Store the acknowledgement/plan in review state, then the TPM-accepted plan before executing; record worker reports and independent verification separately. A dispatch row does not spawn a worker.
 - Evidence uses `evidence` with project/issue, criterion, environment, result and body; actual evidence and external tool output must substantiate every Pass.
 - Do not invent cycles, estimates, permissions, user directories or other absent Linear SaaS features. Assignee is an application string. Placement is tabs or shared within the selected application project.
-- Automation cannot set Done or set the native attachment approval field. The final user controls those UI actions; do not spoof `X-LinearBoard-Actor:user` in the client. An actual user design approval in chat may be recorded as exact-scope evidence under the create-visuals gates; recording it is not setting that native field.
+- Automation cannot set Done. Confirmed Design JPGs may inherit an existing user approval through the verified Design-ticket workflow. The final user controls those UI actions; do not spoof `X-LinearBoard-Actor:user` in the client. An actual user design approval in chat may be recorded as exact-scope evidence under the create-visuals gates; recording it is not setting that native field.
 
 ## Image attachments
 
-LinearBoard has no signed-upload prepare/PUT/finalize workflow. For an authorized file, create `attachments` with target_kind, target_id, name, MIME, screen/version metadata, and content_base64 (maximum decoded size 15 MB), or external_url for an accessible HTTP(S) reference. Local filesystem paths alone are not accessible record attachments. Use draft for unapproved visuals and evidence for verified implementation captures. Only the user marks the native attachment field approved in the application; read back that field before describing it as natively approved. Recorded exact-scope design approval from chat follows [the visual approval gates](create-visuals.md#design-approval-and-native-attachment-state) and does not change the native field. Do not impersonate the user to bypass the server gate.
+LinearBoard has no signed-upload prepare/PUT/finalize workflow. For an authorized file, create `attachments` with target_kind, target_id, name, MIME, screen/version metadata, and content_base64 (maximum decoded size 15 MB), or external_url for an accessible HTTP(S) reference. Use native Approved JPGs and links to their owning LinearBoard records for design review. Use draft for unapproved visuals and evidence for verified implementation captures. Except for confirmed Design JPGs inheriting their recorded approval, only the user marks the native attachment field approved in the application; read back that field before describing it as natively approved. Recorded exact-scope design approval from chat follows [the visual approval gates](create-visuals.md#design-approval-and-native-attachment-state) and does not change the native field. Do not impersonate the user to bypass the server gate.
 
-Read back the attachment, then open `/api/files/{attachment_id}` and the owning record in the actual UI. Link/render the returned file URL using Markdown image syntax in the exact authorized issue/document section. For evidence requiring JPG, convert and inspect before upload; original imagegen design artifacts remain unchanged. Verify titles, version, target identity and visible image. Clean up only task-owned temporary upload staging after successful readback, retaining the read-only gallery exception.
+Read back the attachment and compare downloaded bytes with the selected capture, then open `/api/files/{attachment_id}` and the owning record in the actual UI. Link/render that file URL in the exact authorized document/issue section. Verify actual format/MIME, title, version, ownership and visible image; keep capture scenario/viewport provenance in rendered content, using only supported attachment fields. For required JPG conversion, inspect the derivative and retain the original capture; preserve legacy design originals. Clean up temporary staging after successful readback, retaining the visual-review bundle exception.
 
 ## Saved Views
 
@@ -125,7 +125,7 @@ Use [issue governance](issue-governance.md#status-authority). A status change mu
 
 ## Dispatch-related transitions
 
-Use [coding dispatch](coding-dispatch.md) for the worker lifecycle and [issue governance](issue-governance.md#status-authority) for transitions. Workers never write LinearBoard. Read [PocketStocks delivery exception](pocketstocks-delivery.md) only when that resolved project and UI scope apply.
+Use [coding dispatch](coding-dispatch.md) for the worker lifecycle and [issue governance](issue-governance.md#status-authority) for transitions. For ordinary dispatch the TPM writes to LinearBoard. Under `debug`, the assigned coding agent creates or reuses its BUG ticket, records the report and expectation, and posts its own result comment directly on that ticket. The TPM retains independent verification and review transitions. Read [PocketStocks delivery exception](pocketstocks-delivery.md) only when that resolved project and UI scope apply.
 
 ## Post-write audit
 

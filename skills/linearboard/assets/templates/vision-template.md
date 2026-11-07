@@ -1,27 +1,27 @@
 # Vision Project Document template
 
-Create/reuse a native Project Document titled `[Product] 產品願景` or its established title, based on Planning. Use 4W1H in the user's language; keep unsupported details explicitly unknown.
+Reuse the established document title. For a new document, use the English title `<Idea> — Product Vision`.
 
-## What — 產品／遊戲願景
+Use these five visible Markdown headings in the saved document by default. Replace each drafting prompt with concise prose in the user’s terms. Include only details that describe the intended idea or experience.
 
-The product and central value, or the intended game/play experience.
+Before saving, identify the few phrases a reader should remember: the main benefit, each actor’s responsibility, and any rule that changes the outcome. Bold those phrases selectively. Use bullets for parallel roles or distinct steps in a long flow. Use italics for a meaningful UI label or example. Keep supporting explanations in ordinary text. Use native Markdown and the editor’s theme for typography and color; avoid inline HTML styling and underline.
 
-## Why — 想解決的痛點／想帶來的體驗
+## What
 
-Business: the pain or unmet need and desired improvement. Game: the experience, feelings or appeal offered to players. Preserve the product's actual framing.
+What are you offering or creating? Describe it in one sentence.
 
-## Who — 使用者／玩家
+## Why
 
-Intended audience and relevant broad roles, when known.
+Why would someone choose it? Describe the outcome they want or the experience they seek.
 
-## Where — 使用／遊玩情境
+## Who
 
-Usage/play situation and known platform or environment. Do not invent an unspecified platform.
+Who is it for? Distinguish participants, beneficiaries and buyers when those roles matter.
 
-## How — 解決方向／核心遊玩方式
+## Where
 
-High-level solution approach or core play/experience loop, without detailed feature rules or engineering architecture.
+In what setting or situation does it fit? Include a location, channel or platform when it helps explain how people encounter the idea.
 
-## Boundaries, open questions and sources
+## How
 
-Confirmed broad constraints, proposals clearly identified, material unknowns and actual source links. Include supplied timing only when relevant; do not require a When section, validation report or invented success targets. Link existing milestones/PRDs only when they exist.
+How does it work from the participant's point of view? Describe how the service is delivered, how someone completes the task, or what the player does. Include how it earns money when that is part of the idea and has been discussed.

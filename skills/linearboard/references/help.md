@@ -1,26 +1,29 @@
+- `init <Project> [repository path]`
+  - Set up project AGENTS.md and Codex specialists, preserve customization, and display each agent’s role and supported commands.
+
 - `help`
   - 列出指令與用途。
 
 - `planning`
-  - 討論商業產品的痛點與解法，或遊戲希望帶給玩家的體驗，形成產品願景。
+  - Clarify the 4W1H vision and briefly check a user-chosen stack against official sources.
 
 - `create-vision-document`
-  - 依 Planning 建立或修訂 4W1H 產品願景文件。
+  - Create or revise the product vision from Planning.
+
+- `create-technical-baseline <Project>`
+  - Record shared technical requirements, feasibility findings and open decisions in one project document.
 
 - `create-milestones`
-  - 產生使用者故事，分組為里程碑，建立原生里程碑與分組故事文件。
+  - 依願景建立成果或學習里程碑，在總覽文件記錄完成條件及適用的使用者故事。
 
 - `create-PRDs <Project> <Milestone>`
-  - 依里程碑內的故事建立或修訂 PRD issues 與分類 View。
-
-- `prd-demystify <Project> <Milestone>`
-  - 釐清 PRD 中待決定的範圍與邊界，直接更新 PRD。
+  - Create and verify milestone PRDs and their saved View, then automatically ask clarification questions from those items and record confirmed answers.
 
 - `create-designs <Project> <Milestone>`
-  - 研究參考、提出具產品特色的設計方向，建立設計總覽與畫面互動規格。
+  - Build three branded interactive proposals from the Design Overview and record the selected style only after confirmation.
 
 - `create-visuals <Project> <Milestone>`
-  - 探索或修訂版型並生成完整畫面圖庫；經授權上傳，完整核准後建立 Design tickets。
+  - 延用 create-designs 階段選定的版本，完成並檢查其餘畫面與元件狀態，提供可操作的 HTML。完整設計經核准後建立 Design tickets。
 
 - `create-issues-FE <Project> <Milestone>`
   - 建立或修訂前端開發 issues 與分類 View。
@@ -29,13 +32,13 @@
   - 建立或修訂後端開發 issues 與分類 View。
 
 - `organize-task-batch <Project> <Milestone> [issue IDs]`
-  - 檢查依賴並提出分批執行順序。
+  - 依相依性排列執行批次，為前後端議題加上 Batch N 標籤，並驗證篩選結果。
 
-- `dispatch <Project> <Milestone> [Batch n | issue IDs]`
-  - 檢查指定開發票、派工實作並獨立驗證。
+- `dispatch <Project> <Milestone> [Batch <n> | issue IDs]`
+  - Dispatch a verified milestone batch or explicit issue IDs, sequence dependencies, and independently verify the results.
 
-- `debug [Project] [Milestone] [report document or issue IDs]`
-  - 記錄問題、建立修復票並修復驗證；可指定僅分類。
+- `debug [Project] [Milestone] [report or issue IDs]`
+  - Record, fix and verify a reported defect on its BUG ticket, then comment there with cause and action.
 
-- `sync <Project> <Milestone> [scope]`
-  - 同步已確認的紀錄、設計參照與實際 UI 截圖。
+- `sync <Project> <Milestone> [scope or new request]`
+  - Review affected records, propose from/to changes, and apply them after user approval.

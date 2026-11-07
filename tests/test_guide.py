@@ -151,22 +151,19 @@ class GuideRouteTests(unittest.TestCase):
         self.assertIn(f'{len(expected)} / {len(expected)} 個指令', html)
         # Story creation is now part of the milestone document, not a new issue stage.
         milestones = next(command for command in data if command['name'] == 'create-milestones')
-        self.assertIn('User Stories', milestones['output'])
+        self.assertIn('按里程碑分組', milestones['output'])
         self.assertIn('不建立 UserStory issues 或 View', milestones['limit'])
         self.assertNotIn('create-userstories', names)
         self.assertNotIn('frd', names)
 
-    def test_debug_contract_requires_bugs_document_before_fix_and_document_results(self):
+    def test_debug_contract_keeps_report_and_result_on_the_owning_bug_ticket(self):
         html = (server.ROOT / 'linearboard-guide.html').read_text()
         debug = next(command for command in GuideHTML(html).command_data() if command['name'] == 'debug')
-        self.assertLess(debug['output'].index('Bugs Project Document'), debug['output'].index('FIX'))
-        for requirement in ['Datetime', 'User Report', 'bullet', '原生結果留言', 'issue-only']:
-            self.assertIn(requirement, ' '.join(debug.values()))
-        self.assertIn('不以 issue 留言替代文件結果', debug['check'])
-        self.assertIn('先保存原始回報', html)
-        self.assertIn('每張 FIX 指回正確 report batch／bullet', debug['check'])
-        self.assertIn('在 Bugs 文件回寫結果', html)
-        self.assertNotIn('若來源只有 issue，則回覆來源 issue', html)
+        for requirement in ['coding agent', 'BUG', '記錄回報，再調查', '同一張票', 'Status、Why、Action、Check']:
+            self.assertIn(requirement, debug['output'])
+        self.assertIn('TPM 獨立驗證', debug['check'])
+        self.assertIn('只分流時，核對 BUG 票及對應 FE 或 BE View 後停止', debug['limit'])
+        self.assertNotIn('Bugs Project Document', html)
 
     def test_download_is_complete_html_with_exact_hash_and_no_external_asset_dependency(self):
         status, headers, raw = self.request('/guide/download')

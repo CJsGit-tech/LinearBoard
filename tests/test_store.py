@@ -207,8 +207,10 @@ class WorkflowTests(unittest.TestCase):
 
     def test_all_main_command_contracts_and_aliases(self):
         c=capabilities()
-        self.assertEqual(len(c['commands']),16)
+        self.assertEqual(len(c['commands']),15)
         self.assertEqual(c['application'], 'LinearBoard')
         self.assertEqual(c['aliases']['prd'],'create-PRDs')
+        for alias in ('create-userstories', 'user-stories', 'stories'):
+            self.assertEqual(c['aliases'][alias], 'create-milestones')
 
 if __name__ == '__main__': unittest.main()

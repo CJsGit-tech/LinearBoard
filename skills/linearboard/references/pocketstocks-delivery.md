@@ -4,7 +4,7 @@ Read this reference only after the resolved LinearBoard project is PocketStocks 
 
 ## Execution target
 
-PocketStocks frontend work uses the existing AppDeploy app. Explicit issue-scoped `dispatch`, or an implementation-scoped `debug` after its exact FIX issue IDs are resolved, authorizes building and deploying only that bounded issue scope after calling `get_deploy_instructions`. The same plan, scope, verification and destructive-action gates apply. Neither command authorizes unrelated deployment, ticket changes or scope expansion. Do not create a local replacement frontend, fixture application or build output.
+PocketStocks frontend work uses the existing AppDeploy app. Explicit issue-scoped `dispatch`, or an implementation-scoped `debug` after its exact BUG ticket IDs are resolved, authorizes building and deploying only that bounded issue scope after calling `get_deploy_instructions`. The same plan, scope, verification and destructive-action gates apply. Neither command authorizes unrelated deployment, ticket changes or scope expansion. Do not create a local replacement frontend, fixture application or build output.
 
 The worker must wait for terminal deployment status, inspect AppDeploy QA/runtime results and report the deployed environment/version. Default review viewports are 1366 x 768 and 1440 x 900 unless the issue or approved reference specifies otherwise; mobile checks are not implied.
 

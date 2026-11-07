@@ -8,12 +8,14 @@ skill=Path(sys.argv[1]).resolve() if len(sys.argv)>1 else Path(__file__).resolve
 source=(skill/'SKILL.md').read_text()
 section=source.split('## Commands\n')[1].split('Technology lookup')[0]
 commands={match.split()[0] for match in re.findall(r'^- `([^`]+)`',section,re.M)}
-expected={'help','planning','create-vision-document','create-milestones','create-PRDs','prd-demystify','create-designs','create-visuals','create-issues-FE','organize-task-batch','dispatch','debug','sync'}
-assert commands==expected, 'Standalone skill command router changed'
 assert '`create-issues-BE`' in section, 'Backend delivery command missing'
+commands.add('create-issues-BE')
+help_commands=[match.split()[0] for match in re.findall(r'^- `([^`]+)`',(skill/'references/help.md').read_text(),re.M)]
+assert len(help_commands)==len(commands) and set(help_commands)==commands, 'Offline help and skill router disagree'
+external_skill_links={'../../design-pro/SKILL.md','../../file-change-summary/SKILL.md'}
 for file in skill.rglob('*.md'):
  for target in re.findall(r'\]\(([^)]+)\)',file.read_text()):
-  if ':' in target or target.startswith('#') or '<' in target or ' ' in target: continue
+  if ':' in target or target.startswith(('#','{{')) or '<' in target or ' ' in target or target in external_skill_links: continue
   path=target.split('#')[0]
   if not path: continue
   resolved=(file.parent/path).resolve()
@@ -34,7 +36,8 @@ with tempfile.TemporaryDirectory() as temp:
  def create(kind,**data):
   return call('linearboard_create',{'kind':kind,'data':data,'idempotency_key':'qa-'+kind+'-'+str(data)})
  try:
-  caps=call('linearboard_capabilities'); assert len(caps['commands'])==16
+  caps=call('linearboard_capabilities')
+  assert [command['command'] for command in caps['commands']]==help_commands, 'Capability catalog and offline help disagree'
   team=call('linearboard_list',{'kind':'teams'},all=True)['items'][0]
   project=create('projects',name='Skill QA',team_id=team['id'])
   milestone=create('milestones',name='M1',project_id=project['id'])
