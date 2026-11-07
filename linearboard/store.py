@@ -159,6 +159,31 @@ class Store:
         # reintroducing the previous unused Ready for Test / Blocked defaults.
         return list(dict.fromkeys(STATUSES + self._referenced_statuses(db, team_id)))
 
+    def _confirmed_visual_source(self, db, issue, attachment):
+        """Match a rendered JPG to the exact file recorded for an approved design set."""
+        if (issue.get('category') != 'Design' or not issue.get('milestone_id')
+                or attachment.get('target_kind') != 'issues' or attachment.get('external_url')
+                or attachment.get('mime') != 'image/jpeg'
+                or not attachment.get('name', '').lower().endswith('.jpg')):
+            return None
+        for doc in self._all(db, 'documents'):
+            if (doc.get('doc_type') != 'Screen specification'
+                    or doc.get('project_id') != issue.get('project_id')
+                    or doc.get('milestone_id') != issue.get('milestone_id')):
+                continue
+            for ref in doc.get('confirmed_jpgs', []):
+                if (ref.get('issue_id') == issue['id']
+                        and all(ref.get(k) and ref[k] == attachment.get(k)
+                                for k in ('name', 'screen', 'visual_version', 'sha256'))):
+                    try:
+                        comment = self._ref(db, ref['approval_comment_id'], 'comments')
+                    except Invalid:
+                        continue
+                    if (comment.get('target_kind') == 'documents' and comment.get('target_id') == doc['id']
+                            and comment.get('body', '').startswith('**Approved:')):
+                        return comment['id']
+        return None
+
     def _validate(self, db, kind, r, actor, old=None):
         if kind not in KINDS:
             raise Invalid('不支援的紀錄類型。')
@@ -200,6 +225,26 @@ class Store:
                     raise Invalid('相同群組中已有此標籤。')
             if r.get('name') == 'Category' and (not r.get('is_group') or not r.get('single_select')):
                 raise Invalid('Category 必須是單選群組。')
+        if (kind == 'documents' and 'confirmed_jpgs' in r
+                and (not old or r['confirmed_jpgs'] != old.get('confirmed_jpgs'))):
+            refs = r['confirmed_jpgs']
+            if r.get('doc_type') != 'Screen specification' or not isinstance(refs, list):
+                raise Invalid('已核准 JPG 清單需要畫面規格文件。')
+            for ref in refs:
+                if old and ref in old.get('confirmed_jpgs', []):
+                    continue
+                if not isinstance(ref, dict) or not all(isinstance(ref.get(k), str) and ref[k]
+                        for k in ('issue_id', 'name', 'screen', 'visual_version', 'sha256', 'approval_comment_id')):
+                    raise Invalid('已核准 JPG 缺少來源資料。')
+                if not re.fullmatch('[0-9a-f]{64}', ref['sha256']):
+                    raise Invalid('已核准 JPG 雜湊無效。')
+                owner = self._ref(db, ref['issue_id'], 'issues')
+                approval = self._ref(db, ref['approval_comment_id'], 'comments')
+                if (owner['category'] != 'Design' or owner['project_id'] != r.get('project_id')
+                        or not owner.get('milestone_id') or owner['milestone_id'] != r.get('milestone_id')
+                        or approval.get('target_kind') != 'documents' or approval.get('target_id') != r['id']
+                        or not approval.get('body', '').startswith('**Approved:')):
+                    raise Invalid('JPG 與已核准的設計範圍不符。')
         if kind == 'issues':
             if r.get('status') not in self._workflow(db, r['team_id']) or r.get('category') not in CATEGORIES:
                 raise Invalid('狀態或 Category 無效。')
@@ -248,10 +293,21 @@ class Store:
             if kind == 'attachments':
                 if not r.get('name'):
                     raise Invalid('附件需要檔名。')
+                if old and old.get('inherited_from_comment'):
+                    source_fields = ('target_kind', 'target_id', 'name', 'mime', 'screen', 'visual_version', 'external_url')
+                    if any(r.get(field) != old.get(field) for field in source_fields):
+                        raise Invalid('已繼承核准的 JPG 不可變更來源資料；請新增參考。')
                 r['approval'] = r.get('approval', 'draft')
                 if r['approval'] not in ['draft', 'approved', 'superseded', 'evidence']:
                     raise Invalid('附件審閱標記無效。')
-                if r['approval'] == 'approved' and (not old or old.get('approval') != 'approved') and actor != 'user':
+                inherited = None
+                if (not old and r['approval'] in ('draft', 'approved')
+                        or old and r['approval'] == 'approved' and old.get('approval') != 'approved'):
+                    inherited = self._confirmed_visual_source(db, target, r)
+                if inherited:
+                    r['approval'] = 'approved'
+                    r['inherited_from_comment'] = inherited
+                if r['approval'] == 'approved' and (not old or old.get('approval') != 'approved') and actor != 'user' and not inherited:
                     raise Invalid('只有使用者可以核准視覺參考。')
                 if r.get('external_url') and not r['external_url'].startswith(('https://', 'http://')):
                     raise Invalid('附件連結需使用 HTTP 或 HTTPS。')
@@ -419,6 +475,8 @@ class Store:
                 raise Invalid('請使用垃圾桶操作修改刪除狀態。')
             if data.get('archived'):
                 raise Invalid('不支援封存；請使用垃圾桶。')
+            if kind == 'attachments' and any(k in data for k in ('sha256', 'size', 'inherited_from_comment')):
+                raise Invalid('附件來源與檔案雜湊由系統管理。')
             old = self._get(db, rid, kind) if rid else None
             if old:
                 expected = data.pop('expected_version', None)

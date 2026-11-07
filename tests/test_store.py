@@ -27,6 +27,41 @@ class WorkflowTests(unittest.TestCase):
     def update(self, kind, r, **data):
         return self.s.mutate(kind, {'expected_version': r['version'], **data}, r['id'])
 
+    def test_design_jpg_inherits_only_exact_recorded_set_approval(self):
+        import hashlib
+        issue = self.issue('Design')
+        doc = self.create('documents', title='Screens', doc_type='Screen specification',
+                          project_id=self.p['id'], milestone_id=self.m['id'])
+        note = self.create('comments', target_kind='documents', target_id=doc['id'],
+                           body='**Approved: full set v1** User confirmed.')
+        payload = dict(target_kind='issues', target_id=issue['id'], name='screen-v1.jpg',
+                       screen='SCREEN-01', visual_version='v1', mime='image/jpeg',
+                       content_base64=base64.b64encode(b'fixture').decode())
+        first = self.create('attachments', **payload)
+        self.assertEqual(first['approval'], 'draft')
+        ref = dict(issue_id=issue['id'], approval_comment_id=note['id'],
+                   sha256=hashlib.sha256(b'fixture').hexdigest(),
+                   **{k: payload[k] for k in ('name', 'screen', 'visual_version')})
+        self.update('documents', doc, confirmed_jpgs=[ref])
+        approved = self.create('attachments', **payload)
+        self.assertEqual(approved['approval'], 'approved')
+        for diff in [dict(visual_version='v2'), dict(screen='SCREEN-02'),
+                     dict(target_id=self.issue('Design')['id'])]:
+            with self.assertRaises(Invalid):
+                self.update('attachments', approved, **diff)
+        self.assertEqual(self.update('attachments', approved, approval='superseded')['approval'], 'superseded')
+        self.assertEqual(self.update('attachments', first, approval='approved')['inherited_from_comment'], note['id'])
+        for diff in [dict(content_base64='YQ=='), dict(visual_version='v2'), dict(mime='image/png'),
+                     dict(target_id=self.issue('Design')['id'])]:
+            self.assertEqual(self.create('attachments', **(payload | diff))['approval'], 'draft')
+        with self.assertRaises(Invalid):
+            self.create('attachments', **(payload | dict(approval='approved', content_base64='YQ==')))
+        impact = self.s.trash_impact('milestones', self.m['id'])
+        deleted = self.s.trash_move('milestones', self.m['id'], impact['fingerprint'])
+        self.assertEqual(self.s.get('documents', doc['id'])['milestone_id'], '')
+        self.assertEqual(self.s.trash_restore(deleted['batch_id'])['unrestored_links'], [])
+        self.assertEqual(self.create('attachments', **payload)['approval'], 'approved')
+
     def test_vision_milestones_frd_are_native_documents(self):
         for t in ['Vision', 'Milestones', 'FRD']:
             d=self.create('documents',title=t,body='# Rule\n- One',doc_type=t,project_id=self.p['id'])

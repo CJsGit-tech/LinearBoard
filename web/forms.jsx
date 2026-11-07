@@ -34,7 +34,7 @@ import {
   MilestoneField,
   LabelsSelect,
   IssueChip,
-  Attachment,
+  AttachmentSections,
   AutoTitle,
   BodyEditor,
   revealAnchor,
@@ -557,6 +557,50 @@ function TrashPurgeConfirm({ modal }) {
     }}>{t("永久刪除")}</button></footer>
   </div>;
 }
+function MilestoneJpgApproval({ issue }) {
+  const [busy, setBusy] = useState(false);
+  if (issue.category !== "Design" || !issue.milestone_id) return null;
+  const scoped = row => row.project_id === issue.project_id && row.milestone_id === issue.milestone_id;
+  const specs = list("documents").filter(d => scoped(d) && d.doc_type === "Screen specification"
+    && d.body?.includes("## Approved Design handoff"));
+  const owners = list("issues").filter(i => scoped(i) && i.category === "Design"
+    && specs.some(d => d.body.split("## Approved Design handoff").at(-1).includes("#/issues/" + i.id + ")")));
+  const images = list("attachments").filter(a => {
+    const owner = owners.find(i => i.id === a.target_id);
+    const gallery = owner?.body?.split("## Visual screenshots").at(1);
+    return a.target_kind === "issues" && a.mime === "image/jpeg" && /\.jpe?g$/i.test(a.name)
+      && !a.external_url && a.visual_version && gallery?.includes("/api/files/" + a.id + ")");
+  });
+  const versions = [...new Set(images.filter(a => a.target_id === issue.id).map(a => a.visual_version))];
+  async function approve(batch) {
+    setBusy(true);
+    let completed = 0;
+    try {
+      for (const a of batch) {
+        await persist("attachments", a, { approval: "approved" });
+        completed++;
+      }
+      notify(t("已核准 {0} 張 JPG", completed));
+    } catch (error) {
+      notify(t("已核准 {0} 張 JPG", completed) + " · " + error.message, true);
+    } finally {
+      try { await refresh(); render(); } catch (error) { notify(error.message, true); }
+      setBusy(false);
+    }
+  }
+  return versions.map(version => {
+    const batch = images.filter(a => a.visual_version === version && a.approval === "draft");
+    if (!batch.length) return null;
+    const count = new Set(batch.map(a => a.target_id)).size;
+    return <div key={version} className="inline">
+      <span>{get("milestones", issue.milestone_id)?.name} · {version}</span>
+      <button type="button" disabled={busy} onClick={() => approve(batch)}>
+        {t("核准 {0} 張 JPG（{1} 個任務）", batch.length, count)}
+      </button>
+    </div>;
+  });
+}
+
 function IssueDetail({ record: r, history }) {
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
@@ -720,23 +764,9 @@ function IssueDetail({ record: r, history }) {
           </aside>
         </form>
 
-        <section className="detail-section">
-          <div className="section-title">
-            <h3>{t("視覺參考與附件")}</h3>
-            <Button
-              action="upload"
-              kind="issues"
-              id={r.id}
-              icon="paperclip"
-              className="quiet"
-            >{t("新增附件")}</Button>
-          </div>
-          <div className="attachments">
-            {attachments.map((a) => (
-              <Attachment key={a.id} record={a} />
-            ))}
-          </div>
-        </section>
+        <AttachmentSections records={attachments} kind="issues" id={r.id}>
+          <MilestoneJpgApproval issue={r} />
+        </AttachmentSections>
         <section className="detail-section">
           <div className="section-title">
             <h3>{t("驗證證據")}</h3>
@@ -866,23 +896,7 @@ function DocumentDetail({ record: r, history }) {
         </form>
         {r.id && (
           <>
-            <section className="detail-section">
-              <div className="section-title">
-                <h3>{t("附件")}</h3>
-                <Button
-                  action="upload"
-                  kind="documents"
-                  id={r.id}
-                  icon="paperclip"
-                  className="quiet"
-                >{t("新增附件")}</Button>
-              </div>
-              {list("attachments")
-                .filter((a) => a.target_id === r.id)
-                .map((a) => (
-                  <Attachment key={a.id} record={a} />
-                ))}
-            </section>
+            <AttachmentSections records={list("attachments").filter(a => a.target_id === r.id)} kind="documents" id={r.id} />
             <section className="detail-section">
               <h3>{t("文件留言")}</h3>
               {list("comments")

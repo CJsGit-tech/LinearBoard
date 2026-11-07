@@ -1,0 +1,82 @@
+// Disposable UI regression for visual references and supporting files.
+const { chromium } = require('playwright');
+const { spawn } = require('node:child_process');
+const fs = require('node:fs/promises'), os = require('node:os'), path = require('node:path');
+const assert = require('node:assert/strict');
+const { selectValue } = require('./controls.cjs');
+(async () => {
+ const temp = await fs.mkdtemp(path.join(os.tmpdir(), 'linearboard-attachments-'));
+ const port = process.env.LINEARBOARD_ATTACHMENTS_PORT || '8796', base = 'http://127.0.0.1:' + port;
+ let service, browser; const errors = [], passed = [];
+ const api = async (kind, data) => {
+  const r = await fetch(base + '/api/' + kind, { method: data ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' }, body: data ? JSON.stringify(data) : undefined });
+  const out = await r.json(); assert.ok(r.ok, JSON.stringify(out)); return out;
+ };
+ try {
+  service = spawn('python3', ['server.py', '--port', port, '--db', path.join(temp, 'qa.sqlite3')], { cwd: path.resolve(__dirname, '..') });
+  await new Promise((resolve, reject) => { service.stdout.once('data', resolve); service.once('error', reject); service.once('exit', c => reject(Error('QA server exit ' + c))); });
+  const team = (await api('state')).teams[0];
+  const project = await api('projects', { name: 'Attachment QA', team_id: team.id });
+  const issue = await api('issues', { project_id: project.id, title: 'Visual references', category: 'Design' });
+  const image = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=';
+  const images = [];
+  for (let i = 1; i <= 8; i++) images.push(await api('attachments', { target_kind: 'issues', target_id: issue.id, name: 'SCREEN-' + i + '-desktop.png', mime: 'image/png', screen: 'SCREEN-' + i, visual_version: 'v1', content_base64: image }));
+  const file = await api('attachments', { target_kind: 'issues', target_id: issue.id, name: 'delivery-notes.txt', mime: 'text/plain', content_base64: Buffer.from('Supporting notes').toString('base64') });
+  const external = await api('attachments', { target_kind: 'issues', target_id: issue.id, name: 'External reference', external_url: 'https://example.com/reference' });
+  browser = await chromium.launch({ channel: 'chrome', headless: true });
+  const context = await browser.newContext({ locale: 'en-US', viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+  const page = await context.newPage(); page.setDefaultTimeout(10000); page.on('pageerror', e => errors.push(e.message));
+  await page.goto(base + '/#/issues/' + issue.id);
+  const strip = page.locator('.reference-strip'), next = page.getByRole('button', { name: 'Next reference', exact: true }), previous = page.getByRole('button', { name: 'Previous reference', exact: true });
+  await strip.waitFor();
+  assert.equal(await strip.locator('.reference-card').count(), 8);
+  assert.equal(await page.locator('.attachment-file-list .file-attachment').count(), 2);
+  assert.equal(await strip.locator('a[href="/api/files/' + file.id + '"]').count(), 0);
+  assert.equal(await page.locator('.file-attachment a[href="https://example.com/reference"]').count(), 1);
+  await previous.waitFor(); await page.waitForFunction(() => !document.querySelector('[aria-label="Next reference"]').disabled);
+  assert.equal(await previous.isDisabled(), true);
+  assert.equal(await strip.locator('img').first().evaluate(el => getComputedStyle(el).objectFit), 'contain');
+  const left = () => strip.evaluate(el => el.scrollLeft);
+  await next.click(); await page.waitForFunction(() => document.querySelector('.reference-strip').scrollLeft > 0);
+  assert.ok(await left() > 0); await page.waitForFunction(() => !document.querySelector('[aria-label="Previous reference"]').disabled); assert.equal(await previous.isDisabled(), false);
+  await strip.focus(); const before = await left(); await page.keyboard.press('ArrowRight'); assert.ok(await left() > before);
+  await previous.click();
+  for (let i = 0; i < 12; i++) { await page.waitForTimeout(100); if (!await next.isEnabled()) break; await next.click(); }
+  assert.equal(await next.isDisabled(), true);
+  passed.push('Eight previews stay in one contained strip; arrows, keyboard scrolling, edge states and contained thumbnails work');
+  const previewId = images[7].id;
+  await selectValue(page.locator('[data-approval="' + previewId + '"]'), 'evidence');
+  await page.waitForFunction(id => document.querySelector('[data-approval="' + id + '"]')?.dataset.value === 'evidence' && !document.querySelector('[data-approval="' + id + '"]').disabled, previewId);
+  assert.equal((await api('attachments/' + previewId)).approval, 'evidence');
+  assert.equal(await (await fetch(base + '/api/files/' + file.id)).text(), 'Supporting notes');
+  assert.equal(await strip.locator('a').first().getAttribute('target'), '_blank');
+  await page.locator('.file-attachment [data-id="' + file.id + '"]').click();
+  await page.getByRole('button', { name: /Move to trash/, exact: false }).click();
+  await page.locator('.file-attachment a[href="/api/files/' + file.id + '"]').waitFor({ state: 'detached' });
+  await page.waitForFunction(() => document.querySelector('#issue-form') && document.querySelectorAll('.reference-strip .reference-card').length === 8);
+  assert.equal(await strip.locator('.reference-card').count(), 8);
+  passed.push('Review labels persist; files remain downloadable; deletion targets only the selected file');
+  await page.getByRole('button', { name: 'Add reference', exact: true }).click();
+  await page.locator('dialog input[type="file"]').setInputFiles({ name: 'SCREEN-09.png', mimeType: 'image/png', buffer: Buffer.from(image, 'base64') });
+  await page.locator('dialog #record-form button[type="submit"]').click();
+  await page.locator('.reference-strip .reference-card').nth(8).waitFor();
+  assert.equal(await strip.locator('.reference-card').count(), 9);
+  passed.push('Add reference uses the existing upload flow and appends the image without replacing records');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await strip.scrollIntoViewIfNeeded();
+  assert.ok(await page.locator('#dialog').evaluate(el => el.scrollWidth <= el.clientWidth + 1));
+  assert.ok(await strip.evaluate(el => el.scrollWidth > el.clientWidth));
+  await strip.focus(); const mobileBefore = await left(); await page.keyboard.press('ArrowRight'); assert.ok(await left() > mobileBefore);
+  passed.push('At 390px, only the reference strip scrolls sideways; the document does not overflow');
+  const doc = await api('documents', { project_id: project.id, title: 'Document references', doc_type: 'Notes', body: '## Specification' });
+  await api('attachments', { target_kind: 'documents', target_id: doc.id, name: 'screen.png', mime: 'image/png', content_base64: image });
+  await page.goto(base + '/#/documents/' + doc.id); await page.locator('#document-form').waitFor(); await page.locator('.reference-card').waitFor();
+  assert.equal(await page.locator('.reference-card').count(), 1);
+  await page.getByText('No files attached', { exact: true }).waitFor();
+  assert.equal(await page.getByRole('button', { name: 'Next reference', exact: true }).isDisabled(), true);
+  passed.push('Documents use the same split layout; a single image needs no scrolling; empty files are a compact line');
+  assert.deepEqual(errors, []);
+  console.log(JSON.stringify({ passed, errors }, null, 2));
+ } catch (error) { console.error(error); console.error('Completed checks:', passed); process.exitCode = 1; }
+ finally { await browser?.close(); service?.removeAllListeners('exit'); service?.kill('SIGTERM'); await fs.rm(temp, { recursive: true, force: true }); }
+})();

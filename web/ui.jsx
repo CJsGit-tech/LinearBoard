@@ -291,20 +291,76 @@ export function IssueChip({ id, showTitle = false }) {
     </Button>
   ) : null;
 }
-export function Attachment({ record: a }) {
+const isPreviewImage = a => !a.external_url && ["image/png", "image/jpeg"].includes(a.mime);
+
+export function AttachmentSections({ records, kind, id, children }) {
+  const strip = useRef();
+  const [edges, setEdges] = useState({ previous: false, next: false });
+  const visuals = records.filter(isPreviewImage), files = records.filter(a => !isPreviewImage(a));
+  const updateEdges = () => {
+    const el = strip.current;
+    if (el) setEdges({ previous: el.scrollLeft > 2, next: el.scrollLeft + el.clientWidth < el.scrollWidth - 2 });
+  };
+  useLayoutEffect(() => {
+    const el = strip.current;
+    if (!el) return;
+    updateEdges();
+    const observer = new ResizeObserver(updateEdges);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [visuals.length]);
+  const move = direction => {
+    const el = strip.current;
+    const step = el.querySelector('.reference-card')?.getBoundingClientRect().width || el.clientWidth;
+    el.scrollBy({ left: direction * (step + 16), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  };
+  return <>
+    <section className="detail-section visual-references">
+      <div className="section-title">
+        <h3>{t("視覺參考")}</h3>
+        <div className="reference-actions">
+          {visuals.length > 0 && <>
+            <button type="button" className="icon-button reference-previous" aria-label={t("上一個視覺參考")} disabled={!edges.previous} onClick={() => move(-1)}><Icon name="chevron-right" /></button>
+            <button type="button" className="icon-button" aria-label={t("下一個視覺參考")} disabled={!edges.next} onClick={() => move(1)}><Icon name="chevron-right" /></button>
+          </>}
+          <Button action="upload" kind={kind} id={id} icon="paperclip" className="quiet">{t("新增視覺參考")}</Button>
+        </div>
+      </div>
+      {children}
+      {visuals.length ? <div className="reference-strip" ref={strip} role="region" aria-label={t("視覺參考")} tabIndex={0}
+        onScroll={updateEdges} onKeyDown={event => {
+          if (event.target === event.currentTarget && ['ArrowLeft', 'ArrowRight'].includes(event.key)) {
+            event.preventDefault(); move(event.key === 'ArrowLeft' ? -1 : 1);
+          }
+        }}>
+        {visuals.map(a => <Attachment key={a.id} record={a} visual />)}
+      </div> : <p className="muted small attachment-empty">{t("尚無視覺參考")}</p>}
+    </section>
+    <section className="detail-section file-attachments">
+      <div className="section-title">
+        <h3>{t("附件")}</h3>
+        <Button action="upload" kind={kind} id={id} icon="paperclip" className="quiet">{t("新增附件")}</Button>
+      </div>
+      {files.length ? <div className="attachment-file-list">{files.map(a => <Attachment key={a.id} record={a} />)}</div>
+        : <p className="muted small attachment-empty">{t("尚無附件")}</p>}
+    </section>
+  </>;
+}
+
+export function Attachment({ record: a, visual = false }) {
   const [busy, setBusy] = useState(false);
   const url = a.external_url || "/api/files/" + a.id;
-  const image = !a.external_url && ["image/png", "image/jpeg"].includes(a.mime);
+  const image = isPreviewImage(a);
   return (
-    <div className="attachment">
-      <a href={url} target="_blank" rel="noopener">
+    <div className={"attachment " + (visual ? "reference-card" : "file-attachment")}>
+      <a href={url} target="_blank" rel="noopener" title={a.name}>
         {image ? (
-          <img src={"/api/files/" + a.id} alt={a.name} />
+          <img src={"/api/files/" + a.id} alt="" />
         ) : (
           <Icon name="paperclip" />
         )}
-        <span>
-          {a.name}
+        <span className="attachment-label">
+          <span className="attachment-name">{a.name}</span>
           <small>
             {a.screen || ""}
             {a.visual_version ? " · " + a.visual_version : ""}
@@ -312,7 +368,7 @@ export function Attachment({ record: a }) {
         </span>
         <Icon name="arrow-up-right" />
       </a>
-      <Picker
+      <div className="attachment-controls"><Picker
         aria-label={a.name + t("審閱標記")}
         data-approval={a.id}
         value={a.approval}
@@ -335,6 +391,7 @@ export function Attachment({ record: a }) {
         items={approvalOptions}
       />
       <Button action="trash-confirm" kind="attachments" id={a.id} icon="trash" className="icon-button" aria-label={t("刪除附件 ") + a.name} />
+      </div>
     </div>
   );
 }
