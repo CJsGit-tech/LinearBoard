@@ -1,6 +1,6 @@
 import { t } from "./i18n.js";
 import React, { useMemo, useState } from "react";
-import { EditorContent, useEditor } from "@tiptap/react";
+import { EditorContent, Node, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown as MarkdownExtension } from "@tiptap/markdown";
 import { TaskList, TaskItem } from "@tiptap/extension-list";
@@ -8,6 +8,32 @@ import { TableKit } from "@tiptap/extension-table";
 import Image from "@tiptap/extension-image";
 import { marked } from "marked";
 import { Bold, Italic, Heading2, List, ListOrdered, ListTodo, Code, Link2, Undo2, Redo2 } from "lucide-react";
+
+// Only standalone, empty ID anchors are supported HTML. Other HTML remains in
+// source mode so the Markdown round trip cannot silently discard it.
+const anchorPattern = /^[ \t]{0,3}<a[ \t]+id=(["'])([A-Za-z0-9][A-Za-z0-9_.:-]*)\1[ \t]*>[ \t]*<\/a>[ \t]*(?:\r?\n|$)/;
+const StoryAnchor = Node.create({
+  name: "storyAnchor",
+  group: "block",
+  atom: true,
+  selectable: false,
+  addAttributes: () => ({ id: { default: null } }),
+  parseHTML: () => [{ tag: "div[data-story-anchor][id]",
+    getAttrs: element => /^[A-Za-z0-9][A-Za-z0-9_.:-]*$/.test(element.id) ? { id: element.id } : false,
+  }],
+  renderHTML: ({ node }) => ["div", { id: node.attrs.id, "data-story-anchor": "", contenteditable: "false" }],
+  markdownTokenName: "storyAnchor",
+  markdownTokenizer: {
+    name: "storyAnchor", level: "block",
+    start: source => source.search(/^[ \t]{0,3}<a[ \t]+id=/m),
+    tokenize: source => {
+      const match = source.match(anchorPattern);
+      if (match) return { type: "storyAnchor", raw: match[0], id: match[2] };
+    },
+  },
+  parseMarkdown: (token, helpers) => helpers.createNode("storyAnchor", { id: token.id }),
+  renderMarkdown: node => `<a id="${node.attrs.id}"></a>`,
+});
 
 function RichText({ value, onChange, label }) {
   const [linkOpen, setLinkOpen] = useState(false), [url, setUrl] = useState(""), [error, setError] = useState("");
@@ -17,7 +43,7 @@ function RichText({ value, onChange, label }) {
         underline: false,
         link: { openOnClick: true, HTMLAttributes: { target: "_self", rel: "noopener noreferrer" } },
       }),
-      TaskList, TaskItem.configure({ nested: true, a11y: {
+      StoryAnchor, TaskList, TaskItem.configure({ nested: true, a11y: {
         checkboxLabel: (node, checked) => `${checked ? t("取消勾選") : t("勾選")} ${node.textContent || t("待辦事項")}`,
       } }), TableKit, Image,
       MarkdownExtension,
@@ -68,8 +94,16 @@ function RichText({ value, onChange, label }) {
   </div>;
 }
 
-// Documents with explicit anchors open in the Markdown source editor, so an anchor is text, not an element.
 export function revealAnchor(dialog, anchor) {
+  const richMarker = [...dialog.querySelectorAll('.rich-text-content [data-story-anchor]')]
+    .find(element => element.id === anchor);
+  if (richMarker) {
+    const target = richMarker.nextElementSibling || richMarker;
+    const header = dialog.querySelector('.dialog-head');
+    dialog.scrollTop += target.getBoundingClientRect().top -
+      (header?.getBoundingClientRect().bottom ?? dialog.getBoundingClientRect().top) - 16;
+    return true;
+  }
   const field = dialog.querySelector('textarea[name="body"]:not([hidden])');
   const pattern = new RegExp(`<a\\s+id=["']${anchor.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["']\\s*>`);
   const index = field ? field.value.search(pattern) : -1;
@@ -92,7 +126,8 @@ export function BodyEditor({ value = "", document = false, initialPreview = true
   const [body, setBody] = useState(value);
   const hasHtml = useMemo(() => {
     let found = false;
-    marked.walkTokens(marked.lexer(body), token => { if (token.type === "html") found = true; });
+    const withoutAnchors = body.replace(new RegExp(anchorPattern.source, "gm"), "");
+    marked.walkTokens(marked.lexer(withoutAnchors), token => { if (token.type === "html") found = true; });
     return found;
   }, [body]);
   const [rich, setRich] = useState(initialPreview && !hasHtml);
