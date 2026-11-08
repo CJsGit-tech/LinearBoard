@@ -2,17 +2,84 @@
 
 [English](README.md) · [繁體中文](README.zh-TW.md)
 
-A local workspace for projects, tasks, documents, and delivery reviews. Use the app on its own, or connect Codex through the included LinearBoard skill. No Linear account is required.
+A local workspace for projects, tasks, documents, and delivery reviews. It works without a Linear account or an AI API key. To run the workflow in Codex, use the included LinearBoard skill.
 
-[Quick start](#quick-start) · [Interface tour](#interface-tour) · [Hands-on guides](docs/linearboard-guides/index.html) · [Codex integration](#mcp-integration)
+[Quick start](#quick-start) · [My workflow](#my-workflow) · [Command execution](#how-a-command-runs) · [Articles](#articles) · [Interface tour](#interface-tour) · [Codex integration](#mcp-integration)
 
 ![LinearBoard issue list with grouped workflow states, category and milestone labels, and project details](docs/images/issue-list.jpg)
 
 *Current English interface with fictional demo data. Your workspace starts without prefilled project tasks.*
 
-- **Plan:** keep the vision, grouped stories, requirements, and milestones connected.
-- **Organize:** switch between a compact list, a status board, and saved category Views.
-- **Review:** keep descriptions, design references, comments, and verification evidence with the work.
+## Why I built LinearBoard
+
+I took inspiration from [Linear](https://linear.app) and the way it lets me move from a project overview to a milestone or an individual issue. I wanted a local workspace where I could follow that same path through AI-assisted development, even when the planning, implementation, and review happen in separate chats. I built most of LinearBoard with [OpenAI Codex](https://developers.openai.com/learn/codex).
+
+## My workflow
+
+In PocketMap, “save a place” became a set of decisions I could test. How do I recognize a duplicate? What happens if the save fails? Can I find the place after reopening the app? I start with the user story, record those decisions in a product requirements document (PRD), and link the design and implementation tickets back to it. When I review the result, I can trace a failed check to the rule that explains what should happen.
+
+Here's the sequence I use for a milestone with screens. Each command runs when I ask for it. I can resume from records I've already confirmed and skip design steps when the work has no visual requirements.
+
+```text
+planning -> create-vision-document
+    |
+    +-- create-technical-baseline (if needed)
+    |
+    v
+create-milestones -> milestones + grouped stories
+    |
+    v
+create-PRDs -> clarify open product decisions
+    |
+    v
+create-designs -> choose a direction
+    |
+    v
+create-visuals -> approve the full set -> Design tickets + Approved JPGs
+    |
+    v
+create-issues-FE / create-issues-BE -> organize-task-batch (if needed)
+    |
+    v
+dispatch -> agents implement -> independent checks -> In Review
+    |
+    v
+I review the result -> accept (Done) or report a problem (debug)
+
+Confirmed change across records -> sync preview -> I approve -> update
+```
+
+I use `debug` to turn review feedback into a linked bug ticket. When an agreed change affects several records, I use `sync` to preview the proposed edits and approve what should be updated.
+
+## How a command runs
+
+After loading the [LinearBoard skill](skills/linearboard/SKILL.md), try `$linearboard help` in Codex chat. A command such as `$linearboard dispatch "PocketMap" "Milestone 1" Batch 1` asks Codex to work on that batch. Replace the sample names and batch number with values from your own board.
+
+```text
+Command in Codex chat -> LinearBoard skill chooses the workflow
+    |
+    +-- help -> show the command guide offline
+    +-- init -> prepare the product repository for Codex
+    +-- planning -> clarify the idea in chat
+    |
+    `-- command that uses the board
+        -> connect through MCP or the local HTTP helper
+        -> resolve the requested team, project, and milestone as needed
+        -> check existing records and required decisions
+        -> pause for missing input or approval when needed
+        -> carry out the requested work and save authorized changes
+        -> read back the result and report what was verified
+```
+
+LinearBoard stores the records and evidence. Codex and its tools carry out the work, including launching agents for `dispatch` and checking the delivered behavior before handing it back to me. I decide when an issue in `In Review` is ready for `Done`. The [hands-on guides](docs/linearboard-guides/index.html) have copyable prompts for each stage.
+
+## Articles
+
+I wrote this series while building PocketMap with Linear and the `linear-tpm` skill. It shows where the workflow came from. Use the command flow above for the current local LinearBoard skill.
+
+1. [AI-Assisted Product Building](https://medium.com/@bchuan110/ai-assisted-product-building-d6572d3edead) — from the product idea to milestones and user stories.
+2. [Continued: AI-Assisted Product Building — Documentations](https://medium.com/@bchuan110/continued-ai-assisted-product-building-documentations-85bcc10daedf) — how the save-place story became requirements, designs, and frontend and backend tickets.
+3. [Continued: AI-Assisted Product Building — Review Results](https://medium.com/@bchuan110/continued-ai-assisted-product-building-review-results-e2119098a793) — how I reviewed the implementation and recorded feedback.
 
 ## Quick start
 
@@ -51,17 +118,19 @@ For guided product planning, start with the [English hands-on guide](docs/linear
 
 ### See work by status
 
-Choose **List view** for scanning many tasks, or **Board view** to see work in columns and drag tasks between states. Right-click an issue or group for actions. To update several tasks, select them using the left edge of each row, or choose **Select all in group**, then use **Actions**.
+Choose **List view** to scan tasks, or **Board view** to see work in columns and drag tasks between states. The board scrolls horizontally, and you can hide unused columns from their group menus. To update several tasks, select them using the left edge of each row, or choose **Select all in group**, then use **Actions**.
 
 ![LinearBoard board view showing demo tasks in In Progress, In Review, Todo, and Backlog columns](docs/images/issue-board.jpg)
 
-*The board supports horizontal scrolling. Unused groups can be hidden from their group menu.*
+*The board shows which tasks are in progress and which are waiting for review.*
 
 ### Edit the task where you read it
 
 Write headings, lists, links, and acceptance checklists in the rich-text editor, or switch to Markdown. Status, category, and milestone stay alongside the description. Use the top toolbar to save, go back, or delete; comments, attachments, evidence, and revision history continue below the editor.
 
 ![LinearBoard task detail with rich-text formatting, acceptance checkboxes, task properties, and a top-toolbar Save changes button](docs/images/issue-detail.jpg)
+
+*The issue keeps the acceptance checklist beside its status and milestone so I can review the expected behavior in context.*
 
 ### Know where things live
 
@@ -75,14 +144,6 @@ Write headings, lists, links, and acceptance checklists in the rich-text editor,
 | Workspace settings | Manage teams, labels, trash, and database backups. |
 
 The interface uses a dark, warm-neutral palette, compact task rows, and consistent menus. The sidebar selects the project; top tabs organize its content; the optional right panel shows project details. This keeps navigation and task editing in the same workspace.
-
-## Work manually or with Codex
-
-**In the app:** create projects, write documents, organize tasks, and review changes directly. The app works without an AI model or API key.
-
-**With Codex:** install the [included LinearBoard skill](skills/linearboard/SKILL.md) to guide planning, requirements, design, scoped implementation, and review. Start with `$linearboard help`; use the hands-on guide to choose the next command. The app stores records; Codex and external tools perform the requested work. A dispatch record alone does not start an agent.
-
-**Final acceptance stays with you:** `In Review` means work is ready for your review. Only the user decides `Done`. Exact JPGs registered against the user's complete-set approval inherit Approved on their Design tickets.
 
 ## Language
 
@@ -219,8 +280,3 @@ Main source areas: `web/` (React UI and message catalog), `linearboard/store.py`
 The app uses React, Radix Primitives, Tiptap, Lucide, Marked, DOMPurify, esbuild, and Playwright. Exact dependency versions are locked in `package-lock.json`. The built app has no CDN, remote font, or image dependency. The optional local `/visuals/` review gallery is not included in Git or the Docker image.
 
 Workspace databases, credentials, backups, generated review assets, dependencies, and build output are excluded by `.gitignore`.
-
-
-## Inspired by Linear
-
-This application and its companion management skill are inspired by [Linear](https://linear.app) and its approach to organizing product work. LinearBoard is developed independently as a standalone local workspace.

@@ -2,13 +2,84 @@
 
 [English](README.md) · [繁體中文](README.zh-TW.md)
 
-在本機管理專案、任務、文件與交付審閱。可直接使用 App，或透過隨附的 LinearBoard skill 與 Codex 協作，不需要 Linear 帳號。
+在本機管理專案、任務、文件與交付審閱。App 不需要 Linear 帳號或 AI API key。想用 Codex 執行工作流程時，可載入隨附的 LinearBoard skill。
 
-[啟動方式](#啟動) · [介面導覽](#介面導覽) · [操作指南](docs/linearboard-guides/index.html) · [Docker Compose](#docker-compose-與-postgresql)
+[Docker Compose](#docker-compose-與-postgresql) · [我的工作流程](#我的工作流程) · [指令如何執行](#指令如何執行) · [系列文章](#系列文章) · [介面導覽](#介面導覽) · [啟動方式](#啟動)
 
 ![LinearBoard 任務清單：依狀態分組，顯示類別、里程碑標籤與專案資訊](docs/images/issue-list.jpg)
 
 *截圖為目前英文介面與虛構示範資料；新工作區不會預填專案任務。介面可切換繁體中文。*
+
+## 為什麼做 LinearBoard
+
+我喜歡 [Linear](https://linear.app) 從專案總覽一路看到里程碑和個別任務的方式。我想要一個能在本機運作的工作區，讓我在不同對話裡規劃、開發和驗收時，還是能沿著這條路找到當初的決策。LinearBoard 大部分是我用 [OpenAI Codex](https://developers.openai.com/learn/codex) 協作開發的。
+
+## 我的工作流程
+
+以 PocketMap 的「儲存地點」為例，我得先想清楚幾件事：怎麼判斷地點重複？儲存失敗怎麼辦？重新開啟 App 後還找得到嗎？我從使用者故事出發，把規則寫進產品需求文件（PRD），再讓設計與實作任務連回這份需求。驗收時如果有一項檢查沒過，我就能找到原本約定的行為。
+
+下圖是有介面設計的里程碑範例。我依需要下達各階段指令，可以沿用已確認的紀錄。工作若沒有視覺需求，就跳過設計步驟。
+
+```text
+planning -> create-vision-document
+    |
+    +-- create-technical-baseline (if needed)
+    |
+    v
+create-milestones -> milestones + grouped stories
+    |
+    v
+create-PRDs -> clarify open product decisions
+    |
+    v
+create-designs -> choose a direction
+    |
+    v
+create-visuals -> approve the full set -> Design tickets + Approved JPGs
+    |
+    v
+create-issues-FE / create-issues-BE -> organize-task-batch (if needed)
+    |
+    v
+dispatch -> agents implement -> independent checks -> In Review
+    |
+    v
+I review the result -> accept (Done) or report a problem (debug)
+
+Confirmed change across records -> sync preview -> I approve -> update
+```
+
+我用 `debug` 把審閱意見記成有來源連結的 BUG 任務。若一項已確認的變更影響多筆紀錄，我會用 `sync` 先看每筆預計修改的內容，再核准要更新的項目。
+
+## 指令如何執行
+
+在 Codex 載入 [LinearBoard skill](skills/linearboard/SKILL.md) 後，可以先在對話中輸入 `$linearboard help`。例如 `$linearboard dispatch "PocketMap" "Milestone 1" Batch 1` 會請 Codex 處理指定的批次。使用時把專案、里程碑與批次換成看板上對應的名稱與編號。
+
+```text
+Command in Codex chat -> LinearBoard skill chooses the workflow
+    |
+    +-- help -> show the command guide offline
+    +-- init -> prepare the product repository for Codex
+    +-- planning -> clarify the idea in chat
+    |
+    `-- command that uses the board
+        -> connect through MCP or the local HTTP helper
+        -> resolve the requested team, project, and milestone as needed
+        -> check existing records and required decisions
+        -> pause for missing input or approval when needed
+        -> carry out the requested work and save authorized changes
+        -> read back the result and report what was verified
+```
+
+LinearBoard 保存紀錄和驗證證據，Codex 與工具負責執行。`dispatch` 會啟動 agent，並在交回成果前獨立檢查實作行為。任務進入 `In Review` 後，由我決定何時驗收並移到 `Done`。[操作指南](docs/linearboard-guides/index.html) 提供各階段可直接複製的指令。
+
+## 系列文章
+
+這三篇記錄我在 PocketMap 用 Linear 和 `linear-tpm` skill 管理開發的過程，也是這套工作流程的由來。使用本機 LinearBoard 時，請以上方的指令流程為準。
+
+1. [AI-Assisted Product Building](https://medium.com/@bchuan110/ai-assisted-product-building-d6572d3edead) — 從產品想法整理出里程碑與使用者故事。
+2. [Continued: AI-Assisted Product Building — Documentations](https://medium.com/@bchuan110/continued-ai-assisted-product-building-documentations-85bcc10daedf) — 把「儲存地點」拆成需求、設計與前後端任務。
+3. [Continued: AI-Assisted Product Building — Review Results](https://medium.com/@bchuan110/continued-ai-assisted-product-building-review-results-e2119098a793) — 審閱實作成果並記下回饋。
 
 ## 建立第一個專案
 
@@ -27,13 +98,15 @@
 
 ![LinearBoard 看板：進行中、待審閱、待開始與待安排的示範任務](docs/images/issue-board.jpg)
 
-*看板可橫向捲動；不需要顯示的群組可從群組選單隱藏。*
+*從看板可以看出哪些任務正在做，哪些已經可以審閱。看板可橫向捲動，也能從群組選單隱藏暫時用不到的欄位。*
 
 ### 在任務中直接編輯
 
 Rich-text editor 支援標題、清單、連結與驗收勾選框，也可切換 Markdown。右側保留狀態、類別與里程碑；頂部工具列提供儲存、返回與刪除。留言、附件、驗證證據與修訂歷史位於下方。
 
 ![LinearBoard 任務詳情：rich text、驗收清單、任務屬性與頂部儲存按鈕](docs/images/issue-detail.jpg)
+
+*驗收清單、狀態與里程碑放在同一個任務裡，審閱時可以直接對照預期行為。*
 
 | 位置 | 用途 |
 | --- | --- |
@@ -45,12 +118,6 @@ Rich-text editor 支援標題、清單、連結與驗收勾選框，也可切換
 | 工作區設定 | 管理團隊、標籤、垃圾桶與資料庫備份。 |
 
 介面採暖色調深色背景、緊湊任務列與一致選單。側欄選專案，上方分頁切換內容，右側可收合的資訊面板顯示專案屬性。
-
-## 直接操作，或搭配 Codex
-
-App 不需要 AI model 或 API key。若要由 Codex 引導規劃、需求、設計、派工與審閱，請安裝 [LinearBoard skill](skills/linearboard/SKILL.md)，從 `$linearboard help` 與操作指南開始。App 保存紀錄；Codex 與外部工具執行授權工作，新增派工紀錄本身不會啟動 agent。
-
-`In Review` 代表可以交給你審閱。`Done` 由使用者決定。Design 票中與使用者完整設計核准相符的確切 JPG 會繼承 Approved。
 
 ## 介面語言
 
@@ -237,8 +304,3 @@ export LINEARBOARD_PROJECT_DIR="/absolute/path/to/LinearBoard"
 首次安裝請先依上方 Compose 指令建立本機 secret、build 並啟動服務；skill 的 preflight 只重用或啟動既有部署，不負責初次建立資料卷、遷移或重設密碼。使用 `--url` 或 `LINEARBOARD_URL` 可指定服務位址，另行管理的開發服務可使用 `--no-autostart`。
 
 公開 repository 僅包含應用程式、測試與可重用 skill；`data/`、`output/`、資料庫備份、Compose 密碼、環境變數檔與相依套件均由 `.gitignore` 排除。產品管理紀錄持續保存在各使用者的 LinearBoard 資料庫中。
-
-
-## 靈感來自 Linear
-
-本應用程式與管理 skill 靈感來自 [Linear](https://linear.app) 組織產品工作的方式。LinearBoard 為獨立開發的本機工作區。
