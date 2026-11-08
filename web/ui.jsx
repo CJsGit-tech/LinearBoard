@@ -10,7 +10,11 @@ import {
   Plus,
   ChevronRight,
   Circle,
+  CircleDashed,
   CircleDot,
+  CircleX,
+  Copy,
+  FlaskConical,
   CheckCircle2,
   Clock3,
   LayoutList,
@@ -57,7 +61,11 @@ const icons = {
   plus: Plus,
   "chevron-right": ChevronRight,
   circle: Circle,
+  "circle-dashed": CircleDashed,
   "circle-dot": CircleDot,
+  "circle-x": CircleX,
+  copy: Copy,
+  "flask-conical": FlaskConical,
   "check-circle-2": CheckCircle2,
   "clock-3": Clock3,
   "layout-list": LayoutList,
@@ -90,20 +98,24 @@ export function Icon({ name }) {
   const Component = icons[name] || Circle;
   return <Component aria-hidden="true" />;
 }
+const statusIcons = new Map([
+  ["In Review", "clock-3"],
+  ["Ready for Test", "flask-conical"],
+  ["Todo", "circle-dot"],
+  ["Backlog", "circle-dashed"],
+  ["Done", "check-circle-2"],
+  ["Canceled", "circle-x"],
+  ["Blocked", "circle-x"],
+  ["Duplicate", "copy"],
+]);
 export function StatusIcon({ status }) {
-  return (
-    <Icon
-      name={
-        status === "Done"
-          ? "check-circle-2"
-          : status === "In Progress"
-            ? "circle-dot"
-            : status === "In Review"
-              ? "clock-3"
-              : "circle"
-      }
-    />
-  );
+  if (status === "In Progress") {
+    return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none" />
+    </svg>;
+  }
+  return <Icon name={statusIcons.get(status) || "circle"} />;
 }
 export function Button({
   action: name,

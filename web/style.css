@@ -535,28 +535,22 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--muted);
+  color: var(--status-color, var(--muted));
   flex-shrink: 0;
 }
 .status-symbol svg {
   width: 15px;
   height: 15px;
 }
-.status-symbol.progress {
-  color: var(--yellow);
-}
-.status-symbol.review {
-  color: var(--accent);
-}
-.status-symbol.done {
-  color: var(--green);
-}
-.status-symbol.blocked {
-  color: var(--red);
-}
-.status-symbol.todo {
-  color: var(--text);
-}
+[data-status-tone="review"] { --status-color: #c5afff; --status-tint: 17%; }
+[data-status-tone="progress"] { --status-color: #efbd6d; }
+[data-status-tone="todo"] { --status-color: #9abffa; }
+[data-status-tone="backlog"] { --status-color: #aba59b; --status-tint: 8%; }
+[data-status-tone="done"] { --status-color: #82ce9d; }
+[data-status-tone="canceled"] { --status-color: #e4a39d; }
+[data-status-tone="duplicate"] { --status-color: #a5a7b4; --status-tint: 8%; }
+[data-status-tone="test"] { --status-color: #8dcac9; }
+[data-status-tone="blocked"] { --status-color: #ec9090; }
 .issue-group {
   margin-bottom: 14px;
 }
@@ -2352,12 +2346,6 @@ body {
   width: 14px;
   height: 14px;
 }
-.status-symbol.review {
-  color: #58bd80;
-}
-.status-symbol.done {
-  color: var(--muted);
-}
 .row-meta {
   gap: 8px;
 }
@@ -3333,6 +3321,11 @@ body {
 .group-toggle > svg { width: 11px; height: 11px; color: var(--muted); transform: rotate(90deg); }
 .group-toggle[aria-expanded="false"] > svg { transform: none; }
 .group-heading .group-menu-trigger { margin-left: 0; }
+.group-heading[data-status-tone] {
+  background: color-mix(in srgb, var(--status-color) var(--status-tint, 12%), var(--bg));
+  box-shadow: inset 2px 0 var(--status-color);
+}
+.board > .issue-group:has(> .group-items[hidden]) { align-self: flex-start; }
 .group-toggle:focus-visible, .bulk-actions-trigger:focus-visible { outline: none; box-shadow: inset 0 -1px 0 var(--muted); }
 .issue-entry { display: flex; flex-wrap: wrap; align-items: center; min-width: 0; border-radius: 3px; }
 .issue-label-toggle { flex: 0 0 auto; font-size: 11px; min-height: 28px; padding: 4px 6px; margin-right: 4px; }

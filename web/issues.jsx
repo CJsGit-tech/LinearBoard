@@ -7,6 +7,16 @@ import { cats, statusClass, statusLabel, stamp } from "./labels.js";
 import { Button, Icon, StatusIcon, Picker, Empty } from "./ui.jsx";
 
 const menuClass = "action-menu";
+const statusGroupOrder = new Map([
+  ["In Review", 0],
+  ["In Progress", 1],
+  ["Todo", 3],
+  ["Backlog", 4],
+  ["Done", 5],
+  ["Canceled", 6],
+  ["Duplicate", 7],
+]);
+const statusGroupRank = status => statusGroupOrder.get(status) ?? 2;
 
 function StatusMenu({ parts: M, ids, busy, onStatus }) {
   return (
@@ -18,7 +28,7 @@ function StatusMenu({ parts: M, ids, busy, onStatus }) {
         <M.SubContent className={menuClass + " status-submenu"} sideOffset={5} collisionPadding={10}>
           {teamStatuses().map(status => (
             <M.Item key={status} className="menu-item" onSelect={() => onStatus(ids, status)}>
-              <span className={"status-symbol " + statusClass(status)}><StatusIcon status={status} /></span>
+              <span className="status-symbol" data-status-tone={statusClass(status)}><StatusIcon status={status} /></span>
               {statusLabel(status)}
               {ids.every(id => get("issues", id)?.status === status) && <Icon name="check" />}
             </M.Item>
@@ -67,7 +77,7 @@ function IssueRow({ record: r, selected, selectedIds, busy, onToggle, onSelectOn
               e.dataTransfer.setData("text/plain", r.id);
               e.dataTransfer.effectAllowed = "move";
             }}>
-            <span className={"status-symbol " + statusClass(r.status)}><StatusIcon status={r.status} /></span>
+            <span className="status-symbol" data-status-tone={statusClass(r.status)} role="img" aria-label={statusLabel(r.status)}><StatusIcon status={r.status} /></span>
             <span className="identifier">{r.identifier}</span>
             <strong>{r.title}</strong>
             <span className="row-meta">
@@ -110,24 +120,24 @@ function IssueRow({ record: r, selected, selectedIds, busy, onToggle, onSelectOn
 }
 
 export default function Issues() {
+  const v = get("views", S.view);
+  const group = v?.group_by || "status";
   const [selected, setSelected] = useState(() => new Set());
-  const [collapsed, setCollapsed] = useState(() => new Set());
+  const [collapsed, setCollapsed] = useState(() => new Set(group === "status" ? ["Done"] : []));
   const [hidden, setHidden] = useState(() => new Set());
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
   const mounted = useRef(true);
   useEffect(() => () => { mounted.current = false; }, []);
-  const contextKey = JSON.stringify([S.project, S.view, S.category, S.status, S.milestone, S.q]);
+  const contextKey = JSON.stringify([S.project, S.view, group, S.category, S.status, S.milestone, S.q]);
   const context = useRef(contextKey);
   context.current = contextKey;
   useEffect(() => {
     setSelected(new Set());
-    setCollapsed(new Set());
+    setCollapsed(new Set(group === "status" ? ["Done"] : []));
     setHidden(new Set());
-  }, [contextKey]);
-  const rows = filteredIssues(),
-    v = get("views", S.view),
-    group = v?.group_by || "status";
+  }, [contextKey, group]);
+  const rows = filteredIssues();
   const groups =
     group === "status"
       ? [
@@ -135,10 +145,7 @@ export default function Issues() {
             ...teamStatuses(),
             ...rows.map((r) => r.status).filter(Boolean),
           ]),
-        ].sort((a, b) => {
-          const rank = status => status === "Done" ? 0 : status === "Todo" ? 2 : status === "Backlog" ? 3 : 1;
-          return rank(a) - rank(b);
-        })
+        ].sort((a, b) => statusGroupRank(a) - statusGroupRank(b))
       : group === "category"
         ? S.db.categories
         : group === "priority"
@@ -294,11 +301,11 @@ export default function Issues() {
                 >
                   <ContextMenu.Root>
                     <ContextMenu.Trigger asChild>
-                      <div className="group-heading" data-group={k}>
+                      <div className="group-heading" data-group={k} data-status-tone={group === "status" ? statusClass(k) : undefined}>
                         <button type="button" className="quiet group-toggle" aria-expanded={!collapsed.has(k)}
                           aria-label={t(collapsed.has(k) ? "展開{0}群組" : "收合{0}群組", groupName(k))} onClick={() => toggleGroup(k)}>
                           <Icon name="chevron-right" />
-                          <span className={"status-symbol " + statusClass(k)}>
+                          <span className="status-symbol">
                             {group === "status" ? <StatusIcon status={k} /> : <Icon name="circle" />}
                           </span>
                           <strong>{groupName(k)}</strong>

@@ -53,9 +53,9 @@ const classes = {
   Done: "done",
   Canceled: "canceled",
   Blocked: "blocked",
-  "Ready for Test": "review",
+  "Ready for Test": "test",
   Todo: "todo",
-  Duplicate: "canceled",
+  Duplicate: "duplicate",
 };
 export const statusClass = (status) =>
   Object.hasOwn(classes, status) ? classes[status] : "backlog";

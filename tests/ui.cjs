@@ -249,10 +249,32 @@ const {selectTrigger,selectValue,optionValues,selectProject}=require('./controls
  const bulkView=await http('views',{project_id:bulkProject.id,name:'Bulk FE',category:'FrontEnd',placement:'tabs',group_by:'status'});
  const bulkPage=await context.newPage();bulkPage.on('pageerror',e=>errors.push(e.message));await bulkPage.goto(base+'/#/views/'+bulkView.id);await bulkPage.locator('.issue-row').first().waitFor();await bulkPage.getByRole('button',{name:'清單檢視',exact:true}).click();
  await bulkPage.locator('[data-action="nav"][data-page="issues"]').click();
- await bulkPage.locator('.group-heading[data-group="Done"]').waitFor();
- assert.deepEqual(await bulkPage.locator('.group-heading').evaluateAll(nodes=>nodes.map(n=>n.dataset.group)),['Done','In Progress','In Review','Canceled','Duplicate','Todo','Backlog']);
+ const statusHeadings=bulkPage.locator('.group-heading');
+ const statusOrder=['In Review','In Progress','Todo','Backlog','Done','Canceled','Duplicate'];
+ const doneGroup=bulkPage.locator('.issue-group').filter({has:bulkPage.locator('.group-heading[data-group="Done"]')});
+ const doneToggle=doneGroup.locator('.group-toggle'), doneRow=doneGroup.locator('.issue-row');
+ await doneToggle.waitFor();
+ const verifyStatusGroups=async()=>{
+   assert.deepEqual(await statusHeadings.evaluateAll(nodes=>nodes.map(n=>n.dataset.group)),statusOrder);
+   for(const selector of ['backgroundColor','color']){
+     const colors=await statusHeadings.evaluateAll((nodes,property)=>nodes.map(n=>getComputedStyle(property==='color'?n.querySelector('.status-symbol'):n)[property]),selector);
+     assert.equal(new Set(colors).size,statusOrder.length);
+   }
+   assert.equal(await doneToggle.getAttribute('aria-expanded'),'false');
+   assert.equal(await doneGroup.locator('.count').textContent(),'1');
+   assert.equal(await doneRow.isVisible(),false);
+ };
+ await verifyStatusGroups();
  await bulkPage.getByRole('button',{name:'看板檢視',exact:true}).click();
- assert.deepEqual(await bulkPage.locator('.group-heading').evaluateAll(nodes=>nodes.map(n=>n.dataset.group)),['Done','In Progress','In Review','Canceled','Duplicate','Todo','Backlog']);
+ await verifyStatusGroups();
+ await doneToggle.press('Space');
+ await doneRow.waitFor({state:'visible'});
+ await bulkPage.getByRole('button',{name:'清單檢視',exact:true}).click();
+ await doneRow.waitFor({state:'visible'});
+ await bulkPage.reload();
+ await doneToggle.waitFor();
+ await verifyStatusGroups();
+ passed.push('UI: distinct status colors, In Review first, and Done below Backlog collapsed by default in list and board');
  await bulkPage.goto(base+'/#/views/'+bulkView.id);await bulkPage.locator('.issue-row').first().waitFor();await bulkPage.getByRole('button',{name:'清單檢視',exact:true}).click();
  const selectionArea=bulkPage.locator('.issue-selection-area').first();
  await selectionArea.click({position:{x:1,y:1}});
@@ -260,7 +282,7 @@ const {selectTrigger,selectValue,optionValues,selectProject}=require('./controls
  await selectionArea.click({position:{x:1,y:1}});assert.equal(await bulkPage.locator('.issue-checkbox:checked').count(),0);
  await bulkPage.locator('.issue-checkbox').first().focus();await bulkPage.keyboard.press('Space');assert.equal(await bulkPage.locator('.issue-checkbox:checked').count(),1);
  await bulkPage.keyboard.press('Space');assert.equal(await bulkPage.locator('.issue-checkbox:checked').count(),0);
- passed.push('UI: completed groups first, unstarted groups last in list and board; full-height left gutter toggles selection without opening details, keyboard selection retained');
+ passed.push('UI: full-height left gutter toggles selection without opening details, keyboard selection retained');
  const bulkGroup=status=>bulkPage.locator('.group-heading[data-group="'+status+'"]');
  const selectBulkGroup=async status=>{await bulkGroup(status).click({button:'right'});await bulkPage.getByRole('menuitem',{name:'全選此群組',exact:true}).click();};
  const chooseBulkState=async label=>{await bulkPage.getByRole('button',{name:'動作',exact:true}).click();await bulkPage.getByRole('menuitem',{name:'變更狀態',exact:true}).hover();await bulkPage.getByRole('menuitem',{name:label,exact:true}).click();};
