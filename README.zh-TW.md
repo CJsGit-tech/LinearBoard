@@ -41,10 +41,12 @@ create-visuals -> approve the full set -> Design tickets + Approved JPGs
 create-issues-FE / create-issues-BE -> organize-task-batch (if needed)
     |
     v
-dispatch -> agents implement -> independent checks -> In Review
+dispatch -> implementer reports -> independent reviewer checks the target
     |
-    v
-I review the result -> accept (Done) or report a problem (debug)
+    +-- all required checks and acceptance gates met -> Done (in the app)
+    +-- required test unavailable -> Todo + what to verify next
+    +-- product failure or unfinished work -> remediation
+    `-- review underway or explicit acceptance pending -> In Review
 
 Confirmed change across records -> sync preview -> I approve -> update
 ```
@@ -53,7 +55,7 @@ Confirmed change across records -> sync preview -> I approve -> update
 
 ## 指令如何執行
 
-在 Codex 載入 [LinearBoard skill](skills/linearboard/SKILL.md) 後，可以先在對話中輸入 `$linearboard help`。例如 `$linearboard dispatch "PocketMap" "Milestone 1" Batch 1` 會請 Codex 處理指定的批次。使用時把專案、里程碑與批次換成看板上對應的名稱與編號。
+依 [Docker Compose](#docker-compose-與-postgresql) 啟動 App 並[載入 skill](#隨附-linearboard-skill)，再到 Codex 對話輸入 `$linearboard help`。有新點子就從 `planning` 開始。若已有專案，指定專案和里程碑，讓 Codex 接著使用已存的紀錄。這些指令在對話中輸入。
 
 ```text
 Command in Codex chat -> LinearBoard skill chooses the workflow
@@ -71,7 +73,22 @@ Command in Codex chat -> LinearBoard skill chooses the workflow
         -> read back the result and report what was verified
 ```
 
-LinearBoard 保存紀錄和驗證證據，Codex 與工具負責執行。`dispatch` 會啟動 agent，並在交回成果前獨立檢查實作行為。任務進入 `In Review` 後，由我決定何時驗收並移到 `Done`。[操作指南](docs/linearboard-guides/index.html) 提供各階段可直接複製的指令。
+LinearBoard 保存決策、任務與驗證證據，Codex 執行你指定的工作流程。交付時，由實作者以外的審閱者操作驗證目標、記錄證據並更新狀態。設計核准或任務明訂的使用者驗收，仍由你決定。
+
+Codex 會在回覆末尾列出 **Recommended next step**。需要你回答或核准時，會說明怎麼接續；可以往下做時，會說明下一個指令及理由。同一指令若適用於一個重點里程碑或多個已就緒的里程碑，會列出兩種範圍，由你選擇要執行哪一種。
+
+### 範例：接續既有里程碑
+
+假設 PocketMap 的 **M1 — Save a place** 已有分組使用者故事，在 Codex 輸入：
+
+```text
+$linearboard create-PRDs "PocketMap" "M1 — Save a place"
+沿用現有的儲存地點故事。先問我第一個會影響使用者操作或驗收的未決規則。
+```
+
+確認需求有連回故事，你的回答也寫進對應 PRD。交付任務都已就緒並加上 **Batch 1** 標籤後，可輸入 `$linearboard dispatch "PocketMap" "M1 — Save a place" Batch 1` 實作這批工作。若儲存流程已通過，但必測的裝置檢查暫時無法執行，審閱者會記下待驗項目，並把該任務移到 `Todo`。
+
+[繁體中文操作指南](docs/linearboard-guides/hands-on.zh-Hant.html#examples) 有可複製的指令、範圍選擇與交付驗證範例。請在本機開啟 HTML 使用互動功能。
 
 ## 系列文章
 
@@ -179,7 +196,7 @@ python3 server.py
 
 類別是唯一 Category 子標籤；一般 M／US／Coder labels 與原生 milestone 分開。PRD 以 Markdown 連結至里程碑文件中的故事段落。議題之間的來源關聯與相依使用 `relations`。`blocks` 禁止循環與跨專案關係。派工只接受 FE／BE、每筆一張任務、最多三筆 active，並拒絕重複 active assignment。計畫和完成回報有必填檢查，但真實 readiness、產品驗證和授權仍由執行端負責；資料存在不代表驗收。
 
-Automation 可建立 draft／evidence 附件。Design 票上的確切 JPG 若已登記並對應完整核准紀錄，會繼承 Approved。其餘附件核准與議題轉為 Done 由使用者操作。附件上傳以 `content_base64` 提供，或使用 `external_url`，上限 15 MB。Markdown 經 DOMPurify 清理。可辨識的 PNG／JPEG 顯示預覽，其餘以下載提供。
+Automation 可建立 draft／evidence 附件。Design 票上的確切 JPG 若已登記並對應完整核准紀錄，會繼承 Approved。其餘附件由使用者核准。獲授權的審閱者在必測項目與明訂的驗收條件都滿足後，從 App 介面將議題轉為 Done。附件上傳以 `content_base64` 提供，或使用 `external_url`，上限 15 MB。Markdown 經 DOMPurify 清理。可辨識的 PNG／JPEG 顯示預覽，其餘以下載提供。
 
 ## MCP 與 LinearBoard skill
 
@@ -206,7 +223,7 @@ Automation 可建立 draft／evidence 附件。Design 票上的確切 JPG 若已
 - `linearboard_get {kind, id, history?, members?}`：讀回資料／修訂／View 成員。
 - `linearboard_create {kind, data, idempotency_key}`：建立紀錄。
 - `linearboard_update {kind, id, data, idempotency_key}`：`data.expected_version` 必填。
-- `linearboard_update_issue_statuses {issue_ids, expected_versions, status, idempotency_key}`：批次變更同一專案的任務狀態；所有版本都符合才整批寫入。相同狀態不新增修訂，工具仍不可代替使用者完成最終驗收。
+- `linearboard_update_issue_statuses {issue_ids, expected_versions, status, idempotency_key}`：批次變更同一專案的任務狀態；所有版本都符合才整批寫入。相同狀態不新增修訂。Done 須經 App 介面設定。
 - `linearboard_trash_list {}`、`linearboard_trash_impact {kind, ids}`：列出垃圾桶，或讀取刪除影響與 fingerprint。
 - `linearboard_trash_move {kind, ids, fingerprint, idempotency_key}`、`linearboard_trash_restore {batch_id, idempotency_key}`：依已確認的影響移入與還原整批；永久清除由使用者透過介面操作。
 
@@ -304,3 +321,5 @@ export LINEARBOARD_PROJECT_DIR="/absolute/path/to/LinearBoard"
 首次安裝請先依上方 Compose 指令建立本機 secret、build 並啟動服務；skill 的 preflight 只重用或啟動既有部署，不負責初次建立資料卷、遷移或重設密碼。使用 `--url` 或 `LINEARBOARD_URL` 可指定服務位址，另行管理的開發服務可使用 `--no-autostart`。
 
 公開 repository 僅包含應用程式、測試與可重用 skill；`data/`、`output/`、資料庫備份、Compose 密碼、環境變數檔與相依套件均由 `.gitignore` 排除。產品管理紀錄持續保存在各使用者的 LinearBoard 資料庫中。
+
+已設定過 skill 的產品 repository 可重新執行 `$linearboard init <Project> [repository path]`，更新受管理的指示區塊與審閱者角色。接著在該 repository 開啟新的 Codex 對話，載入更新後的設定。

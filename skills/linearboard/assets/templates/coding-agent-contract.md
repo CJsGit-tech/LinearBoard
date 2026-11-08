@@ -72,6 +72,6 @@ Return:
 
 - **UI evidence, when applicable:** routes, states, viewports, visual versions compared, resolved discrepancies and project-required screenshots or visual evidence
 - **Remaining discrepancies, scope deviations, risks or blockers:** distinguish product defects/essential verification gaps from narrowly evidenced environment-only limitations; include affected criteria, cause evidence, impact and next verification action. Keep unverified checks `Not tested` or `Environment-blocked`.
-- **Recommended ticket state:** state whether implementation is ready for human review and why; an environment-limited check is not automatically unfinished implementation.
+- **Recommended ticket state:** identify whether the implementation is ready for independent verification, has a test restriction or requires remediation. Include the missing prerequisite where applicable.
 
-Keep credentials out of reports and evidence. The TPM independently verifies results and reviews the actual target UI before `In Review`, applying [review handoff and final acceptance](../../SKILL.md#review-handoff-and-final-acceptance). A qualifying environment limitation stays explicit in the handoff; only the user owns final acceptance and `Done`.
+Keep credentials out of reports and evidence. The assigned delivery reviewer verifies results and applicable UI independently, records evidence and updates the ticket under the [shared review status policy](../../SKILL.md#review-handoff-and-final-acceptance).

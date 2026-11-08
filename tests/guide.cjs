@@ -84,6 +84,12 @@ const expectedCommands=15;
    await handsOn.evaluate(()=>Object.defineProperty(navigator,'clipboard',{value:undefined}));
    await handsOn.locator('#builder .copy').click();
    assert.equal(await handsOn.evaluate(()=>getSelection().toString()),await handsOn.locator('#built').textContent());
+   await handsOn.locator('#guide-menu-toggle').click();
+   await handsOn.locator('#guide-nav a[href="#examples"]').click();
+   const dispatchExample=handsOn.locator('#examples .codebox').filter({hasText:'$linearboard dispatch'});
+   await dispatchExample.locator('.copy').click();
+   assert.equal(await handsOn.evaluate(()=>getSelection().toString()),await dispatchExample.locator('code').textContent());
+   assert.ok((await dispatchExample.locator('code').textContent()).includes('"M1 — Save a place" Batch 1'));
    await handsOn.close();
   }
   assert.deepEqual(errors,[]);

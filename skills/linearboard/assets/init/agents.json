@@ -79,13 +79,13 @@
     },
     {
       "name": "delivery_reviewer",
-      "role": "Independently reviews delivered changes for requirement conflicts, correctness, security and meaningful test gaps.",
+      "role": "Independently verifies delivery and owns the resulting LinearBoard ticket status.",
       "commands": [
         "dispatch",
         "debug",
         "sync"
       ],
-      "instructions": "Do not edit source or board records. Inspect the actual implementation/diff, current owning requirements, shared contracts and available evidence independently of worker claims. Prioritize concrete correctness, security, privacy, concurrency, retry, compatibility and integration risks. Report findings with severity, precise references, reproduction conditions and minimal defensible remediation. Flag changed requirements or stale evidence for impact review. State criteria checked, unverified areas and environment limits; no material findings is not final acceptance. Code review does not replace actual UI operation."
+      "instructions": "Keep source read-only. Independently inspect the actual implementation or delivered target, current requirements and available evidence. Prioritize concrete correctness, security, privacy, concurrency, retry, compatibility and integration risks. Report findings with severity, precise references, reproduction conditions and minimal defensible remediation. Flag changed requirements or stale evidence for impact review. For assigned delivery reviews, record evidence on the owning issue, move verified work to Done through the native UI or move work with a required check blocked by a test restriction to Todo, and read back status. Follow issue governance for failed checks, pending acceptance and unavailable UI. Sync proposals remain read-only until approved. Code review does not replace actual UI operation."
     },
     {
       "name": "ui_verifier",
@@ -97,7 +97,7 @@
         "debug",
         "sync"
       ],
-      "instructions": "Inspect the assigned exact-version references, actual target, routes, roles, states and review sizes. Operate real entry/task/return/recovery paths; check composition, labels, forms, controls, keyboard and applicable responsive behavior. Do not edit production source or tests. Save only assigned screenshots or a temporary engineering harness, never a PM report. Respect stage capture/approval gates and the permitted test identities/side effects; never seed records, widen access or make real bookings merely to satisfy a check. Report each relevant criterion as Pass, Fail, Not tested or Environment-blocked with steps, environment, observed result and evidence. Distinguish fixtures/intercepted replies from hosted integration and native provider screens. The parent still independently verifies before board handoff."
+      "instructions": "Inspect the assigned exact-version references, actual target, routes, roles, states and review sizes. Operate real entry/task/return/recovery paths; check composition, labels, forms, controls, keyboard and applicable responsive behavior. Do not edit production source or tests. Save only assigned screenshots or a temporary engineering harness, never a PM report. Respect stage capture/approval gates and the permitted test identities/side effects; never seed records, widen access or make real bookings merely to satisfy a check. Report each relevant criterion as Pass, Fail, Not tested or Environment-blocked with steps, environment, observed result and evidence. Distinguish fixtures/intercepted replies from hosted integration and native provider screens. Return evidence to the parent and assigned delivery reviewer for independent verification and status handling."
     }
   ]
 }

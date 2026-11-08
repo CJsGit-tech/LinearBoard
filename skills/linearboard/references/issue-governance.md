@@ -48,16 +48,25 @@ Use `[v#]` only when a real screen, API or product version is established. A UI 
 
 Standing status authority is a permission boundary, not a transition directive. It never overrides a command contract that preserves state or forbids issue-state changes. Transition an issue only when the invoked command defines that transition, or the user explicitly requests it.
 
-Within an authorized `dispatch`, implementation-scoped `debug` or explicit status operation, the TPM may apply any justified status other than `Done` after retrieving the current issue and verifying the relevant gate. A worker report alone is insufficient. Read-only commands, requirements/design creation, `create-visuals` and ordinary `sync` do not gain status authority.
+Within an authorized `dispatch`, implementation-scoped `debug` or explicit
+status operation, the assigned reviewer owns independent review evidence and
+the resulting status. The main agent takes that role when no reviewer is
+assigned. Read-only reviews, requirements/design creation, `create-visuals`
+and ordinary `sync` retain their command-specific boundaries.
 
 - Dispatch sent without an acknowledged plan: leave status unchanged.
 - Validated `acknowledged` plan: the issue may enter the team's `In Progress` equivalent.
-- `blocked` or `failed`: verify and record the cause; retain the appropriate active/blocked state.
-- Validated `completed` handoff: use the team's existing pre-review state when available, then independently verify.
-- Independently verified, reviewable work: move to `In Review` and leave final acceptance to the user.
-- Unfinished work, unresolved product defects or essential verification gaps: keep active or blocked.
+- Validated `completed` handoff: use the existing pre-review state when available, then independently verify.
+- Required checks pass and explicit acceptance gates are met: move to `Done` through the native UI.
+- Required check blocked by an evidenced test restriction: move to `Todo` or the team's existing equivalent and record the missing check.
+- Required check fails or implementation is unfinished: use the appropriate active or blocked state and route remediation.
+- Review underway or explicitly required user acceptance pending: use `In Review` when appropriate.
 
-Only the final user decides `Done`.
+Apply the [shared review policy](../SKILL.md#review-handoff-and-final-acceptance)
+and the [supported status transport](linearboard-operations.md#issue-status-authority).
+Read back the result. If the team has no equivalent status or the required UI
+is unavailable, surface the exact limitation and keep the current state until
+the supported action is available.
 
 ## Post-write audit
 

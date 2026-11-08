@@ -25,19 +25,22 @@ Planning → 4W1H vision Project Document → optional project Technical Baselin
 
 ## Next-command selection and recommendation
 
-End each LinearBoard command response with one standalone **Recommended next step:** line. Use the [Commands](#commands) section as the source of supported invocations. When a command is next, give one canonical invocation in backticks with its actual required arguments. Keep the resolved project, native milestone and requested issue or batch scope. Use the user's current objective and verified records to find the earliest missing deliverable that applies to that scope. A recommendation grants no authority to execute.
+End each LinearBoard command response with a **Recommended next step:** block. When recommending a command, lead with its name and why it moves the project forward. Then show the applicable scope choices for that same command. Choose the command using the user's current objective, chat context, and verified LinearBoard records, including completed work, remaining milestones, and dependencies. The last command's scope informs the recommendation. A prior run for one milestone alone does not limit the next recommendation to that milestone. Respect explicit limits on what the user wants considered. A recommendation grants no authority to execute.
 
-Choose the form of the line in this order:
+Choose the form of the block in this order:
 
-1. **Continue the current command when a reply is pending.** Name the exact response needed and the active command it resumes. PRD clarification, style selection, full visual approval and approval of a presented sync proposal are continuations. Put the question or approval scope above the line. Reuse an answer or approval that already covers the exact decision.
-2. **Recommend a new command when its inputs are ready.** Give the exact invocation. If the command is known but has a specific unmet prerequisite, put the prerequisite above the line and make the recommendation conditional. If another supported command can resolve the prerequisite first, recommend that command. Preserve any explicit preview-only or read-only boundary.
+1. **Continue the current command when a reply is pending.** Name the exact response needed and the active command it resumes. PRD clarification, style selection, full visual approval and approval of a presented sync proposal are continuations. Put the question or approval scope above the block. Reuse an answer or approval that already covers the exact decision.
+2. **Recommend a new command when its inputs are ready.** Use the [Commands](#commands) section for exact invocations in backticks, with resolved arguments. Show both choices when they offer distinct, meaningful scopes for the same command.
+   - **Focused scope** · Give the invocation for the most relevant milestone, batch, issue selection, or other supported scope. Explain when to choose it.
+   - **Full scope** · Cover all eligible work in the resolved project that serves the current objective. Give a supported project-wide invocation when available. If the command requires narrower arguments, list the exact invocations for the eligible scopes in dependency order where needed. Use an all-scope argument only when the command documents it.
+   - Show one invocation when the command has only one applicable scope or the choices would be identical. Briefly identify any work excluded by an unmet prerequisite and distinguish it from work that can start now. If another supported command can resolve the prerequisite first, recommend that command when it better serves the objective. Preserve any explicit preview-only or read-only boundary.
 3. **Name the immediate action when no command applies yet.** Examples include supplying the missing project or access, reviewing an item already in In Review, or opening a fresh project chat to load `init` configuration. Say when the requested workflow is complete. Avoid guessed arguments, invented commands, a generic `sync`, and a repeated `dispatch` that cannot make progress.
 
-For offline `help` or chat-only planning, use the supplied context without looking up a candidate project. When scope is clear, check relevant records and reuse completed work. An incomplete step on another milestone or an unrelated branch does not determine the next command.
+For offline `help` or chat-only planning, use the supplied context without looking up a candidate project. When the project is resolved, check relevant records and reuse completed work. Consider other milestones when they serve the user's current objective and flag any scope whose readiness cannot be verified.
 
 Use this order for the applicable deliverables:
 
-| Evidence in the current scope | Next command or continuation |
+| Evidence for the relevant work | Next command or continuation |
 | --- | --- |
 | Vision needs clarification | Continue `planning`. When the vision is ready and the next deliverable is the native document, recommend `create-vision-document`. |
 | A chosen stack or shared constraint warrants a missing technical baseline | `create-technical-baseline <Project>`. Otherwise proceed to milestones if they are missing. |
@@ -50,7 +53,7 @@ Use this order for the applicable deliverables:
 | Multiple delivery issues need ordering and no verified batch or explicit bounded selection exists | `organize-task-batch <Project> <Milestone>` with issue IDs if the scope is narrower. |
 | A verified batch has ready work and the required references and execution target are accessible | `dispatch <Project> <Milestone> Batch <n>`. Keep the full batch in the command and explain its internal sequence above the line. A verified native `Batch N` label suffices. A separate saved batch record is optional. |
 | A user-authorized issue subset is ready, or ready work has no applicable batch | `dispatch <Project> <Milestone> <issue IDs>`. |
-| The work is already In Review and the remaining gate is final user acceptance | Ask the user to review the named issue and its evidence. |
+| The only remaining gate is a user decision explicitly required for the issue | Ask for that decision on the named issue and its evidence. The assigned reviewer applies the status policy when the gate is met. |
 
 Use applicable stages only. Canonical requirements can establish that a BE-only or non-visual scope can skip design and visuals. Skip both design routing rows when the user explicitly chooses approved static visuals and the verified approval and accessible images cover the exact scope and visual version. An explicitly requested design deliverable still applies. Follow [delivery issue readiness](references/create-delivery-issues.md#sources-and-scope) for this route. If dispatch preflight finds a material blocker, name it and use the rules above. Ready work in the same authorized scope can proceed independently.
 
@@ -101,13 +104,13 @@ Interpret a leading command when supplied. Otherwise run the smallest command se
 - `organize-task-batch <Project> <Milestone> [issue IDs]`: organize delivery checkpoints and apply one filterable native Batch N label to each selected FE/BE issue. Read [task-batch organization](references/organize-task-batch.md).
 - `create-visuals <Project> <Milestone>`: extend the direction selected in `create-designs` across the remaining scoped screens and states and submit the complete set for review. See [visual workflow](references/create-visuals.md).
 
-- `dispatch <Project> <Milestone> [Batch <n> | issue IDs]`: dispatch only the authorized issue selection, validate worker plans, independently verify results and hand reviewable work to `In Review`. Read [dispatch](references/coding-dispatch.md) and [issue governance](references/issue-governance.md).
+- `dispatch <Project> <Milestone> [Batch <n> | issue IDs]`: dispatch only the authorized issue selection, validate worker plans, then assign independent verification and ticket status updates. Read [dispatch](references/coding-dispatch.md) and [issue governance](references/issue-governance.md).
 - `debug [Project] [Milestone] [report or issue IDs]`: the coding agent records the report and expectation in its BUG ticket, investigates, fixes, verifies and comments directly there. Triage-only stops after recording. Read [debug](references/debug.md), [issue governance](references/issue-governance.md) and [Views](references/issue-views.md).
 - `sync <Project> <Milestone> [scope or new request]`: review affected documents, milestones, issues, acceptance criteria and relations. First show one proposed from/to block per affected record in chat and wait for explicit approval. Apply only approved changes, including specified UI evidence updates, then read back the results. Read [sync](references/sync.md).
 
 Planning checks a user-chosen stack against the core product flows. Detailed SDK and deployment research starts at FE/BE issue creation. Carry unresolved implementation questions forward to those issues. Technology lookup and selection run internally within `create-issues-FE` and `create-issues-BE`; they are not separate user commands.
 
-Creating a draft in LinearBoard is a mutation and requires a user request that authorizes creation or editing. A request to review or explain never authorizes a LinearBoard write.
+Creating a draft in LinearBoard is a mutation and requires a user request that authorizes creation or editing. A read-only review or explanation preserves the board. An authorized delivery review includes the scoped evidence and status updates defined below.
 
 Every actual issue-creation command also creates or reuses its project/category LinearBoard View as part of the authorized output, including when matching issues already exist. Follow [issue Views](references/issue-views.md) for `create-PRDs`, `create-issues-FE`, `create-issues-BE` and their aliases, plus the post-approval Design-ticket stage of `create-visuals`; `debug` BUG tickets reuse the matching FE/BE View or create it if missing. `create-designs` and the merged `create-milestones`/story aliases create no issues or View. A label, unsaved filter or chat link is not a saved View. Read-only commands do not create Views.
 
@@ -137,27 +140,42 @@ The command list above is the routing map; do not load unrelated references. For
 
 ## Review handoff and final acceptance
 
-`In Review` means the scoped implementation is ready for the final user to review. It does not mean final acceptance, production readiness, or that every check passed.
+Across LinearBoard projects, the assigned delivery reviewer independently verifies
+the delivered work, records evidence on each assigned issue, applies the
+appropriate status and reads it back. The main agent fills that role when no
+reviewer is assigned. The user's standing instruction authorizes the reviewer
+to apply these outcomes within an authorized delivery review.
 
-- **In Progress / blocked:** implementation or product remediation remains, or essential behavior cannot be independently verified. Crashes, incorrect data, broken core flows, and uncertain defect attribution remain here.
-- **In Review:** the scoped implementation is complete, the TPM has independently checked the main behavior and applicable evidence, and a reviewable handoff is recorded in LinearBoard. Waiting for user acceptance is not ongoing development.
-- **Done:** only the final user accepts the delivery and decides the disposition of any outstanding checks or risks.
+- **Done:** All applicable required acceptance checks passed on the specified
+  target and any explicitly required user acceptance is recorded. Use the
+  native LinearBoard UI for Done.
+- **Todo:** A required check could not run because of an evidenced test
+  restriction, such as unavailable test credentials, devices, environment or
+  a user-deferred live check. Record what passed, what remains untested and
+  the prerequisite to resume. Use the team's existing Todo equivalent when
+  named differently.
+- **In Progress or Blocked:** A product defect, implementation gap or failed
+  required check needs remediation. Record the failure and route it back.
+- **In Review:** The review is still underway or an explicit issue-specific
+  acceptance decision is pending. Record the outstanding gate.
 
-A narrow environment-only limitation may remain in `In Review` when the actual target application and relevant flows have been inspected, available checks support review readiness, and independent evidence attributes the remaining limitation to the platform, runtime, or external test environment rather than unfinished product work. Do not keep otherwise reviewable work in `In Progress` solely for that limitation. No extra approval is required for this justified non-Done transition within an authorized scope.
-
-Record the exact affected criterion and environment, reproduction and attribution evidence, verified results, remaining impact, and next verification action in the issue. Mark the affected check `Not tested` or `Environment-blocked`, never `Pass`; preserve actual failed results and screenshots. State that the issue is ready for review with this limitation and that final acceptance remains with the user. Update any current handoff conclusion that would otherwise contradict the new state, while retaining its evidence and history.
-
-This is not a blanket waiver of UI review or testing. An unavailable target application, missing required deployment/reference, broadly uninspected UI, unverified core flow, or unresolved product defect still blocks review readiness. Do not silently substitute another environment or claim changed requirements as a passing check. Preserve existing authorization boundaries when changing environments or adding follow-up work.
+For a test restriction, identify the exact criterion, environment, observed
+restriction, impact and next verification action. Record it as `Not tested` or
+`Environment-blocked`. Preserve the actual results and supporting evidence.
+A substitute environment only satisfies a requirement if the accepted test
+contract permits it. If the reviewer lacks access to complete an authorized
+status action, hand the exact issue and evidence to the main agent for the
+supported action and verify the result before reporting it as changed.
 
 ## Dispatch and independent review
 
-Dispatch only the explicitly authorized issue selection. For ordinary dispatch the TPM retains LinearBoard writes, integration and acceptance review; each worker owns one bounded, non-overlapping issue. Use at most three concurrent workers, validate each plan before implementation, and require reports for acknowledgment, completion, blockage or failure. A report is a claim, not verification.
+Dispatch only the explicitly authorized issue selection. The TPM retains dispatch records and integration. Each implementer owns one bounded, non-overlapping issue. The delivery reviewer owns its assigned verification evidence and status. Use at most three concurrent workers, validate each plan before implementation, and require reports for acknowledgment, completion, blockage or failure. A report is a claim, not verification.
 
 Read [coding dispatch](references/coding-dispatch.md) for readiness, worker lifecycle and independent checks. Operate the actual target UI for user-visible work; passing tests, deployment status, static inspection or a worker screenshot alone do not prove the flow. Use credentials only when the authorized test requires them, project instructions permit them and they are safely available; never expose or modify them. Project-specific PocketStocks rules live only in [PocketStocks delivery exception](references/pocketstocks-delivery.md).
 
 ## UI implementation review gate
 
-Every dispatched issue that changes or verifies user-visible UI must pass the independent gate in [coding dispatch](references/coding-dispatch.md#ui-implementation-review-gate) before `In Review`. Missing access to the target application, required deployment/reference or essential UI comparison blocks review readiness. Evidence screenshots prove the inspected implementation state; they never become a canonical design.
+Every dispatched issue that changes or verifies user-visible UI must pass the independent gate in [coding dispatch](references/coding-dispatch.md#ui-implementation-review-gate) before closure. An evidenced test restriction on the required target or comparison follows the Todo rule. Evidence screenshots prove the inspected implementation state; they never become a canonical design.
 
 ## Authorization boundaries
 
@@ -167,9 +185,9 @@ Every dispatched issue that changes or verifies user-visible UI must pass the in
 
 - `dispatch` authorizes workers only for the exact issues or bounded selection resolved from the user's command. It never authorizes scope expansion, destructive actions or unrelated deployment.
 - Status transitions follow [issue governance](references/issue-governance.md). Standing authority never overrides a command that preserves state or forbids status changes.
-- The final user owns the `In Review` → `Done` decision and makes that transition after considering the recorded completion evidence. The TPM never moves a ticket to `Done` or makes that decision on the user's behalf.
+- The assigned reviewer applies the [review status policy](#review-handoff-and-final-acceptance) within the authorized issue scope. Respect any explicit issue-specific acceptance gate.
 - Deletion, reassignment, scheduling, scope changes, uploads and external publication require authority appropriate to that action. Record deletion uses impact preview and recoverable trash; permanent deletion remains a user UI action.
-- For ordinary dispatch the TPM writes to LinearBoard. Under `debug`, the assigned coding agent creates or reuses its BUG ticket, records the report and expectation, and posts its own result comment directly on that ticket. The TPM retains independent verification and review transitions.
+- The TPM writes dispatch records and validates worker handoffs. Under `debug`, the assigned coding agent creates or reuses its BUG ticket and posts its own report and result. The delivery reviewer owns independent verification and its resulting evidence and status.
 - Never claim approval, implementation, verification, or completion from an agent's self-report alone.
 
 ## Completion criteria

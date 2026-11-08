@@ -420,7 +420,7 @@
         <li>確認本機 LinearBoard 預設服務是 <code>http://127.0.0.1:8765</code>，或明確提供另一個 loopback URL。</li>
         <li>指定真正存在的 team、project 與 milestone；不要用目前瀏覽器頁面或資料夾名稱猜目的地。</li>
         <li>檢查回傳的 LinearBoard document、issue 與 View 連結，以及讀回後的欄位與關聯。</li>
-        <li>把「討論」、「建立紀錄」、「派工實作」、「In Review」與最終使用者接受分開。</li>
+        <li>分清楚討論、寫入紀錄、派工實作，以及依證據決定交付狀態。</li>
       </ol>
       <div class="note">若 connected <code>linearboard_*</code> tools 不可用，skill 會改用 <code>scripts/operate.py</code> 進行服務 preflight 與操作。這不是改用 Linear SaaS。</div>
       <div id="commands-start"></div>
@@ -454,7 +454,7 @@
           <p>不要為了遵守指令順序而重做已完成文件，也不要把 read-only 規劃誤當成實作授權。</p>
         </article>
       </div>
-      <p>最後一行 <strong>Recommended next step:</strong> 優先指出接續目前指令所需的回覆；否則提供確切的下一個指令或立即可做的事。推薦不會授權執行。</p>
+      <p>回覆末尾的 <strong>Recommended next step</strong> 會說明如何接續待定事項，或建議下一個指令及理由。同一指令若有重點與完整兩種有意義的範圍，會列出可執行的選項，由你決定。</p>
       <div class="note warm"><strong>先建票，後派工。</strong> <code>create-issues-FE</code>／<code>create-issues-BE</code> 只建立 Backlog issues 與 saved Views；<code>dispatch</code> 才讓 agents 實作。</div>
       <label class="done-row"><input type="checkbox" data-progress="workflow">我能從現有產出選擇下一步，不會儀式性重跑整條流程。</label>
     </section>
@@ -523,15 +523,18 @@
 
     <section id="execution">
       <span class="eyebrow">08 / Dispatch → Review</span>
-      <h2>派工、獨立驗證與 final acceptance</h2>
+      <h2>派工、獨立驗證與任務狀態</h2>
       <div id="commands-execution"></div>
       <div class="three">
-        <article class="mini-card"><span class="eyebrow">In Progress</span><h3>仍需實作或修復</h3><p>產品缺陷、核心流程未驗證或 attribution 不明時，不能交審。</p></article>
-        <article class="mini-card"><span class="eyebrow">In Review</span><h3>可供使用者審閱</h3><p>Implementation complete，TPM 已做獨立檢查並記錄證據；不等於 production ready。</p></article>
-        <article class="mini-card"><span class="eyebrow">Done</span><h3>只由 final user 決定</h3><p>TPM 與 coding agents 都不能代替使用者接受交付。</p></article>
+        <article class="mini-card"><span class="eyebrow">Done</span><h3>必測項目通過</h3><p>明訂的驗收也已取得。審閱者從 App 介面設定 Done，再讀回確認。</p></article>
+        <article class="mini-card"><span class="eyebrow">Todo</span><h3>必測項目暫時無法執行</h3><p>記下測試限制、受影響項目與補測條件。</p></article>
+        <article class="mini-card"><span class="eyebrow">In Progress / Blocked</span><h3>仍需實作或修復</h3><p>必測項目失敗或實作未完成，交回修正。</p></article>
+        <article class="mini-card"><span class="eyebrow">In Review</span><h3>審閱或驗收決定尚未完成</h3><p>記下尚待完成的檢查，或任務明訂的使用者決定。</p></article>
       </div>
-      <div class="note"><strong>Agent lifecycle：</strong>worker 先讀來源並回報 <code>acknowledged</code>／<code>blocked</code>；TPM 驗證 plan 後才放行 implementation。Worker report 是 claim，TPM 仍需檢查 source／deployment、執行適當 checks，一般派工的 LinearBoard 寫入由 TPM 負責。Debug 的 BUG 票與結果留言則由負責修復的 coding agent 寫入。</div>
-      <label class="done-row"><input type="checkbox" data-progress="execution">我能區分 worker report、TPM verification、In Review 與 user acceptance。</label>
+      <div class="note">TPM 確認實作者的計畫後才放行。實作者回報後，由另一位審閱者操作指定目標，記錄每張任務的證據與狀態。Debug 的 BUG 票和結果留言由負責修復的實作者寫入。</div>
+      <h3>派工範例</h3>
+      <p>在 Codex 輸入 <code>$linearboard dispatch "PocketMap" "M1 — Save a place" Batch 1</code>。先確認 Batch 1 的任務成員與就緒條件。如果儲存流程通過，但必測的手機目前無法取得，審閱者會記下補測條件，將該票移至 Todo。</p>
+      <label class="done-row"><input type="checkbox" data-progress="execution">我能區分實作回報、獨立驗證及各種審閱結果。</label>
     </section>
 
     <section id="maintenance">
@@ -549,8 +552,8 @@
       <details><summary>create-designs 為什麼沒有 Design issues？</summary><p>本指令比較三個可操作方案，選定後記錄至設計總覽與畫面互動規格。Design tickets 要等 <code>create-visuals</code> 的完整設計範圍明確核准後才建立。</p></details>
       <details><summary>什麼時候需要比較三個品牌方案？</summary><p>新的風格方向比較正好三個方案。同一範圍及版本已有明確選擇時，可重用選擇並接續剩餘畫面與狀態。</p></details>
       <details><summary>View 看不到正確 issues，應該改 issue 狀態嗎？</summary><p>先修 View filters 與 membership。Saved View 應依 project 與精確 Category 組合；不要為了配合錯誤 View 改 issue 狀態或 labels。</p></details>
-      <details><summary>Worker 說 completed，可以直接移到 Done 嗎？</summary><p>不行。TPM 必須獨立驗證後才能交到 In Review；Done 永遠由 final user 決定。</p></details>
-      <details><summary>測試環境限制是否一定卡在 In Progress？</summary><p>只有狹窄、已明確 attribution 的 environment-only limitation，可以在主要 target 與流程已檢查、其他證據支持 review readiness 時保留於 In Review；該檢查必須標示 Not tested 或 Environment-blocked，不能寫 Pass。</p></details>
+      <details><summary>實作者回報完成後，如何判定 Done？</summary><p>指定審閱者獨立檢查實際交付目標。必測項目通過且明訂的使用者驗收已記錄時，由審閱者從 App 介面設定 Done。</p></details>
+      <details><summary>測試環境不可用時，任務放在哪裡？</summary><p>若有證據顯示必測項目因環境限制無法執行，將該項記為 Not tested 或 Environment-blocked，任務移至 Todo，並記下補測條件。產品問題交回修正。</p></details>
       <h3>最後檢查</h3>
       <ul class="checklist">
         <li><label><input type="checkbox">我指定了正確 team、project、milestone 與本次產出。</label></li>
@@ -567,7 +570,7 @@
 
     <footer>
       <h3>教學依據與版本</h3>
-      <p>依 2026-11-07 本機安裝的 <code>/Users/chuang/.codex/skills/linearboard/SKILL.md</code> 整理，並以 <code>references/linearboard-operations.md</code>、<code>issue-governance.md</code>、<code>create-designs.md</code>、<code>create-visuals.md</code>、<code>create-design-tickets.md</code>、<code>issue-views.md</code>、<code>coding-dispatch.md</code>、<code>debug.md</code> 與 <code>sync.md</code> 的責任邊界呈現。這份 HTML 是操作指南，不是另一份 backlog、PRD 或 LinearBoard 即時鏡像；skill 更新後，以當時安裝版本與 LinearBoard canonical records 為準。</p>
+      <p>依據隨附的 <code>skills/linearboard/SKILL.md</code> 與各指令的參考文件，2026-11-08 核對。執行時，以目前載入的 skill 和看板上的正式紀錄為準。</p>
       <p>範例中的佔位符應換成實際 team／project／milestone、issue IDs、已核准視覺及執行目標。</p>
     </footer>
   </main>
@@ -753,10 +756,10 @@
     "view": "—",
     "when": "已指定交付票或可解析的 Batch N，且可檢查執行目標時。",
     "input": "已就緒的 FE／BE IDs，或能在專案與里程碑內解析成確切 IDs 的 Batch N；另需適用的已核准視覺及可操作的執行目標。",
-    "output": "派工紀錄、通過檢查的 worker 計畫、實作回報、TPM 獨立證據；可供審閱的工作到 In Review。",
+    "output": "派工紀錄、已確認的實作計畫、實作回報，以及審閱者的獨立驗證證據與讀回確認的任務狀態。",
     "check": "從實際 App 正常入口驗證主要流程；報告結果、環境限制與 remaining checks，並讀回 issue 與派工紀錄。",
-    "example": "$linearboard dispatch \u003cProject> \u003cMilestone> \u003cIssue IDs>\n先檢查是否可派工，僅派送指定範圍。使用指定儲存庫及實際執行目標，獨立驗證後才交審。",
-    "limit": "未就緒時只做唯讀檢查。最多三位 worker，各負責一張範圍明確的票。一般派工由 TPM 寫入並獨立審查，Done 由使用者決定。"
+    "example": "$linearboard dispatch \u003cProject> \u003cMilestone> \u003cIssue IDs>\n先確認就緒，再派送指定任務。獨立驗證實際交付目標，記錄證據，最後讀回任務狀態。",
+    "limit": "未就緒時只做唯讀檢查。最多三位實作者，各負責一張任務。TPM 協調派工與整合；指定審閱者記錄證據並更新所負責的任務狀態。"
   },
   {
     "name": "debug",
@@ -768,7 +771,7 @@
     "when": "有可辨識的問題回報或重現路徑時。",
     "input": "問題觀察、預期行為及重現背景，或既有 issue IDs。",
     "output": "coding agent 先建立或重用對應 BUG 票並記錄回報，再調查。修復後在同一張票留言：Status、Why、Action、Check。",
-    "check": "讀回回報、預期、來源連結與 FE／BE View。交審前確認代理的結果留言及 TPM 獨立驗證證據。",
+    "check": "讀回回報、預期、來源連結與 FE／BE View。確認實作者的結果留言、獨立審閱證據及更新後的狀態。",
     "example": "$linearboard debug \u003cProject> \u003cMilestone> \u003cReport or issue IDs>",
     "limit": "只分流時，核對 BUG 票及對應 FE 或 BE View 後停止。若 View 缺少則建立。行為有爭議或新增需求時，走 sync 審閱。"
   },

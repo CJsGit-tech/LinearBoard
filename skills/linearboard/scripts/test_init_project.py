@@ -52,6 +52,16 @@ class InitTests(unittest.TestCase):
         self.assertTrue(all(r['developer_instructions'] and r['description'] for r in roles))
         self.assertTrue(all('model' not in r and 'sandbox_mode' not in r for r in roles))
 
+    def test_generated_reviewer_owns_evidence_based_status_updates(self):
+        self.apply()
+        role = self.repo / '.codex/agents/delivery_reviewer.toml'
+        instructions = tomllib.loads(role.read_text())['developer_instructions']
+        self.assertIn('move verified work to Done through the native UI', instructions)
+        self.assertIn('blocked by a test restriction to Todo', instructions)
+        self.assertIn('read back status', instructions)
+        self.assertNotIn('Never mark Done', instructions)
+        self.assertNotIn('Do not edit source or board records', instructions)
+
     def test_repeat_leaves_all_bytes_and_mtimes_unchanged(self):
         self.apply()
         before = self.files()

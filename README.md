@@ -41,10 +41,12 @@ create-visuals -> approve the full set -> Design tickets + Approved JPGs
 create-issues-FE / create-issues-BE -> organize-task-batch (if needed)
     |
     v
-dispatch -> agents implement -> independent checks -> In Review
+dispatch -> implementer reports -> independent reviewer checks the target
     |
-    v
-I review the result -> accept (Done) or report a problem (debug)
+    +-- all required checks and acceptance gates met -> Done (in the app)
+    +-- required test unavailable -> Todo + what to verify next
+    +-- product failure or unfinished work -> remediation
+    `-- review underway or explicit acceptance pending -> In Review
 
 Confirmed change across records -> sync preview -> I approve -> update
 ```
@@ -53,7 +55,7 @@ I use `debug` to turn review feedback into a linked bug ticket. When an agreed c
 
 ## How a command runs
 
-After loading the [LinearBoard skill](skills/linearboard/SKILL.md), try `$linearboard help` in Codex chat. A command such as `$linearboard dispatch "PocketMap" "Milestone 1" Batch 1` asks Codex to work on that batch. Replace the sample names and batch number with values from your own board.
+Follow [Quick start](#quick-start) and [load the skill](#included-management-skill), then send `$linearboard help` in Codex chat. Use `planning` for a new idea, or name an existing project and milestone to continue from its saved records. These are chat prompts.
 
 ```text
 Command in Codex chat -> LinearBoard skill chooses the workflow
@@ -71,7 +73,23 @@ Command in Codex chat -> LinearBoard skill chooses the workflow
         -> read back the result and report what was verified
 ```
 
-LinearBoard stores the records and evidence. Codex and its tools carry out the work, including launching agents for `dispatch` and checking the delivered behavior before handing it back to me. I decide when an issue in `In Review` is ready for `Done`. The [hands-on guides](docs/linearboard-guides/index.html) have copyable prompts for each stage.
+LinearBoard stores decisions, tickets, and evidence. Codex runs the requested workflow. During delivery, a reviewer other than the implementer checks the target, records the evidence, and applies the status. Required user decisions, such as approving a design or accepting a ticket that explicitly asks for sign-off, stay with you.
+
+Codex ends with **Recommended next step**. It tells you how to resume a pending decision or gives the next command and why it helps. When the same command can cover a focused milestone or a wider set of ready milestones, it shows both options. You choose what to run.
+
+### Example: Pick up an existing milestone
+
+Suppose PocketMap already has a milestone called **M1 — Save a place** with a grouped user story. Send:
+
+```text
+$linearboard create-PRDs "PocketMap" "M1 — Save a place"
+Use the existing save-place story. Ask me about the first unresolved rule
+that affects what the user can do or how we'll test it.
+```
+
+Check that the saved requirements link back to the story and that your answer appears in the owning PRD. Once the related delivery tickets are ready and labeled **Batch 1**, `$linearboard dispatch "PocketMap" "M1 — Save a place" Batch 1` asks Codex to implement that batch. For example, if saving works but a required device check cannot run, the reviewer records the missing check and moves the ticket to `Todo`.
+
+The [hands-on guide](docs/linearboard-guides/hands-on.en.html#examples) walks through command selection, scope choices, and the delivery checks with copyable prompts. Open the HTML file locally for the interactive guide.
 
 ## Articles
 
@@ -181,7 +199,7 @@ Without `DATABASE_URL`, the server uses SQLite (by default `data/linearboard.sql
 
 Press **C** to create an issue and **/** to search outside editable controls. Forms use explicit Save buttons. Record details provide Back navigation and **Alt+←**. Updates from external tools appear on explicit navigation or reopening a record; an open editor is not overwritten by background writes.
 
-Default workflow states: Backlog, Todo, In Progress, In Review, Done, Canceled, and Duplicate. Teams can define custom states. A referenced state cannot be removed. **Done** and native visual approval require a user action; automation cannot grant final acceptance.
+Default workflow states: Backlog, Todo, In Progress, In Review, Done, Canceled, and Duplicate. Teams can define custom states. A referenced state cannot be removed. An authorized reviewer uses the native UI for **Done** after meeting the required checks and any explicit acceptance gate. Other than Design JPGs that inherit a recorded set approval, native attachment approval stays with the user.
 
 ## Data, backups, and trash
 
@@ -239,6 +257,8 @@ export LINEARBOARD_PROJECT_DIR="/absolute/path/to/LinearBoard"
 ```
 
 Perform the initial Compose setup yourself using the steps above. The skill's preflight reuses or starts an existing deployment; it does not initialize volumes, migrate data, or rotate passwords. Image-generation commands also require the host's `imagegen` skill and tools, which are not bundled here.
+
+For a product repository already configured with this skill, run `$linearboard init <Project> [repository path]` again to refresh the managed instructions and reviewer role. Start a fresh Codex chat in that repository to load the refreshed configuration.
 
 The bundle is a publication snapshot. Changes to a personal skill installation do not automatically update this repository. Product requirements, planning decisions, task states, approvals, and delivery evidence belong in the LinearBoard application rather than a parallel repository backlog.
 

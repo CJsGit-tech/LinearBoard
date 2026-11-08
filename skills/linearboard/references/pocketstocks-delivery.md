@@ -10,9 +10,9 @@ The worker must wait for terminal deployment status, inspect AppDeploy QA/runtim
 
 ## Independent UI review
 
-After the worker reports completion, the TPM must operate the deployed AppDeploy UI, inspect the affected routes and required states, and compare it with canonical story behavior and approved visuals. A worker screenshot, deployment status, backend response, passing build or static inspection does not replace this review.
+After the worker reports completion, the assigned delivery reviewer must operate the deployed AppDeploy UI, inspect the affected routes and required states, and compare it with canonical story behavior and approved visuals. A worker screenshot, deployment status, backend response, passing build or static inspection does not replace this review.
 
-Return material discrepancies for focused remediation and repeat affected checks after a new worker report. Unresolved product defects remain active or blocked. Apply the shared review-handoff policy only after the deployed UI is reviewable.
+Return material discrepancies for focused remediation and repeat affected checks after a new worker report. Unresolved product defects remain active or blocked. Apply the [shared review status policy](../SKILL.md#review-handoff-and-final-acceptance) if a test restriction prevents the required hosted verification.
 
 When discrepancies are resolved:
 

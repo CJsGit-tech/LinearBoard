@@ -68,7 +68,7 @@ Read capability `resources` for exact fields and `statuses_by_team` from `/api/s
 - Batches optionally persist explicitly authorized checkpoint proposals via `batches`; dispatches are separate `dispatches`, each with exactly one FE/BE issue and a maximum of three active assignments. Store the acknowledgement/plan in review state, then the TPM-accepted plan before executing; record worker reports and independent verification separately. A dispatch row does not spawn a worker.
 - Evidence uses `evidence` with project/issue, criterion, environment, result and body; actual evidence and external tool output must substantiate every Pass.
 - Do not invent cycles, estimates, permissions, user directories or other absent Linear SaaS features. Assignee is an application string. Placement is tabs or shared within the selected application project.
-- Automation cannot set Done. Confirmed Design JPGs may inherit an existing user approval through the verified Design-ticket workflow. The final user controls those UI actions; do not spoof `X-LinearBoard-Actor:user` in the client. An actual user design approval in chat may be recorded as exact-scope evidence under the create-visuals gates; recording it is not setting that native field.
+- The automation API cannot set Done. For an authorized Done transition use the normal LinearBoard UI, following the applicable browser tool rules. Do not spoof `X-LinearBoard-Actor:user` or bypass the API gate. Confirmed Design JPGs may inherit a recorded user approval through the Design-ticket workflow. Other attachment approvals retain their own user-controlled gate.
 
 ## Image attachments
 
@@ -121,11 +121,11 @@ For issue categories, delivery shape, titles, allowed transitions and post-write
 
 ## Issue status authority
 
-Use [issue governance](issue-governance.md#status-authority). A status change must be part of the invoked command's defined workflow or explicitly requested; generic mutation authority never overrides a preserve-state rule. Retrieve before and after every authorized transition. Only the final user decides `Done`.
+Use [issue governance](issue-governance.md#status-authority). A status change must be part of the invoked command's defined workflow or explicitly requested; generic mutation authority never overrides a preserve-state rule. Retrieve before and after each transition. Use the native UI for authorized `Done` transitions. Use the supported API or UI for `Todo` and other permitted states.
 
 ## Dispatch-related transitions
 
-Use [coding dispatch](coding-dispatch.md) for the worker lifecycle and [issue governance](issue-governance.md#status-authority) for transitions. For ordinary dispatch the TPM writes to LinearBoard. Under `debug`, the assigned coding agent creates or reuses its BUG ticket, records the report and expectation, and posts its own result comment directly on that ticket. The TPM retains independent verification and review transitions. Read [PocketStocks delivery exception](pocketstocks-delivery.md) only when that resolved project and UI scope apply.
+Use [coding dispatch](coding-dispatch.md) for the worker lifecycle and [issue governance](issue-governance.md#status-authority) for transitions. The TPM owns dispatch records. The assigned delivery reviewer owns independent verification evidence and review status updates. Under `debug`, the assigned coding agent creates or reuses its BUG ticket and records its result there. Read [PocketStocks delivery exception](pocketstocks-delivery.md) only when that resolved project and UI scope apply.
 
 ## Post-write audit
 

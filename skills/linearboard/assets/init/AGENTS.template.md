@@ -42,10 +42,10 @@ validates the plan and explicitly releases execution. This is an internal
 checkpoint, not a repeated user-approval request. Read-only specialists return
 findings directly. Worker reports are claims for independent verification.
 
-The main agent writes ordinary workflow records. Debug BUG ownership follows
-the skill unless an existing explicit repository rule requires main-only board
-writes. A worker may write only its own BUG when explicitly assigned and both
-rules permit it. No other delegated board write is implied.
+The main agent writes ordinary workflow records. The assigned delivery
+reviewer owns verification evidence and status for the tickets in its review
+scope. The main agent covers that role when no reviewer is assigned. Debug
+implementers write only their own BUG when authorized.
 
 LinearBoard remains the sole product-work store: visions, milestones, stories,
 PRDs, decisions, approvals, relations, Views and delivery evidence stay there.
@@ -107,16 +107,18 @@ a separate native mobile implementation. Distinguish fixture/adaptor checks,
 real hosted data and provider-managed screens. Attribute limitations with
 evidence; never turn an untested criterion into Pass.
 
-The main agent independently inspects results and applicable UI before moving
-review-ready work to In Review under the skill’s evidence rules. The user alone
-accepts work and moves it to Done. Deployment and consequential live-data
-changes need authorization covering that target/action; reuse existing
-authorization without repeated permission requests. Protect secrets in all
-tools, source, logs and screenshots.
+The delivery reviewer verifies the actual target and records the result on
+the owning ticket. Follow the shared skill’s review policy. Move verified
+tickets to Done using the native UI and move tickets with a required check
+blocked by test restrictions to Todo. Route failed checks for remediation.
+Read the resulting status back. Deployment and consequential live-data
+changes require authorization covering that target and action. Protect
+secrets in all tools, source, logs and screenshots.
 
-End each LinearBoard command response with one standalone **Recommended next step:**
-line using the skill router. Preserve the verified batch or explicitly selected
-issue scope. Use an exact supported invocation for a new command. If the
-current command is waiting for a reply, name the reply that resumes it.
-A recommendation grants no authority to execute.
+Use the skill router to end each LinearBoard command response with a
+**Recommended next step:** block. Name the command first, then give the exact
+focused and full-scope invocations for that command when both apply. Resolve
+the choices from verified LinearBoard records and chat context. If the current
+command is waiting for a reply, name the reply that resumes it. A recommendation
+grants no authority to execute.
 <!-- linearboard:init:end -->

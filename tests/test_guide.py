@@ -161,7 +161,8 @@ class GuideRouteTests(unittest.TestCase):
         debug = next(command for command in GuideHTML(html).command_data() if command['name'] == 'debug')
         for requirement in ['coding agent', 'BUG', '記錄回報，再調查', '同一張票', 'Status、Why、Action、Check']:
             self.assertIn(requirement, debug['output'])
-        self.assertIn('TPM 獨立驗證', debug['check'])
+        self.assertIn('獨立審閱證據', debug['check'])
+        self.assertIn('更新後的狀態', debug['check'])
         self.assertIn('只分流時，核對 BUG 票及對應 FE 或 BE View 後停止', debug['limit'])
         self.assertNotIn('Bugs Project Document', html)
 

@@ -70,11 +70,12 @@ The reusable assets are `assets/init/AGENTS.template.md` and
 that shared registry. Generated guidance references the installed skill/router,
 current templates and shared change-review method rather than duplicating them.
 
-The main agent routes commands and coordinates sources, decisions, integration
-and independent verification. Ordinary board writes remain with the main
-agent; debug ownership follows the skill unless existing project instructions
-explicitly require main-only writes. Preserve that distinction in the generated
-roles instead of silently changing a repository's policy.
+The main agent routes commands and coordinates sources, decisions and
+integration. The generated delivery reviewer owns scoped independent review
+evidence and ticket status under the shared review policy. The main agent
+owns other ordinary board writes, with the own-BUG exception for debug.
+Rerun `init` to refresh managed blocks. Report custom role instructions
+that conflict with the new policy so the owner can reconcile them.
 
 Explain when to use each stage, prerequisites and approval gates, bounded agent
 ownership and acknowledgment/release, plus which checks each specialist performs.

@@ -36,7 +36,7 @@ Dispatch is prohibited only for issues whose current status is `Canceled`, `Dupl
 
 ## Dispatch readiness gate
 
-Use [shared change review](change-review.md) to baseline source versions, respond immediately to mid-build changes, and compare the latest criteria and references immediately before In Review.
+Use [shared change review](change-review.md) to baseline source versions, respond immediately to mid-build changes, and compare the latest criteria and references immediately before applying the review outcome.
 
 Retrieve each target issue and its canonical LinearBoard sources. Dispatch only when material product inputs and execution access are available; explicitly owned engineering research may remain as planned work:
 
@@ -77,13 +77,13 @@ The worker first reviews the sources and existing implementation. For UI work, i
 
 The TPM checks source coverage, scope, visual understanding, ownership and planned verification, then explicitly releases the worker to execute. An acknowledgment alone does not authorize implementation. This is a TPM checkpoint, not a new user-permission request. Return incomplete plans for correction. Material discoveries that invalidate the plan require another TPM check before dependent work continues.
 
-Preserve applicable repository and conditionally loaded project-specific delivery rules in the request. Worker checks never replace independent TPM review.
+Preserve applicable repository and project-specific delivery rules in the request. Worker checks never replace independent delivery review.
 
 ## Mandatory report-back lifecycle
 
-Use [review handoff and final acceptance](../SKILL.md#review-handoff-and-final-acceptance) to distinguish review readiness from final acceptance. A narrow evidenced environment limitation can accompany `In Review`; unresolved product defects or essential verification gaps cannot.
+Apply the [review status policy](../SKILL.md#review-handoff-and-final-acceptance) to the actual evidence for each issue.
 
-For ordinary dispatch the TPM writes to LinearBoard. Under `debug`, the assigned coding agent creates or reuses its BUG ticket, records the report and expectation, and posts its own result comment directly on that ticket. The TPM retains independent verification and review transitions.
+The TPM owns dispatch and integration records. The assigned reviewer owns verification evidence and resulting status for each assigned issue. Under `debug`, the coding agent records the report and result on its own BUG before independent review.
 
 ```text
 LinearBoard issue ready
@@ -100,13 +100,12 @@ Agent implements and reports completed, blocked, or failed
     ↓
 TPM validates the completed handoff and may move it to Ready for Test
     ↓
-TPM independently inspects available source or deployment results and runs relevant checks
+Reviewer independently inspects the delivered target, runs required checks and applies the UI gate
     ↓
-TPM applies the UI gate and any conditionally loaded project-specific delivery rules
-    ↓
-Review-ready handoff → In Review with any qualifying environment limits; product failures → In Progress or Blocked
-    ↓
-Final user reviews In Review and moves accepted work to Done
+Verified → Done via native UI
+Required test blocked by a restriction → Todo
+Product failure → remediation in an active or blocked state
+Explicit acceptance decision pending → In Review
 ```
 
 Hard invariants:
@@ -116,11 +115,11 @@ Hard invariants:
 - The TPM must receive a later implementation report before any subsequent implementation-status update. A validated completed handoff may use the team’s existing `Ready for Test` equivalent while TPM review is pending; if absent, retain the active state and record review pending. Do not create a status.
 - Agent silence, ambiguous identity, or an incomplete report leaves the ticket unchanged.
 - A `completed` report is a claim, not verification.
-- The TPM must inspect available source or deployment results, apply the UI gate and follow any conditionally loaded project-specific delivery rules before `In Review`.
-- Passing checks, static inspection, a coding-agent screenshot, or a coding-agent claim never substitutes for TPM visual review.
+- The reviewer must inspect the delivered target, apply the UI gate and follow applicable project-specific rules before closing the issue.
+- Passing checks, static inspection, a coding-agent screenshot, or a coding-agent claim never substitutes for independent visual review.
 - Never claim success from a worker's self-report alone.
 - Every transition must satisfy [issue governance](issue-governance.md#status-authority) and the applicable report and verification gates.
-- The TPM moves independently verified, review-ready work to `In Review` and leaves it there for the final user. Apply the linked policy for limited environment checks; do not report them as passed or keep completed work active solely for them. The final user owns acceptance and `Done`.
+- The assigned reviewer records the review evidence, applies the status and verifies it. For `Done`, use the native UI. If unavailable to the reviewer, the main agent handles the supported action using the reviewer’s exact issue and evidence.
 
 ## Agent report contract
 
@@ -137,16 +136,16 @@ On report receipt:
 5. For user-visible UI work, apply the UI implementation review gate and any project-specific delivery reference.
 6. If findings require correction, return a focused task to the responsible agent and wait for a new report. Repeat the UI inspection after every relevant visual remediation.
 7. Write the accepted report summary and verification evidence to the issue in LinearBoard, including any project-required visual evidence.
-8. After a valid completed handoff, use the existing `Ready for Test` equivalent while TPM verification is pending, or retain the active state if absent. Apply the UI review gate and linked review-handoff policy before `In Review`; move review-ready work there with its limitations recorded, and retain `In Progress` or Blocked for unresolved product failures or essential verification gaps. The final user owns any later transition to `Done`.
+8. The reviewer applies the shared status policy after independent verification. Use `Done` for verified work through the native UI, `Todo` for a required test blocked by restrictions, and the applicable active or blocked state for product failures. Record any explicit acceptance gate that is still pending.
 9. Retrieve the issue and verify the comment, evidence, links, attachments and state.
 
 Do not store agent reports in repository files. The canonical accepted report and evidence belong on the LinearBoard issue.
 
 ## UI implementation review gate
 
-Apply this gate to every dispatched issue that changes or verifies user-visible UI. A worker's completed report is only a handoff to the TPM.
+Apply this gate to every dispatched issue that changes or verifies user-visible UI. A worker's completed report is a handoff for independent review.
 
-Before `In Review`, the TPM must:
+Before closing the issue, the reviewer must:
 
 1. Retrieve the applicable story acceptance, requirements, approved visual reference, routes, states and required viewports.
 2. Operate the actual target application after the change is present in the project-required environment; record environment, route, session and data scenario.
@@ -155,14 +154,14 @@ Before `In Review`, the TPM must:
 5. Return material discrepancies for focused remediation, wait for a new worker report and repeat affected checks.
 6. Record dated evidence identifying what was inspected, references compared, findings resolved, checks, limitations and review conclusion. Retrieve the issue and verify its evidence and state.
 
-Passing builds, tests, deployment status, static inspection or worker evidence does not waive this gate. Missing the actual target, required deployment/reference or essential comparison blocks review readiness. A narrowly evidenced environment-only limitation may follow the root review-handoff policy, but remains explicitly unverified.
+Passing builds, tests, deployment status, static inspection or worker evidence does not waive this gate. If a test restriction prevents a required target check, record the missing check and apply the shared Todo rule.
 
 If the resolved project is PocketStocks, read [PocketStocks delivery exception](pocketstocks-delivery.md) for AppDeploy, viewport and JPG evidence requirements.
 
 ## Automatic own-ticket records and cross-record sync
 
-The TPM writes each assignment identity (issue, agent/run identity, bounded ownership and source versions), validated plan, research conclusion/technical contract, blocker, delivery report and independent verification to its own issue as the work progresses. Update or reference an existing matching entry rather than replaying duplicate comments. Do not require a separate `sync` command after every report. Workers report to TPM and never write LinearBoard.
+The TPM records the assignment identity, validated plan, technical decisions, blockers and worker handoff on the owning issue. The assigned reviewer records independent verification and updates that issue’s status. Reuse matching entries and avoid a separate `sync` for routine review. Implementers report to the TPM during ordinary dispatch.
 
 A dispatch does not implicitly authorize rewriting source US, PRDs, QA, Design documents or unrelated Views. When a confirmed decision has authorized cross-record effects, apply [sync](sync.md) within that scope. Otherwise list the affected records and obtain only the missing material edit authorization. Preserve original QA answers and revisions; do not turn an engineering proposal into a confirmed product decision.
 
-For FE, verification includes the actual affected UI interaction and comparison to the exact approved visual. For BE, verify resulting data and applicable deduplication, write consistency, partial failure, retry and recovery behavior. Verify only applicable criteria; report unavailable hardware or runtime evidence as unverified/environment-blocked at the criterion level. Decide the issue state using the linked review-handoff policy rather than treating every blocked check as unfinished implementation. Neither static images nor a passing unit test prove an untested end-to-end flow.
+For FE, verification includes the actual affected UI interaction and comparison to the exact approved visual. For BE, verify resulting data and applicable deduplication, write consistency, partial failure, retry and recovery behavior. Verify only applicable criteria; report unavailable hardware or runtime evidence as unverified/environment-blocked at the criterion level. Apply the shared status policy to distinguish a blocked test from unfinished implementation. Neither static images nor a passing unit test prove an untested end-to-end flow.

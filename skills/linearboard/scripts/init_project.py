@@ -73,8 +73,9 @@ def role_block(role: dict) -> str:
         'Supported command responsibilities: ' + ', '.join(role['commands']) + '.\n'
         'Commands do not grant authority beyond the delegated stage and scope.\n'
         + role['instructions'] + '\n'
-        'Report concise source-backed results to the main agent. Never mark Done,\n'
-        'deploy, send external messages, spawn agents or save PM report archives.\n'
+        'Report concise source-backed results to the main agent. Follow the board\n'
+        'permissions for this role. Do not deploy, send external messages, spawn\n'
+        'agents or save PM report archives.\n'
         + ROLE_END
     )
 
