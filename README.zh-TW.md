@@ -313,6 +313,8 @@ PostgreSQL 交易目前使用應用程式層級的 advisory lock，保留原 SQL
 
 完整管理 skill 位於 [`skills/linearboard/SKILL.md`](skills/linearboard/SKILL.md)，包含 references、工作流範本、agents metadata 與 Python 操作工具。這些是可重用的 authoring instructions，不是任何專案的 PRD、backlog 或驗收資料。此 bundle 是發布時的副本，更新個人安裝版本不會自動同步到 repository。
 
+各次工作流程的更新日期與內容，請參閱 [LinearBoard skill 更新紀錄](skills/linearboard/logs.md)。
+
 可在 Codex 直接指定此 repository 內的 LinearBoard `SKILL.md`，或將 [`skills/linearboard/`](skills/linearboard/) 與 [`skills/design-pro/`](skills/design-pro/) 一起安裝至 `~/.codex/skills/`，保留兩者並列的目錄結構。若已安裝，請先保留原版本。兩個設計指令使用隨附的 `design-pro`。同步流程另參照獨立安裝的 `file-change-summary` skill。
 
 若 checkout 不在原始作者的路徑，請在使用 skill 自動啟動服務前設定：
