@@ -95,8 +95,8 @@ Do not claim enforcement or a passing audit that was not actually run.
 ## Design, verification and handoff
 
 Follow the current skill’s design method and exact selected direction.
-Keep mockups isolated and deliver an interactive HTML gallery with reachable
-screens/states. Style selection is not complete-set approval. Only after the
+Keep React Native prototypes isolated and provide launch instructions and an
+in-app review menu with reachable screens and states. Style selection is not complete-set approval. Only after the
 applicable approval upload confirmed JPGs to their owning Design issues and
 verify the supported approval workflow. Production captures are evidence,
 not newly approved designs.

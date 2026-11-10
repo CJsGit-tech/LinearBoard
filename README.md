@@ -32,10 +32,13 @@ create-milestones -> milestones + grouped stories
 create-PRDs -> clarify open product decisions
     |
     v
-create-designs -> choose a direction
+create-designs -> compare three React Native proposals -> choose one
     |
     v
-create-visuals -> approve the full set -> Design tickets + Approved JPGs
+create-visuals -> review React Native screens
+    |
+    v
+Full-set approval -> Design tickets + Approved JPGs
     |
     v
 create-issues-FE / create-issues-BE -> organize-task-batch (if needed)
@@ -244,7 +247,7 @@ Start the HTTP app first, then configure a stdio server in your MCP client:
 
 Available tools include `linearboard_capabilities`, `linearboard_list`, `linearboard_get`, `linearboard_create`, `linearboard_update`, `linearboard_update_issue_statuses`, and the `linearboard_trash_*` operations. Inspect `/api/capabilities` for exact fields and contracts. List calls are paginated; follow every `next_cursor`. The supplied `linearboard.client.Client` supports MCP connections, readback, reuse, and exact retries.
 
-LinearBoard persists records and exposes the 15 canonical commands and their aliases in the capability catalog. Codex and external tools interpret the skill, build and review local HTML prototypes, run agents, and inspect the actual target product. Share runnable prototype links in chat and link the owning Design tickets or their native Approved JPGs from LinearBoard records.
+LinearBoard persists records and exposes the 15 canonical commands and their aliases in the capability catalog. Codex and external tools interpret the skill, build and review local React Native prototypes, run agents, and inspect the actual target product. Share prototype launch instructions and review menu entries in chat and link the owning Design tickets or their native Approved JPGs from LinearBoard records.
 
 ### Included management skill
 

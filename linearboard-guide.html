@@ -434,7 +434,7 @@
       <div class="flow">
         <a href="#planning">願景／技術基線／Milestones</a><b>→</b>
         <a href="#requirements">Stories／PRDs</a><b>→</b>
-        <a href="#design">三個 HTML 方案／選風格</a><b>→</b>
+        <a href="#design">三個 React Native 方案／選風格</a><b>→</b>
         <a href="#cmd-create-visuals">全套視覺／核准</a><b>→</b>
         <a href="#delivery">Design／FE／BE issues</a><b>→</b>
         <a href="#cmd-organize-task-batch">Checkpoints</a><b>→</b>
@@ -477,7 +477,7 @@
       <div class="three">
         <article class="mini-card"><span class="eyebrow">Database</span><h3>PostgreSQL-backed</h3><p>應透過 App／tools 操作；不可直接改 database 或 legacy SQLite backup。</p></article>
         <article class="mini-card"><span class="eyebrow">Deletion</span><h3>Recoverable trash</h3><p>先做 impact preview；record deletion 進入可復原垃圾桶，永久刪除留給使用者 UI。</p></article>
-        <article class="mini-card"><span class="eyebrow">Visual exception</span><h3>Read-only gallery</h3><p>兩個設計指令的版本化 HTML 審閱包可留在本機；核准仍記在 LinearBoard。</p></article>
+        <article class="mini-card"><span class="eyebrow">Visual exception</span><h3>Read-only gallery</h3><p>兩個設計指令的 React Native 原型留在本機；核准仍記在 LinearBoard。</p></article>
       </div>
       <div class="note">如果 LinearBoard、workspace、team、project 或必要權限不可用，停止受影響操作並回報 blocker；不要改存本機文件或切換到 Linear SaaS。</div>
       <label class="done-row"><input type="checkbox" data-progress="storage">我能分辨 LinearBoard canonical records、repository 工程檔案與視覺 gallery 例外。</label>
@@ -504,7 +504,7 @@
       <h2>品牌提案、風格選擇與完整視覺審閱</h2>
       <p><code>create-designs</code> 與 <code>create-visuals</code> 是兩個不同階段。前者比較三個可操作方案；選定前不寫入 LinearBoard，選定後將確切版本記入兩份設計文件。後者沿用該風格完成指定畫面、元件與狀態。</p>
       <div id="commands-design"></div>
-      <div class="note warm"><strong>核准順序：</strong>確認風格 → 審閱完整可操作 HTML → 明確核准全套設計 → 建立或重用 Design 票與 View，並上傳各票必要的 JPG。原型連結留在對話中。核准前僅在另行要求時截圖；確切的設計 JPG 會繼承該範圍的 Approved，其餘附件由使用者核准。</div>
+      <div class="note warm"><strong>核准順序：</strong>確認風格 → 在指定平台操作完整的 React Native 原型 → 明確核准全套設計 → 建立或重用 Design 票與 View，並上傳各票必要的 JPG。啟動方式與審閱選單留在對話中。核准前僅在另行要求時截圖；確切的設計 JPG 會繼承該範圍的 Approved，其餘附件由使用者核准。</div>
       <label class="done-row"><input type="checkbox" data-progress="design">我能分辨風格選擇、完整設計核准、必要 JPG 上傳與原生附件核准。</label>
     </section>
 
@@ -557,7 +557,7 @@
       <h3>最後檢查</h3>
       <ul class="checklist">
         <li><label><input type="checkbox">我指定了正確 team、project、milestone 與本次產出。</label></li>
-        <li><label><input type="checkbox">我知道這次是 read-only、LinearBoard write、本機 HTML 審閱，還是 dispatch。</label></li>
+        <li><label><input type="checkbox">我知道這次是 read-only、LinearBoard write、本機 React Native 原型審閱，還是 dispatch。</label></li>
         <li><label><input type="checkbox">我檢查實際 document／issue／View links 與 readback，不只相信完成宣告。</label></li>
         <li><label><input type="checkbox">我沒有把 PM records 另存到 repository 或第二個 database。</label></li>
         <li><label><input type="checkbox">我保留 unresolved、environment limits 與 user acceptance 的真實狀態。</label></li>
@@ -686,8 +686,8 @@
     "view": "—",
     "when": "有使用者可見的範圍，尚未確認風格方向時。",
     "input": "既有設計文件或 brief、適用故事與 PRDs、目標平台及主要使用流程。",
-    "output": "正好三個可操作的 HTML／Tailwind／JS 方案與離線索引。明確選定風格後，於互相連結的 Design Overview 與 Screen and Interaction Specification 記錄確切版本。",
-    "check": "從索引開啟三版，以相同範例資料與目標寬度操作主要流程及返回路徑。選定後讀回兩份文件及風格規則。",
+    "output": "正好三個可操作的 React Native 方案，從原型內的審閱選單切換。明確選定風格後，於互相連結的 Design Overview 與 Screen and Interaction Specification 記錄確切版本。",
+    "check": "在指定平台啟動原型，從審閱選單開啟三版，以相同範例資料與目標尺寸操作主要流程及返回路徑。選定後讀回兩份文件及風格規則。",
     "example": "$linearboard create-designs \u003cProject> \u003cMilestone>\n使用既有設計背景或提供的 brief，展示同一操作流程的三個可操作方向，等我選擇。",
     "limit": "選定版本前 LinearBoard 維持唯讀。同範圍及版本可重用已確認方向。不建 Design 票、不建 View、不改正式程式。"
   },
@@ -696,14 +696,14 @@
     "syntax": "create-visuals \u003cProject> \u003cMilestone>",
     "title": "完成並審閱選定的設計",
     "phase": "設計",
-    "effect": "本機 HTML；核准後建立 Design 票",
+    "effect": "React Native 原型；核准後建立 Design 票",
     "view": "Designs（完整核准後）",
     "when": "兩份設計文件已記錄相符的確切風格版本時。",
     "input": "create-designs 已記錄的確切風格及版本，以及範圍內畫面、元件及狀態清單。",
-    "output": "有版本的可操作 HTML 與離線索引。明確核准全套設計後，建立含原生 Approved JPG 的 Design 票與 Designs View。",
-    "check": "由索引操作指定目標上的各畫面及關鍵狀態。核准後核對畫面及版本、繼承的核准、各票 JPG 預覽及 View 成員。",
-    "example": "$linearboard create-visuals \u003cProject> \u003cMilestone>\n將已記錄的風格延伸到所有指定畫面與狀態，提供互動索引及確切版本清單供完整核准。",
-    "limit": "原型連結留在對話中。完整設計核准前，截圖須另行要求。對應核准範圍的確切 JPG 會繼承 Approved，其餘附件核准由使用者操作。"
+    "output": "有版本的 React Native 畫面與原型內的審閱選單。明確核准全套設計後，建立含原生 Approved JPG 的 Design 票與 Designs View。",
+    "check": "在指定平台從原型的審閱選單操作各畫面及關鍵狀態。核准後核對畫面及版本、繼承的核准、各票 JPG 預覽及 View 成員。",
+    "example": "$linearboard create-visuals \u003cProject> \u003cMilestone>\n將已記錄的風格延伸到所有指定畫面與狀態，提供啟動方式、審閱選單與確切版本清單供完整核准。",
+    "limit": "啟動方式與審閱選單留在對話中。完整設計核准前，截圖須另行要求。對應核准範圍的確切 JPG 會繼承 Approved，其餘附件核准由使用者操作。"
   },
   {
     "name": "create-issues-FE",

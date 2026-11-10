@@ -12,7 +12,11 @@ For `create-designs`, state what the proposals will hold in common and give one 
 
 ## Target platform
 
-Scope the declared platform and requested view sizes. Follow existing navigation, terminology, controls and accessibility conventions for that platform. A browser depiction of a native screen is a design study. Defer SDK and deployment research to FE/BE issue creation.
+Scope the declared platform and requested review sizes. Follow its navigation, input and accessibility conventions. Both commands author every draft and review screen as React Native components. Use the project's compatible React Native tooling in an isolated prototype, or default to Expo for a new prototype. Production stack selection stays with the product's delivery work.
+
+- For iOS or Android, launch and operate the prototype on the scoped simulator, emulator or device. For a web target, use React Native Web from the same React Native source. Review only the requested target and sizes. If the required runtime is unavailable, keep the source, report the blocker and unverified screens or states, and complete the required checks before requesting the dependent selection or approval.
+- Keep the versioned prototype source, package manifest and lockfile, local assets and fictional fixtures together. Provide an in-app review menu with labeled proposal, screen and state entries. Share the project location, install and launch commands, required runtime, and menu entries or tested deep links in chat. For an Expo prototype, use the scoped option such as `npx expo start --ios`, `npx expo start --android` or `npx expo start --web` with the required dependencies installed. See [Expo launch instructions](https://docs.expo.dev/get-started/start-developing/) and [web setup](https://docs.expo.dev/workflow/web/).
+- Do not deliver standalone HTML drafts, DOM/CSS mockups, or an HTML review index. A React Native Web preview is evidence only for the web rendering that was operated.
 
 ## Design direction
 
@@ -26,25 +30,11 @@ For an open direction, use identity and composition to turn the product’s subj
 
 ## Find resources for runnable drafts
 
-For both `create-designs` and `create-visuals`, start with the project's design system and any references already selected. When a draft needs an icon, reusable UI component or animation and there is no suitable reference yet, proactively look up the relevant asset or example in an official catalog, component guide or maintainer's repository. Choose what fits the action, visual direction and lightweight HTML/CSS/JavaScript draft. Use a native control or a simple CSS transition when it serves the interaction.
+Start with the project's design system, selected references and [React Native components](https://reactnative.dev/docs/components-and-apis). For gaps, prefer compatible native controls or a maintained React Native package. Use [Lucide](https://lucide.dev/icons/) as the default icon family. Uiverse may supply visual inspiration when relevant. Recreate any useful pattern with React Native components and styles. Check license, dependencies, platform support, interaction states and reduced motion before adopting a resource.
 
-Use the Uiverse MCP when the project’s own components and native controls leave a concrete gap. Describe the screen, action, state, visual direction and platform in the search brief. Use search_components to find candidates and inspect_component and get_component_source to inspect promising examples. Check the source, author, license, dependencies, selector scope, input states and motion. Use preview_components when appearance or motion matters, then operate the adapted control in the rendered draft, including keyboard and reduced-motion behavior where applicable. A catalog preview establishes only what was observed there.
+For each external resource used, show the screen/control/state, exact component or asset name, source link and credited author when available, what was adapted and why it fits. Prefer a pinned source link when available. Document shared choices once and reuse them wherever the same interaction recurs. Keep these references alongside the proposal for review. After the user chooses a direction, carry its mappings into the screen specification. During `create-visuals`, reuse those choices and look up only what newly covered states need.
 
-Choose as many or as few references as the task warrants, including zero. If the MCP is unavailable or no result fits, use a suitable local or native control. Disclose unavailable checks and cite only sources actually used.
-
-Use these sites as starting points across projects. Browse the categories relevant to the draft and choose by audience, visual direction, intended interaction and target stack.
-
-| Draft need | Reference sites |
-| --- | --- |
-| Icons | Use [Lucide](https://lucide.dev/icons/) as the default icon family. |
-| Styled controls | Use [levxyca’s Uiverse button](https://uiverse.io/levxyca/tidy-mayfly-7) as an HTML/CSS reference when an outlined button suits the action. Check focus and pressed feedback in the draft and retain the license notice when copying code. |
-| Motion or animation | Use [Uiverse](https://uiverse.io/) to find a specific effect when motion helps explain a state change. Link the exact example used and verify equivalent feedback with reduced motion. Motion is optional. |
-
-Other official catalogs or maintainer examples may better fit a particular draft. For imagery, link the selected visual to the screen or section where it appears and identify whether it served as inspiration or was bundled.
-
-For each external resource used, show the screen/control/state, exact component or asset name, source link and credited author when available, what was adapted and why it fits. Prefer the pinned source link returned by the MCP. Document shared choices once and reuse them wherever the same interaction recurs. Keep these references alongside the proposal for review. After the user chooses a direction, carry its mappings into the screen specification. During `create-visuals`, reuse those choices and look up only what newly covered states need.
-
-Bundle any required assets and attribution locally. Open the draft offline and check that the icons render, the controls work and the same feedback is available with reduced motion.
+Bundle required assets and attribution locally. Launch the prototype and check that icons render, controls work and reduced motion preserves the same feedback. Use local fixtures so checks need no live product services.
 
 ## Controls and interactions
 
@@ -55,16 +45,16 @@ Choose between an icon alone and an icon with a visible text label based on the 
 - Use dialogs for bounded tasks. Provide a clear exit and restore focus to the initiating control. For lists distinguish no data, no matching results and load failure, each with an appropriate next action.
 - Keep keyboard focus visible, preserve reading order and convey status through text or shape as well as color. Motion should explain a state change and respect reduced-motion preferences. Apply [interaction guidance](interaction-loading-motion.md) for applicable loading, retry and recovery behavior.
 
-## Build and review the runnable page
+## Build and review the runnable prototype
 
 After sharing the rationale, use this sequence for each new draft. For a revision, start with the step affected by the change and recheck the affected journey.
 
 1. Map the screens. Name the job of each destination, its entry point, the main action and the return path. Decide what stays visible and what opens on demand.
-2. Build the HTML. Put realistic content, headings, landmarks, links and controls in task order. Use the same sample scenario across competing proposals.
-3. Apply the visual direction in CSS. Use type, spacing, alignment and contrast to make priority and grouping visible. Check the layout at the intended review sizes with realistic content.
-4. Connect the interactions in JavaScript where needed. Wire navigation, selections and the applicable pending, success, failure and retry states using local sample data. Preserve meaningful context when the visitor returns.
-5. Review in the browser. Open each entry from the offline index. Follow the primary task and its return path, then exercise relevant alternate states, keyboard controls and reduced motion. Check whether the rendered page supports the stated rationale.
-6. Fix and verify. Revise the source where the layout or behavior makes the task harder, repeat the affected checks and hand over direct links with observed results and any untested paths.
+2. Build the screens with React Native components such as `View`, `Text`, `Pressable` and `TextInput`. Use the same sample scenario across competing proposals and give interactive controls accessible labels and roles.
+3. Apply the visual direction with React Native styling. Use type, spacing, alignment and contrast to show priority and grouping. Check safe areas, layout and realistic content at the intended sizes.
+4. Wire navigation, selections and applicable pending, success, failure and retry states with local fixtures. Preserve meaningful context when the visitor returns.
+5. Open each entry from the in-app review menu on the scoped runtime. Follow the main task and its return path, then exercise alternate states and relevant touch, keyboard, focus and reduced-motion behavior.
+6. Fix and verify. Repeat the affected checks and hand over launch instructions, menu entries, observed results and any untested paths.
 
 ## From written decisions to observed results
 

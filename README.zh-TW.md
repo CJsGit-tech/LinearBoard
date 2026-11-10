@@ -32,10 +32,13 @@ create-milestones -> milestones + grouped stories
 create-PRDs -> clarify open product decisions
     |
     v
-create-designs -> choose a direction
+create-designs -> compare three React Native proposals -> choose one
     |
     v
-create-visuals -> approve the full set -> Design tickets + Approved JPGs
+create-visuals -> review React Native screens
+    |
+    v
+Full-set approval -> Design tickets + Approved JPGs
     |
     v
 create-issues-FE / create-issues-BE -> organize-task-batch (if needed)
@@ -233,7 +236,7 @@ Automation 可建立 draft／evidence 附件。Design 票上的確切 JPG 若已
 2. **Codex／外部工具** 解讀 `planning`、產出產品文字、訪談、生成視覺與 gallery、選擇批次、執行 coding agents、實際操作待測產品並做獨立驗證。
 3. **LinearBoard skill** 定義本應用程式的規劃、需求、設計、交付、除錯與同步流程，透過原生 REST API 或 MCP 工具讀寫紀錄。以隨附的 `skills/linearboard/SKILL.md` 為流程依據。
 
-App 保存派工與驗證紀錄，Codex 和外部工具負責執行與檢查。`create-designs` 和 `create-visuals` 的可操作 HTML 留在工作區並在對話中分享。LinearBoard 紀錄連結至 Design 票或原生 Approved JPG。
+App 保存派工與驗證紀錄，Codex 和外部工具負責執行與檢查。`create-designs` 和 `create-visuals` 會把可操作的 React Native 原型留在工作區，並在對話中分享啟動方式與審閱選單。LinearBoard 紀錄連結至 Design 票或原生 Approved JPG。
 
 ## 開發與可重現檢查
 

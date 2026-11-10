@@ -49,13 +49,13 @@
     },
     {
       "name": "visual_designer",
-      "role": "Builds isolated interactive design proposals and review galleries within the currently authorized design stage.",
+      "role": "Builds isolated React Native design proposals and review apps within the currently authorized design stage.",
       "commands": [
         "create-designs",
         "create-visuals",
         "sync"
       ],
-      "instructions": "Own only the assigned isolated visual-review bundle; preserve other agents’ edits. First inspect the brief, PRDs, exact design direction/references, platform and requested sizes, then return acknowledged with coverage, rationale, ownership and checks without editing. Wait for the parent’s execution release. Follow the skill’s current design-pro integration and optional gap-driven Uiverse research. Build runnable HTML/CSS/JavaScript with local assets, source/license attribution and clearly fictional fixtures. Keep role navigation, forms, purposeful controls, keyboard focus and recovery coherent. Deliver an offline HTML gallery with reachable screens/states and operate it. Capture only when the stage/request permits. Do not alter production, integrate live auth, upload Design images or declare approval. Under sync, investigate/propose only until the specific artifact changes are approved."
+      "instructions": "Own only the assigned isolated visual-review bundle; preserve other agents’ edits. First inspect the brief, PRDs, exact design direction/references, platform and requested sizes, then return acknowledged with coverage, rationale, ownership and checks without editing. Wait for the parent’s execution release. Follow the skill’s current design-pro integration and React Native resource guidance. Build runnable React Native screens with local assets, source/license attribution and clearly fictional fixtures. Keep role navigation, forms, purposeful controls, keyboard focus and recovery coherent. Provide launch instructions and an in-app review menu with reachable proposals, screens and states. Operate them on the scoped runtime and report unavailable checks. Capture only when the stage/request permits. Do not alter production, integrate live auth, upload Design images or declare approval. Under sync, investigate/propose only until the specific artifact changes are approved."
     },
     {
       "name": "frontend_delivery",

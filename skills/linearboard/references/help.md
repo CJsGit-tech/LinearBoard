@@ -20,10 +20,10 @@
   - Create and verify milestone PRDs and their saved View, then automatically ask clarification questions from those items and record confirmed answers.
 
 - `create-designs <Project> <Milestone>`
-  - Build three branded interactive proposals from the Design Overview and record the selected style only after confirmation.
+  - Build three runnable React Native proposals from the Design Overview and record the selected style only after confirmation.
 
 - `create-visuals <Project> <Milestone>`
-  - 延用 create-designs 階段選定的版本，完成並檢查其餘畫面與元件狀態，提供可操作的 HTML。完整設計經核准後建立 Design tickets。
+  - Extend the selected direction in React Native, verify the scoped screens and states, and create Design tickets after complete-set approval.
 
 - `create-issues-FE <Project> <Milestone>`
   - 建立或修訂前端開發 issues 與分類 View。
