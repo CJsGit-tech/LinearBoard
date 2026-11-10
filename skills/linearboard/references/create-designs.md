@@ -19,7 +19,7 @@ Use [interaction handoff](interaction-loading-motion.md) for the lifecycle and m
 
 ## Build and select three proposals
 
-Build exactly three runnable React Native proposals, A, B and C, for the same audience, task, sample content, starting state and review size. Make them selectable in the prototype's review menu. Apply these principles:
+Build exactly three runnable React Native proposals, A, B and C, for the same audience, task, sample content, starting state and review size. Make them selectable in the prototype's review menu. Use the [prototype checklist](prototype-coverage.md) to select comparable interaction and permission cases. Apply these principles:
 
 1. **Start with the visitor’s journey.** Read the Design Overview and Screen and Interaction Specification together. Identify the entry point, what the visitor needs to understand or compare, and the action and outcome the proposal must demonstrate. Use the missing-document rule above where applicable.
 2. **Give each proposal a distinct brand idea.** Choose a creative direction grounded in the audience and product. Carry it from entry through the main action using composition, imagery, typography, color and interaction within confirmed brand constraints. Explain one concrete tradeoff for each proposal.

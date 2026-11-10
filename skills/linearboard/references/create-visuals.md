@@ -10,7 +10,7 @@ Read the selection recorded by create-designs in Design Overview and the matchin
 
 ## Step 2 — Remaining screens and component designs
 
-Begin with an explicit user style selection that covers this scope, including a valid recorded selection from an earlier draft. Cover every scoped screen and applicable component state, including opened dropdowns, filled forms, validation, loading and recovery.
+Begin with an explicit user style selection that covers this scope, including a valid recorded selection from an earlier draft. Use the [prototype checklist](prototype-coverage.md) to build and operate every applicable component, state, interaction and account permission case across the scoped screens.
 
 Use [LinearBoard’s design method](design-direction.md) to apply the user-selected visual direction to the specified tasks, components and content. Keep source/fixtures inside the isolated review bundle, separate from production. Use local/mock state; no live submissions, credentials or backend integration merely for screenshots.
 
