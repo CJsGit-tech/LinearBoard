@@ -1,38 +1,53 @@
 # Shared execution contract
 
-Use this for the task commands in [command routing](commands/index.md). Existing concept queries remain explanatory and do not create designs or edit files.
+Use this for the task commands in [command routing](commands/index.md). Concept queries stay explanatory: they create no designs and edit no files.
 
 ## Establish the task and evidence
 
-Identify the target, primary user task, requested outcome, platform, preserved behavior and allowed edit scope. Reuse project instructions, the brief, components/tokens and current decisions. Ask one consequential question only when missing context changes the correct action. Do not restart discovery for a small correction. An ambient browser tab is context, not authority to edit an unrelated project.
+Identify the target, primary user task, requested outcome, platform, preserved behavior and allowed edit scope. Reuse project instructions, the brief, components/tokens and current decisions. Ask one consequential question only when missing context changes the correct action. For a small correction, skip discovery. Edit only the project the request names; an open browser tab is context.
 
-Inspect relevant source and rendered state when visual or interaction claims require it. Distinguish observable facts, design judgments and hypotheses. A screenshot can support a visible symptom, not prove hidden behavior. Before editing, state short acceptance conditions tied to this request. Useful findings identify a location, an effect on the task and evidence for the likely cause.
+Inspect the relevant source and rendered state when a visual or interaction claim depends on it. Label each statement as an observed fact, a design judgment or a hypothesis. Use a screenshot as evidence of a visible symptom only. Before editing, state short acceptance conditions tied to this request. Write each finding as a location, its effect on the task, and the evidence for the likely cause.
 
 ## Decide and act within scope
 
-Default to the user's open composition: hierarchy through whitespace, alignment and type size/weight. A border, card, pill, fill or elevation needs a semantic or interaction purpose. Preserve discoverability, usable targets and focus/error/selection cues. Respect confirmed project-specific contracts and deliberate variants.
+Default to the user's open composition: hierarchy through whitespace, alignment and type size/weight. Give every border, card, pill, fill or elevation a semantic or interaction purpose. Keep controls discoverable, with usable targets and focus/error/selection cues. Respect confirmed project-specific contracts and deliberate variants.
 
-For a consequential choice, compare materially different approaches against the same task and constraints. A small correction does not need several variants or an extensive reasoning transcript; report concise reasons and relevant tradeoffs. Reuse the existing stack and the nearest suitable component. An external reference is not permission to migrate frameworks, add paid services or rebrand the product.
+For a consequential choice, compare materially different approaches against the same task and constraints. For a small correction, make it and report concise reasons and tradeoffs. Reuse the existing stack and the nearest suitable component. Keep the framework, services and brand as they are unless the user asks to change them.
 
-`diagnose` and `prove` inspect and report. `compare` creates isolated alternatives when requested, without adopting one into the main source until selection or explicit adoption authority. Other task commands perform the requested scoped improvement when implementation is authorized. `--review` makes them proposal-only: no target-source, project-brief, skill or configuration mutation. Save separate reports/candidate artifacts only when requested or clearly part of the authorized comparison.
+Effects by command:
 
-Prior authorization persists. Do not require a separate approval for already-authorized local work. A request for advice or a command plan does not authorize installation. Command chaining preserves the original scope. Global skill defaults or memories require their own explicit user request.
+| Command | Effect |
+| --- | --- |
+| `diagnose`, `prove` | Inspect and report. No source changes. |
+| `compare` | Create isolated alternatives when requested. Adopt one into the main source only after selection or explicit authority. |
+| All other task commands | Perform the requested scoped improvement when implementation is authorized. |
+| Any command with `--review` | Proposal only: no change to target source, project brief, skill or configuration. |
+
+Save separate reports or candidate artifacts only when requested or clearly part of an authorized comparison.
+
+Authorization given earlier in the conversation still holds; proceed with authorized local work without asking again. Advice or a command plan authorizes no installation. Chained commands keep the original scope. Change global skill defaults or memories only on an explicit request for that change.
 
 ## Use the appropriate platform
 
-- **Web:** inspect actual browser dimensions, content semantics, keyboard/pointer paths, focus, routing/history, hover alternatives and relevant reflow. Retain table/list relationships that support comparison. A narrow website remains Web unless its actual context establishes a different product mode.
-- **Mobile:** establish native iOS, native Android or mobile web. Preserve the task across relevant available height, keyboard, safe areas, orientation, touch, platform back/navigation and interruption. Reuse platform conventions. Verify current numerical/API requirements before prescribing them. CSS pixels, native points and dp are different units. Browser resizing is layout evidence, not proof of real keyboard, native or assistive-technology behavior.
+- **Web:** inspect actual browser dimensions, content semantics, keyboard/pointer paths, focus, routing/history, hover alternatives and reflow. Keep table/list relationships that support comparison. A narrow website stays Web unless its context establishes another product mode.
+- **Mobile:** establish native iOS, native Android or mobile web. Preserve the task across available height, keyboard, safe areas, orientation, touch, platform back/navigation and interruption. Reuse platform conventions. Verify current numerical/API requirements before prescribing them; CSS pixels, native points and dp are different units. Treat browser resizing as layout evidence and name real-keyboard, native and assistive-technology behavior as untested.
 
 ## Inspect the result and finish honestly
 
-For authorized edits, render the changed target and exercise the affected main task plus relevant failure/return/input conditions at the required sizes. Fix problems demonstrated by those observations. Use change-appropriate checks; do not create tests that only repeat the implementation or run broad checks repeatedly after the relevant checks pass without new concerns.
+For authorized edits, render the changed target and exercise the affected main task plus the relevant failure, return and input conditions at the required sizes. Fix the problems those observations show. Run checks matched to the change, once; rerun only when something new changes.
 
-Stop when the acceptance conditions are met and required checks pass. If repeated changes do not resolve a finding, reconsider the cause or identify the specific missing decision instead of adding effects. A tool returning “done,” a manifest, a clean console or a screenshot alone is not proof of overall usability, accessibility or native behavior.
+Stop when the acceptance conditions are met and the required checks pass. If repeated changes leave a finding unresolved, reconsider its cause or name the missing decision. Base a claim of usability, accessibility or native behavior on a check of that behavior; a tool's "done", a manifest, a clean console or a screenshot covers only what it shows.
 
-Deliver what changed and why, evidence for the affected task, and precise unverified boundaries. Label simulations and design predictions; do not invent performance, user-research or conversion results, or award an unexplained quality score. In review mode, deliver findings/proposals rather than quietly applying fixes.
+Deliver:
+
+1. What changed and why.
+2. Evidence for the affected task.
+3. What remains unverified, stated precisely.
+
+Label simulations and design predictions. Report performance, user-research and conversion results only when measured, and give quality as observations instead of a score. In review mode, deliver findings and proposals and apply nothing.
 
 ## Sources and continuity
 
-Load only the relevant [concept reference](concepts/index.md) and follow its cited book passages when needed. Historical examples do not establish current platform standards. Keep exact filenames/PDF locators in supporting rationale, outside product copy. These command procedures are design-pro synthesis; do not attribute them to books that did not supply the commands.
+Load only the relevant [concept reference](concepts/index.md) and follow its cited book passages when needed. Take current platform standards from current sources; the books are historical. Keep filenames and PDF locators in supporting rationale, outside product copy. These command procedures are design-pro's own.
 
-Save confirmed project decisions in its established documentation when authorized. Preserve the distinction between confirmed constraints, assumptions and unanswered questions. Do not claim cross-chat continuity without loading saved context.
+Save confirmed project decisions in the project's established documentation when authorized. Keep confirmed constraints, assumptions and unanswered questions separate. Claim cross-chat continuity only after loading saved context.

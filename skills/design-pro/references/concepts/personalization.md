@@ -1,23 +1,23 @@
 # Personalization and customization
 
-Personalization adapts an experience using signals; customization lets the person explicitly choose preferences. Select them for a useful task benefit, not a promise that the product “knows” someone. [X14, pp. 70–80](../books/X14.md#personalization-must-have-a-useful-correctable-purpose)
+Personalization adapts an experience from signals; customization lets the person choose preferences explicitly. Use either for a concrete task benefit. [X14, pp. 70–80](../books/X14.md#personalization-must-have-a-useful-correctable-purpose)
 
 ## DO
 
-- State what becomes easier: for example, a relevant suggestion or less repeated input.
-- Use only signals relevant to that benefit; distinguish explicit choices, observations and inferred preferences.
-- Make consequential suggestions understandable and correctable. Preserve a usable fallback when a guess is wrong.
-- Evaluate actual task outcomes and unwanted effects, rather than recommendation clicks alone. These safeguards are design-pro synthesis qualifying the source's emphasis on implicit adaptation. [X14, pp. 75–93](../books/X14.md)
+- State what becomes easier, such as a relevant suggestion or less repeated input.
+- Use only signals relevant to that benefit, and keep explicit choices, observations and inferred preferences distinct.
+- Make consequential suggestions understandable and correctable, with a usable fallback when a guess is wrong.
+- Evaluate task outcomes and unwanted effects as well as recommendation clicks *(synthesis; qualifies [X14, pp. 75–93](../books/X14.md))*.
 
 ## DON'T
 
-- Do not treat purchases, browsing, age, gender or job title as certain evidence of motives.
-- Do not collect every available signal or interpret continued use as consent to unrelated assumptions.
-- Do not claim simulated chat replies learn personal preferences, or require a recommendation engine for a simple local demo.
-- Do not assume explicit customization is inferior to passive “magic.” [X14, pp. 72–87](../books/X14.md)
+- Do not read purchases, browsing, age, gender or job title as certain evidence of motive.
+- Do not collect every available signal, or take continued use as consent to unrelated assumptions.
+- Do not say simulated chat replies learn preferences, or add a recommendation engine to a simple local demo.
+- Do not rank explicit customization below passive "magic". [X14, pp. 72–87](../books/X14.md)
 
 ## Guidelines and example
 
-First ask whether adaptation improves the user's task enough to justify complexity and data use. Explain a recommendation's basis when useful; permit correction rather than silently locking someone into a segment. The source's Netflix example illustrates explanation, but its historical percentages do not predict your outcome. [X14, pp. 87–93](../books/X14.md)
+First ask whether adaptation improves the task enough to justify its complexity and data use. Explain a recommendation's basis where useful and let people correct it. [X14, pp. 87–93](../books/X14.md)
 
-For a chatbot, “Short replies” can be an explicit preference that predictably changes presentation. Do not infer sensitive traits from a conversation to supply that control. If it is only a local prototype, identify where the preference is stored and what behavior is simulated in companion documentation. Native permission rules, current privacy law and production model behavior need separate applicable evidence; this concept is not a compliance assessment.
+For a chatbot, "Short replies" can be an explicit preference with a predictable effect; offer it as a control instead of inferring it. In a local prototype, document where the preference is stored and what is simulated. Check native permission rules, current privacy law and production model behavior against their own current sources.

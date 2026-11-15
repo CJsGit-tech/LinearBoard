@@ -2,6 +2,8 @@
 
 Select the closest concept below and read only that file. For additional depth, follow its source notes. A filename match alone is not evidence; use the cited passage and its limits.
 
+In the concept files, a rule marked *(synthesis)* is design-pro's own; a citation beside the mark is the passage it builds on or corrects. An unmarked rule comes from the citation on its line, or from the citation under its section heading.
+
 | Concepts and synonyms | Reference |
 | --- | --- |
 | art direction, creativity, design sense, taste, distinctive design, visual concept, concept development, visual tension, motif, expressive shape, creative critique, 創意, 品味, 藝術指導, 視覺主題, 構圖張力, 造型語言, 千篇一律 | [creative-design.md](creative-design.md); supporting [reading notes](../creative-sources.md) |
