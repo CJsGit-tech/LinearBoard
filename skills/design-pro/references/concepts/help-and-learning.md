@@ -1,31 +1,31 @@
 # Help, terminology and learning
 
-Help belongs to the user's job: it must be findable, recognizable and usable at the point of uncertainty. A brief contextual answer and a detailed reference can serve different needs. These guidelines apply to Mobile and Web; the form depends on available space, input and the user's prior knowledge. [U06, PDF pp. 135–147](../books/U06.md#help-must-be-findable-and-useful-within-the-job)
+Help belongs to the user's job: findable, recognizable and usable at the point of uncertainty. Offer a brief contextual answer and a detailed reference for their different needs. The form depends on space, input and the user's prior knowledge, in both modes. [U06, PDF pp. 135–147](../books/U06.md#help-must-be-findable-and-useful-within-the-job)
 
 ## DO
 
-- Write task instructions around the outcome, necessary steps and feedback that tells someone they are on track.
-- Separate a concise answer from optional command/technical depth when different audiences need them.
-- Include familiar alternate terms and related concepts in help/concept lookup. Confirm the intended operation when a term could refer to different behavior.
-- Keep the task context available or provide an understandable return path when opening help.
-- Preserve relevant issue context across support handoffs so the person need not start the explanation again.
+*(synthesis from [U06, PDF pp. 137–145, 150–152](../books/U06.md#help-must-be-findable-and-useful-within-the-job))*
 
-These are design-pro applications of the task manual, synonym index and support examples. [U06, PDF pp. 137–145, 150–152](../books/U06.md#help-must-be-findable-and-useful-within-the-job)
+- Write task instructions around the outcome, the necessary steps and the feedback that shows someone is on track.
+- Separate the concise answer from optional command or technical depth.
+- Include familiar alternate terms in help and concept lookup, and confirm the intended operation when a term is ambiguous.
+- Keep the task context visible, or give a clear return path, when help opens.
+- Carry issue context across support handoffs.
 
 ## DON'T
 
-- Do not hide necessary controls/recovery behind a tutorial or make a manual compensate for avoidable interaction failures.
-- Do not enforce historical “one line of online help” limits or assume a current digital reference cannot be browsed/searched.
-- Do not equate similar terms with identical semantics: Copy, Move and Paste can have different effects.
-- Do not require a full onboarding course for a narrow question, or invent prior expertise and learning outcomes.
-- Do not collect diagnostic/account information merely because another support flow asks for it.
+[U06, PDF pp. 136, 141–152](../books/U06.md#help-must-be-findable-and-useful-within-the-job); [X14, PDF pp. 148–154](../books/X14.md#empowerment-recovery-and-onboarding)
 
-Source qualifications: [U06, PDF pp. 136, 141–152](../books/U06.md#help-must-be-findable-and-useful-within-the-job); targeted onboarding and controls remain distinct in [X14, PDF pp. 148–154](../books/X14.md#empowerment-recovery-and-onboarding).
+- Do not put necessary controls or recovery behind a tutorial, or use a manual to cover an avoidable interaction failure.
+- Do not cap help at one line; size it to the gap.
+- Do not treat similar terms as identical: Copy, Move and Paste have different effects.
+- Do not require an onboarding course for a narrow question.
+- Do not collect diagnostic or account information the support task does not need.
 
 ## Guidelines and example
 
-Choose guidance depth by the actual gap: a forgotten shortcut may need one line; an unfamiliar multi-step procedure may need an example, prerequisites, steps and recovery. Active practice/feedback may help learning, but neither a tutorial completion count nor a simulated walkthrough demonstrates independent task success. The book's learning claims and survey percentages are historical reports, not measured effects for this product. [U06, PDF pp. 143–150](../books/U06.md#help-must-be-findable-and-useful-within-the-job)
+Size guidance to the gap: one line for a forgotten shortcut; an example, prerequisites, steps and recovery for an unfamiliar multi-step procedure. Measure learning by independent task success. [U06, PDF pp. 143–150](../books/U06.md#help-must-be-findable-and-useful-within-the-job)
 
-For a chatbot demo, a visible retry action and understandable failure message should let a person recover directly. Optional help can explain what retry sends and which draft/history remains; it should not be the only place that reveals a failed send. For the game page, release/platform information belongs in the main page rather than exclusively in an FAQ. These are proposed applications, not observed user findings.
+In a chatbot demo, a visible retry action and a clear failure message let a person recover directly; optional help can explain what retry sends and what draft/history remains. On the game page, release and platform information sits on the main page as well as any FAQ *(synthesis)*.
 
-For `design-pro query`, terms such as padding/gap/whitespace can route toward spacing. A request for a native touch target must retain the platform distinction rather than silently reusing Web CSS measurements. No terminal command is implied by this conversational lookup.
+For `design-pro query`, terms such as padding, gap and whitespace route to spacing. A native touch-target request keeps its platform distinction. This lookup is conversational; no terminal command is involved.
